@@ -1,0 +1,9 @@
+
+*** ExtPlane ***
+
+X-Plane plugin that allows commanding X-Plane from external programs using TCP protocol.
+
+GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
+
+Still WIP, documentation to be added..
+
