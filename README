@@ -22,9 +22,9 @@ copy libextplane-plugin.so.1.0.0 to X-Plane/Resources/plugins/extplane.xpl
 Launch X-Plane in console and observe the output. You should see something like:
 TcpServer::TcpServer(QObject*, DataRefProvider*) Listening on port 51000
 
-In a different window, run 'telnet localhost 51000'
+Run in a different window 'telnet localhost 51000'
 
-Type 'sub sim/flightmodel/position/groundspeed 1'
+When connected, type 'sub sim/flightmodel/position/groundspeed 1'
 
 You should now start seeing groundspeed updates. The last variable is accuracy - GS is updated
 only if it changes 1 knots or more.
