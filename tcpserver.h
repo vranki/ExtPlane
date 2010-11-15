@@ -16,7 +16,7 @@ public:
    ~TcpServer();
 public slots:
      void clientConnected();
-     void clientDiscoed(QObject *obj);
+     void clientDiscoed(TcpClient *client);
 private:
     QTcpServer server;
     QList<TcpClient *> clientConnections;

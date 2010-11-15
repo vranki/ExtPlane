@@ -1,7 +1,6 @@
 #include "tcpserver.h"
 
-TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent), server(this), _refProvider(refProvider)
-{
+TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent), server(this), _refProvider(refProvider) {
     if(!server.listen(QHostAddress::Any, 51000)) {
         qDebug() << Q_FUNC_INFO << "Unable to listen";
         return;
@@ -12,21 +11,23 @@ TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(pa
 
 TcpServer::~TcpServer() {
     qDebug() << Q_FUNC_INFO;
+
     while (!clientConnections.isEmpty()) {
-       delete clientConnections.takeLast();
+        TcpClient *client = clientConnections.takeLast();
+        client->disconnect(this);
+        delete client;
     }
 }
 
 void TcpServer::clientConnected() {
     TcpClient *client = new TcpClient(this, server.nextPendingConnection(), _refProvider);
-    connect(client, SIGNAL(destroyed(QObject*)), this, SLOT(clientDiscoed(QObject*)));
-//    connect(client, SIGNAL(subscribeRef(QString)), this, SIGNAL(subscribeRef(QString)));
-//    connect(client, SIGNAL(unsubscribeRef(QString)), this, SLOT(checkIfRefCanBeUnsubscribed(QString)));
+    connect(client, SIGNAL(discoed(TcpClient *)), this, SLOT(clientDiscoed(TcpClient *)));
+    //    connect(client, SIGNAL(subscribeRef(QString)), this, SIGNAL(subscribeRef(QString)));
+    //    connect(client, SIGNAL(unsubscribeRef(QString)), this, SLOT(checkIfRefCanBeUnsubscribed(QString)));
     clientConnections.append(client);
 }
 
-void TcpServer::clientDiscoed(QObject *obj) {
-    TcpClient *client = qobject_cast<TcpClient*> (obj);
+void TcpServer::clientDiscoed(TcpClient *client) {
     qDebug() << Q_FUNC_INFO << client;
     clientConnections.removeOne(client);
 }

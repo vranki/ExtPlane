@@ -24,6 +24,7 @@ TcpClient::~TcpClient() {
         ref->disconnect(this);
         _refProvider->unsubscribeRef(ref);
     }
+    emit discoed(this);
 }
 
 void TcpClient::readClient() {

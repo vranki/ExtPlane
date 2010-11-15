@@ -17,6 +17,8 @@ public:
 public slots:
     void readClient();
     void refChanged(DataRef *ref);
+signals:
+    void discoed(TcpClient *client);
 private:
     DataRef *getSubscribedRef(QString name);
     QTcpSocket *_socket;

@@ -63,8 +63,6 @@ void XPlanePlugin::unsubscribeRef(DataRef *ref) {
 
 void XPlanePlugin::pluginStop() {
     qDebug() << Q_FUNC_INFO;
-    qDeleteAll(refs);
-    refs.clear();
     app->processEvents();
     delete server;
     server = 0;
@@ -72,4 +70,6 @@ void XPlanePlugin::pluginStop() {
     app->processEvents();
     delete app;
     app = 0;
+    qDeleteAll(refs);
+    refs.clear();
 }
