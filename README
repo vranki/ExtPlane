@@ -1,9 +1,44 @@
 
-*** ExtPlane ***
+                        *** ExtPlane ***
 
 X-Plane plugin that allows commanding X-Plane from external programs using TCP protocol.
 
 GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
 
-Still WIP, documentation to be added..
+The plugin is usable but still work in progress. Documentation to be added..
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ * To build (tested only on Linux): *
+Copy X-Plane SDK to home directory, so that the headers can be found
+at ~/SDK/CHeaders/XPLM (or edit the .pro file). You'll need
+Qt development libraries installed.
+
+qmake extplane-plugin.pro
+make
+copy libextplane-plugin.so.1.0.0 to X-Plane/Resources/plugins/extplane.xpl
+
+ * To test: *
+Launch X-Plane in console and observe the output. You should see something like:
+TcpServer::TcpServer(QObject*, DataRefProvider*) Listening on port 51000
+
+In a different window, run 'telnet localhost 51000'
+
+Type 'sub sim/flightmodel/position/groundspeed 1'
+
+You should now start seeing groundspeed updates. The last variable is accuracy - GS is updated
+only if it changes 1 knots or more.
+
+ * Command reference *
+sub <dataref> [accuracy]   - Subscribe to dataref, with optional accuracy
+unsub <dataref>            - Unsubscribe dataref
+disconnect                 - Disconnect
+
+ * Plugin output *
+ uf <dataref> <value>      - Update of float dataref
+
+Only float datarefs are supported for now.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Comments and bug reports to ville.ranki@iki.fi.
+Official git repo is at  https://github.com/vranki/ExtPlane

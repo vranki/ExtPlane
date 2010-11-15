@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2010-11-13T18:03:33
-#
-#-------------------------------------------------
-
 QT       += core network
 QT       -= gui
 
@@ -21,11 +15,10 @@ SOURCES += main.cpp \
     tcpclient.cpp \
     datarefprovider.cpp
 
-INCLUDEPATH += /home/cosmo/SDK/CHeaders/XPLM
+INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
 
 QMAKE_CXXFLAGS_DEBUG  += -D LIN=1 -D XPLM200=1  -fPIC -shared -rdynamic -nodefaultlibs
 QMAKE_CXXFLAGS_RELEASE  += -D LIN=1 -D XPLM200=1  -fPIC -shared -rdynamic -nodefaultlibs
-#  -fvisibility=hidden
 QMAKE_LFLAGS += -shared
 
 HEADERS += \
@@ -34,3 +27,5 @@ HEADERS += \
     tcpserver.h \
     tcpclient.h \
     datarefprovider.h
+
+OTHER_FILES += README
