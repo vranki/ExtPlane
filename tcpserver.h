@@ -8,6 +8,10 @@
 #include "dataref.h"
 #include "tcpclient.h"
 #include "datarefprovider.h"
+/**
+  * Creates the TCP socket and manages client connections
+  */
+#define EXTPLANE_PORT 51000
 
 class TcpServer : public QObject {
     Q_OBJECT

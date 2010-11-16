@@ -13,7 +13,10 @@ SOURCES += main.cpp \
     dataref.cpp \
     tcpserver.cpp \
     tcpclient.cpp \
-    datarefprovider.cpp
+    datarefprovider.cpp \
+    floatdataref.cpp \
+    intdataref.cpp \
+    doubledataref.cpp
 
 INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
 
@@ -26,6 +29,9 @@ HEADERS += \
     dataref.h \
     tcpserver.h \
     tcpclient.h \
-    datarefprovider.h
+    datarefprovider.h \
+    floatdataref.h \
+    intdataref.h \
+    doubledataref.h
 
 OTHER_FILES += README

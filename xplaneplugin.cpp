@@ -9,15 +9,14 @@ XPlanePlugin::~XPlanePlugin() {
 
 float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop,
                                int inCounter, void *inRefcon) {
-    foreach(DataRef *ref, refs) {
-        ref->setValue(XPLMGetDataf(ref->ref()));
-    }
+    foreach(DataRef *ref, refs)
+        ref->updateValue();
     app->processEvents();
     return 0.016;
 }
 
 int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << "ExtPlane plugin started";
     app = new QCoreApplication(argc, &argv);
     server = new TcpServer(this, this);
     strcpy(outName, "ExtPlane");
@@ -39,15 +38,28 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
 
     XPLMDataRef ref = XPLMFindDataRef(name.toAscii());
     if(ref) {
-        DataRef *dr = new DataRef(this, name, ref);
-        dr->setSubscribers(1);
-        qDebug() << Q_FUNC_INFO << "Subscribed to ref " << dr->name();
-        refs.append(dr);
-        return dr;
+        XPLMDataTypeID refType = XPLMGetDataRefTypes(ref);
+        DataRef *dr = 0;
+        if(refType & xplmType_Double) {
+            dr = new DoubleDataRef(this, name, ref);
+        } else if(refType & xplmType_Float) {
+            dr = new FloatDataRef(this, name, ref);
+        } else if(refType & xplmType_Int) {
+            dr = new IntDataRef(this, name, ref);
+        }
+        if(dr) {
+            dr->setSubscribers(1);
+            dr->setCanWrite(XPLMCanWriteDataRef(ref) != 0);
+            qDebug() << Q_FUNC_INFO << "Subscribed to ref " << dr->name() << ", type: " << dr->typeString() << ", writable:" << dr->isWritable();
+            refs.append(dr);
+            return dr;
+        } else {
+            qDebug() << Q_FUNC_INFO << "Dataref type " << refType << "not supported";
+        }
     } else {
         qDebug() << Q_FUNC_INFO << "Can't find dataref " << name;
-        return 0;
     }
+    return 0;
 }
 
 void XPlanePlugin::unsubscribeRef(DataRef *ref) {

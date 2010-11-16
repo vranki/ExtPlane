@@ -1,44 +1,65 @@
 
+
                         *** ExtPlane ***
+
 
 X-Plane plugin that allows commanding X-Plane from external programs using TCP protocol.
 
 GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
 
-The plugin is usable but still work in progress. Documentation to be added..
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * To build (tested only on Linux): *
+
 Copy X-Plane SDK to home directory, so that the headers can be found
-at ~/SDK/CHeaders/XPLM (or edit the .pro file). You'll need
-Qt development libraries installed.
+at ~/SDK/CHeaders/XPLM (or edit the .pro file). You'll need Qt development
+libraries installed.
 
 qmake extplane-plugin.pro
 make
 copy libextplane-plugin.so.1.0.0 to X-Plane/Resources/plugins/extplane.xpl
 
  * To test: *
+
 Launch X-Plane in console and observe the output. You should see something like:
 TcpServer::TcpServer(QObject*, DataRefProvider*) Listening on port 51000
 
-Run in a different window 'telnet localhost 51000'
+Open another console and run 'telnet localhost 51000'
 
-When connected, type 'sub sim/flightmodel/position/groundspeed 1'
+When connected, try typing the following commands:
 
-You should now start seeing groundspeed updates. The last variable is accuracy - GS is updated
-only if it changes 1 knots or more.
+sub sim/cockpit/electrical/night_vision_on
+set sim/cockpit/electrical/night_vision_on 1
+set sim/cockpit/electrical/night_vision_on 0
+sub sim/flightmodel/position/local_y 100
+set sim/flightmodel/position/local_y 3000
+disconnect
 
  * Command reference *
+
 sub <dataref> [accuracy]   - Subscribe to dataref, with optional accuracy
 unsub <dataref>            - Unsubscribe dataref
+set <dataref> <value>      - Set dataref to value. Dataref must be subscribed first.
 disconnect                 - Disconnect
 
- * Plugin output *
- uf <dataref> <value>      - Update of float dataref
+With accuracy you can decide how much the dataref's value can
+change before the update is sent. Set it to as large value as possible
+to maximize frame rate.
 
-Only float datarefs are supported for now.
+ * Plugin output *
+
+EXTPLANE <version>             - Sent when connected. Version number is currently 1.
+u<type> <dataref> <value>      - Update of dataref
+
+ExtPlane plugin outputs some log to stdout, so if you have problems with the
+plugin, start X-Plane in console and read the output.
+
+ * Features *
+
+ - Multiple concurrent connections
+ - Set and get datarefs
+ - Dataref types: int, float and double
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Comments and bug reports to ville.ranki@iki.fi.
-Official git repo is at  https://github.com/vranki/ExtPlane
+Comments and bug reports to ville.ranki@iki.fi
+Official git repo at https://github.com/vranki/ExtPlane

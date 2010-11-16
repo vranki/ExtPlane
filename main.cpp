@@ -4,7 +4,6 @@
 #include "xplaneplugin.h"
 
 XPlanePlugin *globalPlugin=0;
-//int *globalPlugin = 0;
 
 PLUGIN_API __attribute__((visibility("default"))) float	MyFlightLoopCallback(
         float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop,
@@ -16,10 +15,7 @@ PLUGIN_API __attribute__((visibility("default"))) float	MyFlightLoopCallback(
 
 PLUGIN_API __attribute__((visibility("default"))) int XPluginStart(
         char * outName, char * outSig, char *outDesc) {
-    qDebug() <<  Q_FUNC_INFO ;
-    XPLMRegisterFlightLoopCallback(MyFlightLoopCallback, /* Callback */
-                                   0.01,					/* Interval */
-                                   NULL);					/* refcon not used. */
+    XPLMRegisterFlightLoopCallback(MyFlightLoopCallback, 0.01, NULL);
     globalPlugin = new XPlanePlugin();
     if(globalPlugin) {
         return globalPlugin->pluginStart(outName,outSig,outDesc);

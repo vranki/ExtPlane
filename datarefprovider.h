@@ -2,7 +2,9 @@
 #define DATAREFPROVIDER_H
 
 #include "dataref.h"
-
+/**
+  * Interface class for subscribing and unsubscribing datarefs
+  */
 class DataRefProvider {
 public:
     DataRefProvider();
