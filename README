@@ -12,8 +12,8 @@ GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
  * To build (tested only on Linux): *
 
 Copy X-Plane SDK to home directory, so that the headers can be found
-at ~/SDK/CHeaders/XPLM (or edit the .pro file). You'll need Qt development
-libraries installed.
+at ~/SDK/CHeaders/XPLM (or edit the .pro file).
+You'll need Qt development libraries installed.
 
 qmake extplane-plugin.pro
 make
