@@ -11,7 +11,7 @@ float FloatDataRef::value() {
 }
 
 void FloatDataRef::updateValue() {
-   float newValue = XPLMGetDataf(ref());
+   float newValue = XPLMGetDataf(_ref);
     if(_value != newValue) {
         _value = newValue;
         emit changed(this);

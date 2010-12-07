@@ -1,7 +1,7 @@
 #include "tcpclient.h"
 
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
-    QObject(parent), _socket(socket), _refProvider(refProvider)
+        QObject(parent), _socket(socket), _refProvider(refProvider)
 {
     qDebug() << Q_FUNC_INFO << " client connected ";
     connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
@@ -28,67 +28,69 @@ TcpClient::~TcpClient() {
 }
 
 void TcpClient::readClient() {
-    QTextStream stream(_socket);
-    QString line = stream.readLine();
-    if(line.isNull()) return;
-    qDebug() << Q_FUNC_INFO << "Client says: " << line;
-    QStringList subLine = line.split(" ", QString::SkipEmptyParts);
-    QString command = subLine.value(0);
-    if(command == "disconnect") {
-        deleteLater();
-    } else if(command == "sub") {
-        if(subLine.length() >= 2) {
-            QString refName = subLine[1].trimmed();
+    while(_socket->canReadLine()) {
+        QByteArray lineBA = _socket->readLine();
 
-            double accuracy = 0;
-            if(subLine.length() >=3)
-                accuracy = subLine[2].toDouble();
+        QString line = QString(lineBA);
+        qDebug() << Q_FUNC_INFO << "Client says: " << line;
+        QStringList subLine = line.split(" ", QString::SkipEmptyParts);
+        QString command = subLine.value(0);
+        if(command == "disconnect") {
+            deleteLater();
+        } else if(command == "sub") {
+            if(subLine.length() >= 2) {
+                QString refName = subLine[1].trimmed();
 
-            DataRef *ref = getSubscribedRef(refName);
-            if(!ref) {
-                ref = _refProvider->subscribeRef(refName);
-                if(ref) {
-                    connect(ref, SIGNAL(changed(DataRef*)), this, SLOT(refChanged(DataRef*)));
-                    _subscribedRefs.insert(ref);
-                    _refAccuracy[ref] = accuracy;
-                    if(ref->type() == xplmType_Float) {
-                        _refValueF[ref] = qobject_cast<FloatDataRef*>(ref)->value();
-                    } else if(ref->type() == xplmType_Int) {
-                        _refValueI[ref] = qobject_cast<IntDataRef*>(ref)->value();
-                    } else if(ref->type() == xplmType_Double) {
-                        _refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
+                double accuracy = 0;
+                if(subLine.length() >=3)
+                    accuracy = subLine[2].toDouble();
+
+                DataRef *ref = getSubscribedRef(refName);
+                if(!ref) {
+                    ref = _refProvider->subscribeRef(refName);
+                    if(ref) {
+                        connect(ref, SIGNAL(changed(DataRef*)), this, SLOT(refChanged(DataRef*)));
+                        _subscribedRefs.insert(ref);
+                        _refAccuracy[ref] = accuracy;
+                        if(ref->type() == xplmType_Float) {
+                            _refValueF[ref] = qobject_cast<FloatDataRef*>(ref)->value();
+                        } else if(ref->type() == xplmType_Int) {
+                            _refValueI[ref] = qobject_cast<IntDataRef*>(ref)->value();
+                        } else if(ref->type() == xplmType_Double) {
+                            _refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
+                        }
+                        qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy;
+                    } else {
+                        qDebug() << Q_FUNC_INFO << "Ref not found" << refName;
                     }
-                    qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy;
                 } else {
-                    qDebug() << Q_FUNC_INFO << "Ref not found" << refName;
+                    qDebug() << Q_FUNC_INFO << "Updating " << refName << " accuracy to " << accuracy;
+                    _refAccuracy[ref] = accuracy;
                 }
             } else {
-                qDebug() << Q_FUNC_INFO << "Updating " << refName << " accuracy to " << accuracy;
-                _refAccuracy[ref] = accuracy;
+                qDebug() << Q_FUNC_INFO << "Invalid sub command";
             }
-        } else {
-            qDebug() << Q_FUNC_INFO << "Invalid sub command";
-        }
-    } else if(command == "unsub") {
-        QString refName = subLine.value(1);
-        DataRef *ref = getSubscribedRef(refName);
-        if(ref) {
-            ref->disconnect(this);
-            _refProvider->unsubscribeRef(ref);
-            _subscribedRefs.remove(ref);
-            _refAccuracy.remove(ref);
-            _refValueF.remove(ref);
-        }
-    } else if(command == "set") {
-        if(subLine.size() == 3) {
+        } else if(command == "unsub") {
             QString refName = subLine.value(1);
-            QString refValue = subLine.value(2);
             DataRef *ref = getSubscribedRef(refName);
             if(ref) {
-                ref->setValue(refValue);
+                ref->disconnect(this);
+                _refProvider->unsubscribeRef(ref);
+                _subscribedRefs.remove(ref);
+                _refAccuracy.remove(ref);
+                _refValueF.remove(ref);
             }
-        } else {
-            qDebug() << Q_FUNC_INFO << "Invalid set command";
+        } else if(command == "set") {
+            if(subLine.size() == 3) {
+                QString refName = subLine.value(1);
+                QString refValue = subLine.value(2);
+                DataRef *ref = getSubscribedRef(refName);
+                if(ref) {
+                    ref->setValue(refValue);
+                }
+            } else {
+                qDebug() << Q_FUNC_INFO << "Invalid set command";
+            }
         }
     }
 }
@@ -111,16 +113,19 @@ void TcpClient::refChanged(DataRef *ref) {
             return; // Hasn't changed enough
         _refValueD[ref] = refD->value();
     } else {
-         qDebug( ) << Q_FUNC_INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
-         return;
-     }
+        qDebug( ) << Q_FUNC_INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
+        return;
+    }
     QByteArray block;
     QTextStream out(&block, QIODevice::WriteOnly);
     out << "u" << ref->typeString() << " " << ref->name() << " " << ref->valueString() << "\n";
     out.flush();
 
-    if(_socket->isOpen())
+    if(_socket->isOpen()) {
         _socket->write(block);
+        _socket->flush();
+        qDebug() << Q_FUNC_INFO << ref->name() << ref->valueString();
+    }
 }
 
 QSet<QString> TcpClient::listRefs() {

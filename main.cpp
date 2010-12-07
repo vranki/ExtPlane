@@ -16,6 +16,7 @@ PLUGIN_API __attribute__((visibility("default"))) float	MyFlightLoopCallback(
 PLUGIN_API __attribute__((visibility("default"))) int XPluginStart(
         char * outName, char * outSig, char *outDesc) {
     XPLMRegisterFlightLoopCallback(MyFlightLoopCallback, 0.01, NULL);
+    Q_ASSERT(!globalPlugin);
     globalPlugin = new XPlanePlugin();
     if(globalPlugin) {
         return globalPlugin->pluginStart(outName,outSig,outDesc);

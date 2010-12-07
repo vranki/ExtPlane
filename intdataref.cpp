@@ -11,7 +11,7 @@ int IntDataRef::value() {
 }
 
 void IntDataRef::updateValue() {
-   int newValue = XPLMGetDatai(ref());
+   int newValue = XPLMGetDatai(_ref);
     if(_value != newValue) {
         _value = newValue;
         emit changed(this);

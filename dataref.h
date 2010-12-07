@@ -29,9 +29,9 @@ signals:
 protected:
     QString _typeString;
     XPLMDataTypeID _type;
+    XPLMDataRef _ref;
 private:
     QString _name;
-    XPLMDataRef _ref;
     int _subscribers;
     bool _writable;
 };

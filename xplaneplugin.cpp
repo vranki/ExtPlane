@@ -12,7 +12,7 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTime
     foreach(DataRef *ref, refs)
         ref->updateValue();
     app->processEvents();
-    return 0.016;
+    return 0.016; // 60hz
 }
 
 int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
