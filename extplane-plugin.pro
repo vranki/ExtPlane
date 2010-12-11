@@ -1,12 +1,33 @@
 QT       += core network
 QT       -= gui
 
-TARGET = extplane-plugin
-CONFIG   += console
+CONFIG   += console warn_on release shared
 CONFIG   -= app_bundle
 
 TEMPLATE = lib
 
+TARGET = extplane-plugin
+
+QMAKE_CXXFLAGS_DEBUG += -DXPLM200=1 -fPIC
+QMAKE_CXXFLAGS_RELEASE += -XPLM200=1 -fPIC
+QMAKE_LFLAGS += -shared -static-libgcc -fPIC
+
+unix:!macx {
+     DEFINES += APL=0 IBM=0 LIN=1
+     QMAKE_CFLAGS += -fstack-protector
+     QMAKE_CXXFLAGS += -fstack-protector #-rdynamic -nodefaultlibs
+     QMAKE_LFLAGS += -shared
+}
+
+macx {
+     DEFINES += APL=1 IBM=0 LIN=0
+     QMAKE_LFLAGS += -flat_namespace -undefined warning -dynamiclib #-Wl,-Bsymbolic
+     # Build for multiple architectures.
+     # The following line is only needed to build universal on PPC architectures.
+     # QMAKE_MAC_SDK=/Devloper/SDKs/MacOSX10.4u.sdk
+     # This line defines for wich architectures we build.
+     CONFIG += x86 ppc
+}
 
 SOURCES += main.cpp \
     xplaneplugin.cpp \
@@ -20,9 +41,6 @@ SOURCES += main.cpp \
 
 INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
 
-QMAKE_CXXFLAGS_DEBUG  += -D LIN=1 -D XPLM200=1  -fPIC -shared -rdynamic -nodefaultlibs
-QMAKE_CXXFLAGS_RELEASE  += -D LIN=1 -D XPLM200=1  -fPIC -shared -rdynamic -nodefaultlibs
-QMAKE_LFLAGS += -shared
 
 HEADERS += \
     xplaneplugin.h \
@@ -35,3 +53,4 @@ HEADERS += \
     doubledataref.h
 
 OTHER_FILES += README
+
