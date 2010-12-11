@@ -9,15 +9,29 @@ GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * To build (tested only on Linux): *
+* Common build requirements *
 
 Copy X-Plane SDK to home directory, so that the headers can be found
 at ~/SDK/CHeaders/XPLM (or edit the .pro file).
 You'll need Qt development libraries installed.
 
-qmake extplane-plugin.pro
-make
+* To build on Linux *
+
+$ qmake
+$ make
 copy libextplane-plugin.so.1.0.0 to X-Plane/Resources/plugins/extplane.xpl
+
+* To build on Mac *
+
+$ qmake
+$ make
+copy libextplane-plugin.1.0.0.dylib to X-Plane/Resources/plugins/extplane.xpl
+
+Warning! If you see any error or warning like :
+   ld: in /opt/local/lib/libxslt.1.dylib, file was built for unsupported file format which is not the architecture being linked (i386)
+
+You need to rebuild libxslt with the +universal variant on MacPort otherwise the plugin cannot be loaded by X-Plane !
+You should get the same for qt4-mac also.
 
  * To test: *
 
