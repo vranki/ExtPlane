@@ -21,7 +21,7 @@ unix:!macx {
 
 macx {
      DEFINES += APL=1 IBM=0 LIN=0
-     QMAKE_LFLAGS += -flat_namespace -undefined warning -dynamiclib #-Wl,-Bsymbolic
+     QMAKE_LFLAGS += -flat_namespace -undefined warning -dynamiclib
      # Build for multiple architectures.
      # The following line is only needed to build universal on PPC architectures.
      # QMAKE_MAC_SDK=/Devloper/SDKs/MacOSX10.4u.sdk
