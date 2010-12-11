@@ -9,7 +9,7 @@ TEMPLATE = lib
 TARGET = extplane-plugin
 
 QMAKE_CXXFLAGS_DEBUG += -DXPLM200=1 -fPIC
-QMAKE_CXXFLAGS_RELEASE += -XPLM200=1 -fPIC
+QMAKE_CXXFLAGS_RELEASE += -DXPLM200=1 -fPIC
 QMAKE_LFLAGS += -shared -static-libgcc -fPIC
 
 unix:!macx {

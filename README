@@ -5,6 +5,9 @@
 
 X-Plane plugin that allows commanding X-Plane from external programs using TCP protocol.
 
+Used by:
+ExtPlane-Panel - a panel application https://github.com/vranki/ExtPlane-Panel
+
 GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,7 +36,7 @@ Warning! If you see any error or warning like :
 You need to rebuild libxslt with the +universal variant on MacPort otherwise the plugin cannot be loaded by X-Plane !
 You should get the same for qt4-mac also.
 
- * To test: *
+ * To test *
 
 Launch X-Plane in console and observe the output. You should see something like:
 TcpServer::TcpServer(QObject*, DataRefProvider*) Listening on port 51000
@@ -58,7 +61,7 @@ disconnect                 - Disconnect
 
 With accuracy you can decide how much the dataref's value can
 change before the update is sent. Set it to as large value as possible
-to maximize frame rate.
+to maximize frame rate and minimize network traffic.
 
  * Plugin output *
 
