@@ -73,6 +73,22 @@ void XPlanePlugin::unsubscribeRef(DataRef *ref) {
     }
 }
 
+void XPlanePlugin::keyStroke(int keyid) {
+    qDebug() << Q_FUNC_INFO << keyid;
+
+    XPLMCommandKeyStroke(keyid);
+}
+
+void XPlanePlugin::buttonPress(int buttonid) {
+    qDebug() << Q_FUNC_INFO << buttonid;
+    XPLMCommandButtonPress(buttonid);
+}
+
+void XPlanePlugin::buttonRelease(int buttonid) {
+    qDebug() << Q_FUNC_INFO << buttonid;
+    XPLMCommandButtonRelease(buttonid);
+}
+
 void XPlanePlugin::pluginStop() {
     qDebug() << Q_FUNC_INFO;
     app->processEvents();

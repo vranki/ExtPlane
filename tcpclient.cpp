@@ -24,6 +24,8 @@ TcpClient::~TcpClient() {
         ref->disconnect(this);
         _refProvider->unsubscribeRef(ref);
     }
+    foreach(int but, _heldButtons)
+        _refProvider->buttonRelease(but);
     emit discoed(this);
 }
 
@@ -36,6 +38,7 @@ void TcpClient::readClient() {
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
         QString command = subLine.value(0);
         if(command == "disconnect") {
+            qDebug() << Q_FUNC_INFO << "killing this client connection";
             deleteLater();
         } else if(command == "sub") {
             if(subLine.length() >= 2) {
@@ -90,6 +93,38 @@ void TcpClient::readClient() {
                 }
             } else {
                 qDebug() << Q_FUNC_INFO << "Invalid set command";
+            }
+        } else if(command == "key") {
+            if(subLine.size() == 2) {
+                bool ok;
+                int keyId = subLine.value(1).toInt(&ok);
+                if(ok)
+                    _refProvider->keyStroke(keyId);
+            } else {
+                qDebug() << Q_FUNC_INFO << "Invalid key command";
+            }
+        } else if(command == "but") {
+            if(subLine.size() == 2) {
+                bool ok;
+                int keyId = subLine.value(1).toInt(&ok);
+                if(ok) {
+                    _refProvider->buttonPress(keyId);
+                    _heldButtons.insert(keyId);
+                }
+            } else {
+                qDebug() << Q_FUNC_INFO << "Invalid but command";
+            }
+        } else if(command == "rel") {
+            if(subLine.size() == 2) {
+                bool ok;
+                int keyId = subLine.value(1).toInt(&ok);
+                if(ok && _heldButtons.contains(keyId)) {
+                    _refProvider->buttonRelease(keyId);
+                } else {
+                    qDebug() << Q_FUNC_INFO << "Invalid rel command, button not held";
+                }
+            } else {
+                qDebug() << Q_FUNC_INFO << "Invalid rel command";
             }
         }
     }

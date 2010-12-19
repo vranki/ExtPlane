@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QStringList>
 #include <QTcpSocket>
+#include <QString>
+#include <QSet>
 #include "dataref.h"
 #include "floatdataref.h"
 #include "intdataref.h"
@@ -32,7 +34,9 @@ private:
     QMap<DataRef*, double> _refValueD;
     QMap<DataRef*, float> _refValueF;
     QMap<DataRef*, int> _refValueI;
+    QSet<int> _heldButtons;
     DataRefProvider *_refProvider;
+
 };
 
 #endif // TCPCLIENT_H

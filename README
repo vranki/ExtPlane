@@ -5,8 +5,9 @@
 
 X-Plane plugin that allows commanding X-Plane from external programs using TCP protocol.
 
-Used by:
-ExtPlane-Panel - a panel application https://github.com/vranki/ExtPlane-Panel
+Known users:
+
+ExtPlane-Panel - a panel application @ https://github.com/vranki/ExtPlane-Panel
 
 GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
 
@@ -16,6 +17,7 @@ GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
 
 Copy X-Plane SDK to home directory, so that the headers can be found
 at ~/SDK/CHeaders/XPLM (or edit the .pro file).
+
 You'll need Qt development libraries installed.
 
 * To build on Linux *
@@ -50,18 +52,37 @@ set sim/cockpit/electrical/night_vision_on 1
 set sim/cockpit/electrical/night_vision_on 0
 sub sim/flightmodel/position/local_y 100
 set sim/flightmodel/position/local_y 3000
+key 0
+key 0
 disconnect
 
  * Command reference *
 
-sub <dataref> [accuracy]   - Subscribe to dataref, with optional accuracy
-unsub <dataref>            - Unsubscribe dataref
+Datarefs:
+sub <dataref> [accuracy]   - Subscribe to dataref, with optional accuracy.
+unsub <dataref>            - Unsubscribe dataref.
 set <dataref> <value>      - Set dataref to value. Dataref must be subscribed first.
-disconnect                 - Disconnect
 
 With accuracy you can decide how much the dataref's value can
-change before the update is sent. Set it to as large value as possible
+change before a update is sent. Set it to as large value as possible
 to maximize frame rate and minimize network traffic.
+
+List of datarefs can be found at:
+http://www.xsquawkbox.net/xpsdk/docs/DataRefs.txt
+
+Keys and buttons:
+key <key id>               - Create a command key press.
+but <button id>            - Press down an button.
+rel <button id>            - Release button pressed using "but" command.
+
+List of key and button id's can be found at:
+http://www.xsquawkbox.net/xpsdk/mediawiki/XPLMUtilities
+Note that the key and button id's are numbers, not names. X-Plane does not
+provide a way to lookup keys or buttons by name.
+
+Other:
+
+disconnect                 - Disconnect.
 
  * Plugin output *
 
@@ -76,6 +97,7 @@ plugin, start X-Plane in console and read the output.
  - Multiple concurrent connections
  - Set and get datarefs
  - Dataref types: int, float and double
+ - Simulate key and button presses
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Comments and bug reports to ville.ranki@iki.fi

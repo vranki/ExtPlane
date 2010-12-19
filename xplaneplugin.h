@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QtCore/QCoreApplication>
 #include "XPLMDataAccess.h"
+#include "XPLMUtilities.h"
 #include "floatdataref.h"
 #include "intdataref.h"
 #include "doubledataref.h"
@@ -26,6 +27,9 @@ public:
 public: // DataRefProvider
     virtual DataRef *subscribeRef(QString name);
     virtual void unsubscribeRef(DataRef *ref);
+    virtual void keyStroke(int keyid);
+    virtual void buttonPress(int buttonid);
+    virtual void buttonRelease(int buttonid);
 private:
     QList<DataRef*> refs;
     int argc; // Fake argc and argv for QCoreApplication
