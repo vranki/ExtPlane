@@ -3,10 +3,10 @@
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
         QObject(parent), _socket(socket), _refProvider(refProvider)
 {
-    qDebug() << Q_FUNC_INFO << " client connected ";
+    qDebug() << Q_FUNC_INFO << " client connected from " << socket->peerAddress();
     connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(_socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
-    connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(deleteLater()));
+    connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
 
     QByteArray block;
     QTextStream out(&block, QIODevice::WriteOnly);
@@ -27,6 +27,11 @@ TcpClient::~TcpClient() {
     foreach(int but, _heldButtons)
         _refProvider->buttonRelease(but);
     emit discoed(this);
+}
+
+void TcpClient::socketError(QAbstractSocket::SocketError err) {
+    qDebug() << Q_FUNC_INFO << _socket->errorString();
+    deleteLater();
 }
 
 void TcpClient::readClient() {
@@ -159,7 +164,6 @@ void TcpClient::refChanged(DataRef *ref) {
     if(_socket->isOpen()) {
         _socket->write(block);
         _socket->flush();
-        qDebug() << Q_FUNC_INFO << ref->name() << ref->valueString();
     }
 }
 

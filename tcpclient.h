@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include <QString>
 #include <QSet>
+#include <QHostAddress>
 #include "dataref.h"
 #include "floatdataref.h"
 #include "intdataref.h"
@@ -24,6 +25,7 @@ public:
 public slots:
     void readClient();
     void refChanged(DataRef *ref);
+    void socketError(QAbstractSocket::SocketError err);
 signals:
     void discoed(TcpClient *client);
 private:
