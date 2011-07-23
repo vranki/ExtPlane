@@ -46,6 +46,8 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
             dr = new FloatDataRef(this, name, ref);
         } else if(refType & xplmType_Int) {
             dr = new IntDataRef(this, name, ref);
+        } else if (refType & xplmType_FloatArray) {
+            dr = new FloatArrayDataRef(this, name, ref);
         }
         if(dr) {
             dr->setSubscribers(1);

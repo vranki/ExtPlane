@@ -66,6 +66,13 @@ void TcpClient::readClient() {
                             _refValueI[ref] = qobject_cast<IntDataRef*>(ref)->value();
                         } else if(ref->type() == xplmType_Double) {
                             _refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
+                        } else if(ref->type() == xplmType_FloatArray) {
+                            float *value = qobject_cast<FloatArrayDataRef*>(ref)->value();
+                            long length = (long) value[0];
+                            _refValueFA[ref] = (float *) calloc(length, sizeof(float));
+                            for (int i=0;i<length;i++){
+                                _refValueFA[ref][i]=value[i+1];
+                            }
                         }
                         qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy;
                     } else {
@@ -93,7 +100,7 @@ void TcpClient::readClient() {
                 QString refName = subLine.value(1);
                 QString refValue = subLine.value(2);
                 DataRef *ref = getSubscribedRef(refName);
-                if(ref) {
+                if (ref) {
                     ref->setValue(refValue);
                 }
             } else {
@@ -142,6 +149,23 @@ void TcpClient::refChanged(DataRef *ref) {
         if(qAbs(refF->value() - _refValueF[ref]) < _refAccuracy[ref])
             return; // Hasn't changed enough
         _refValueF[ref] = refF->value();
+    } else if(ref->type()== xplmType_FloatArray) {                          // BB needs thought...
+        FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
+        
+        bool bigenough = false;
+        float * value = refF->value();
+        long length = (long) value[0];
+        
+        for (int i=0; i<length;i++){
+            if (qAbs(value[i+1] - _refValueFA[ref][i]) > _refAccuracy[ref]) bigenough = true;
+        }
+        if (bigenough){
+            for (int i=0; i<length;i++){
+                _refValueFA[ref][i] = value[i+1];
+            }    
+        } else {
+            return;
+        }
     } else if(ref->type()== xplmType_Int) {
         IntDataRef *refI = qobject_cast<IntDataRef*>(ref);
         if(qAbs(refI->value() - _refValueI[ref]) < _refAccuracy[ref])

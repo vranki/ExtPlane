@@ -36,6 +36,7 @@ SOURCES += main.cpp \
     tcpclient.cpp \
     datarefprovider.cpp \
     floatdataref.cpp \
+    floatarraydataref.cpp \
     intdataref.cpp \
     doubledataref.cpp
 
@@ -49,6 +50,7 @@ HEADERS += \
     tcpclient.h \
     datarefprovider.h \
     floatdataref.h \
+    floatarraydataref.h \
     intdataref.h \
     doubledataref.h
 
