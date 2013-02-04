@@ -9,6 +9,7 @@
 #include <QHostAddress>
 #include "dataref.h"
 #include "floatdataref.h"
+#include "floatarraydataref.h"
 #include "intdataref.h"
 #include "datarefprovider.h"
 #include "doubledataref.h"
@@ -35,6 +36,7 @@ private:
     QMap<DataRef*, double> _refAccuracy;
     QMap<DataRef*, double> _refValueD;
     QMap<DataRef*, float> _refValueF;
+    QMap<DataRef*, float *> _refValueFA;
     QMap<DataRef*, int> _refValueI;
     QSet<int> _heldButtons;
     DataRefProvider *_refProvider;
