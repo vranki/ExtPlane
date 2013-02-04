@@ -40,12 +40,13 @@ void TcpClient::readClient() {
 
         QString line = QString(lineBA);
         qDebug() << Q_FUNC_INFO << "Client says: " << line;
+        // Split the command in strings
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
         QString command = subLine.value(0);
         if(command == "disconnect") {
             qDebug() << Q_FUNC_INFO << "killing this client connection";
             deleteLater();
-        } else if(command == "sub") {
+        } else if(command == "sub") { // Subscribe command
             if(subLine.length() >= 2) {
                 QString refName = subLine[1].trimmed();
 
@@ -54,9 +55,9 @@ void TcpClient::readClient() {
                     accuracy = subLine[2].toDouble();
 
                 DataRef *ref = getSubscribedRef(refName);
-                if(!ref) {
+                if(!ref) { // Ref not subscribed yet, try to subscribe
                     ref = _refProvider->subscribeRef(refName);
-                    if(ref) {
+                    if(ref) { // Succesfully subscribed
                         connect(ref, SIGNAL(changed(DataRef*)), this, SLOT(refChanged(DataRef*)));
                         _subscribedRefs.insert(ref);
                         _refAccuracy[ref] = accuracy;
@@ -67,18 +68,13 @@ void TcpClient::readClient() {
                         } else if(ref->type() == xplmType_Double) {
                             _refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
                         } else if(ref->type() == xplmType_FloatArray) {
-                            float *value = qobject_cast<FloatArrayDataRef*>(ref)->value();
-                            long length = (long) value[0];
-                            _refValueFA[ref] = (float *) calloc(length, sizeof(float));
-                            for (int i=0;i<length;i++){
-                                _refValueFA[ref][i]=value[i+1];
-                            }
+                            _refValueFA[ref] = qobject_cast<FloatArrayDataRef*>(ref)->value();
                         }
                         qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy;
                     } else {
                         qDebug() << Q_FUNC_INFO << "Ref not found" << refName;
                     }
-                } else {
+                } else { // Ref already subscribed - update accuracy
                     qDebug() << Q_FUNC_INFO << "Updating " << refName << " accuracy to " << accuracy;
                     _refAccuracy[ref] = accuracy;
                 }
@@ -153,15 +149,19 @@ void TcpClient::refChanged(DataRef *ref) {
         FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
         
         bool bigenough = false;
-        float * value = refF->value();
-        long length = (long) value[0];
+
+        QVector<float> values = refF->value();
+        long length = values.size();
         
         for (int i=0; i<length;i++){
-            if (qAbs(value[i+1] - _refValueFA[ref][i]) > _refAccuracy[ref]) bigenough = true;
+            if (qAbs(values[i] - _refValueFA[ref][i]) > _refAccuracy[ref]) {
+                bigenough = true;
+                break;
+            }
         }
-        if (bigenough){
+        if (bigenough){ // Values have changed enough
             for (int i=0; i<length;i++){
-                _refValueFA[ref][i] = value[i+1];
+                _refValueFA[ref][i] = values[i];
             }    
         } else {
             return;

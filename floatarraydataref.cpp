@@ -9,40 +9,36 @@
 
 #include "floatarraydataref.h"
 
-FloatArrayDataRef::FloatArrayDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref), _value(NULL)
-{
+FloatArrayDataRef::FloatArrayDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref) {
     _typeString = "fa";
     _type = xplmType_FloatArray;
-    
     _length = (float) XPLMGetDatavf(_ref, NULL, 0, 0);
     qDebug() << Q_FUNC_INFO << "Inited dataref with a length of =" << _length;
-    
-    _value = (float *)calloc(_length+1, sizeof(float));
-    _value[0] = (float) _length;
+    _values.fill(0, _length); // Resize vector
+    _valueArrayForReading = new float[_length];
 }
 
-float * FloatArrayDataRef::value() {
-    return _value;
+FloatArrayDataRef::~FloatArrayDataRef() {
+    delete [] _valueArrayForReading;
+}
+
+QVector<float> & FloatArrayDataRef::value() {
+    return _values;
 }
 
 void FloatArrayDataRef::updateValue() {
-    float newValue[_length];
-    
-    long retval = XPLMGetDatavf(_ref, newValue, 0, _length);
-    //    qDebug() << Q_FUNC_INFO << "XPLMGetDatavf returns" << retval;
-    
+    long valuesCopied = XPLMGetDatavf(_ref, _valueArrayForReading, 0, _length);
+    Q_ASSERT(valuesCopied == _length);
+
     bool notequal = false;
     for(long i=0;i<_length;i++){
-        
-        if(_value[i+1] != newValue[i]) {
-            _value[i+1] = newValue[i];
+        if(_values[i] != _valueArrayForReading[i]) {
+            _values[i] = _valueArrayForReading[i];
             notequal = true;
-            // break;
         }
     }
     if (notequal) emit changed(this);
 }
-
 
 void FloatArrayDataRef::setValue(float newValue) {
     qDebug() << Q_FUNC_INFO << "Interface currenly doesn't allow setting Datavf type" << name();
@@ -62,7 +58,7 @@ QString FloatArrayDataRef::valueString() {
     QString ret = QString::number(_length)+QString(": ");
     
     for(int i=0;i<_length;i++){
-        ret += QString::number(_value[i+1])+QString(", ");
+        ret += QString::number(_values[i])+QString(", ");
     }
     
     return ret;
