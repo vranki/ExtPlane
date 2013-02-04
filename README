@@ -3,13 +3,21 @@
                         *** ExtPlane ***
 
 
-X-Plane plugin that allows commanding X-Plane from external programs using TCP protocol.
+X-Plane plugin that allows commanding X-Plane from external programs using an easy
+TCP protocol.
 
 Known users:
 
 ExtPlane-Panel - a panel application @ https://github.com/vranki/ExtPlane-Panel
 
 GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Downloading *
+
+Binaries for various platforms are available in binaries/ directory. Just
+download a suitable binary and copy it to X-Plane/Resources/plugins/extplane.xpl.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -20,17 +28,12 @@ at ~/SDK/CHeaders/XPLM (or edit the .pro file).
 
 You'll need Qt development libraries installed.
 
-* To build on Linux *
+* To build on Mac & Linux *
 
 $ qmake
 $ make
-copy libextplane-plugin.so.1.0.0 to X-Plane/Resources/plugins/extplane.xpl
 
-* To build on Mac *
-
-$ qmake
-$ make
-copy libextplane-plugin.1.0.0.dylib to X-Plane/Resources/plugins/extplane.xpl
+Mac notes:
 
 Warning! If you see any error or warning like :
    ld: in /opt/local/lib/libxslt.1.dylib, file was built for unsupported file format which is not the architecture being linked (i386)
@@ -82,7 +85,7 @@ provide a way to lookup keys or buttons by name.
 
 Other:
 
-disconnect                 - Disconnect.
+disconnect                 - Disconnect the TCP socket.
 
  * Plugin output *
 
@@ -102,3 +105,5 @@ plugin, start X-Plane in console and read the output.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Comments and bug reports to ville.ranki@iki.fi
 Official git repo at https://github.com/vranki/ExtPlane
+
+Contributions welcome!
