@@ -1,7 +1,9 @@
 #ifndef DATAREFPROVIDER_H
 #define DATAREFPROVIDER_H
+#include <QString>
 
-#include "dataref.h"
+class DataRef;
+
 /**
   * Interface class for subscribing and unsubscribing datarefs
   */

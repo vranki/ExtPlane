@@ -1,4 +1,6 @@
 #include "tcpserver.h"
+#include "tcpclient.h"
+#include "datarefprovider.h"
 
 TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent), server(this), _refProvider(refProvider) {
     if(!server.listen(QHostAddress::Any, EXTPLANE_PORT)) {

@@ -1,7 +1,7 @@
 #ifndef DOUBLEDATAREF_H
 #define DOUBLEDATAREF_H
 
-#include <dataref.h>
+#include "dataref.h"
 
 class DoubleDataRef : public DataRef {
     Q_OBJECT

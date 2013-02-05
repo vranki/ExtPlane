@@ -6,6 +6,15 @@
 X-Plane plugin that allows commanding X-Plane from external programs using an easy
 TCP protocol.
 
+ * Features *
+
+ - Multiple concurrent connections
+ - Set and get datarefs
+ - Dataref types supported: int, float, double, int[], float[]
+ - Simulate key and button presses
+ - Supports both X-Plane 9 and 10 (may need rebuild)
+ - Open Source under GPL
+
 Known users:
 
 ExtPlane-Panel - a panel application @ https://github.com/vranki/ExtPlane-Panel
@@ -16,8 +25,11 @@ GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
 
 * Downloading *
 
-Binaries for various platforms are available in binaries/ directory. Just
+Some binaries for various platforms are available in binaries/ directory. Just
 download a suitable binary and copy it to X-Plane/Resources/plugins/extplane.xpl.
+
+If a binary for your favorite platform is missing, please build it and
+send it to authors!
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,10 +53,14 @@ Warning! If you see any error or warning like :
 You need to rebuild libxslt with the +universal variant on MacPort otherwise the plugin cannot be loaded by X-Plane !
 You should get the same for qt4-mac also.
 
- * To test *
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ * Test session *
 
 Launch X-Plane in console and observe the output. You should see something like:
 TcpServer::TcpServer(QObject*, DataRefProvider*) Listening on port 51000
+
+Wait until X-Plane has loaded and is running.
 
 Open another console and run 'telnet localhost 51000'
 
@@ -57,7 +73,11 @@ sub sim/flightmodel/position/local_y 100
 set sim/flightmodel/position/local_y 3000
 key 0
 key 0
+set sim/flightmodel/engine/ENGN_thro [1,0]
+set sim/flightmodel/engine/ENGN_thro [0,0]
 disconnect
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * Command reference *
 
@@ -92,15 +112,17 @@ disconnect                 - Disconnect the TCP socket.
 EXTPLANE <version>             - Sent when connected. Version number is currently 1.
 u<type> <dataref> <value>      - Update of dataref
 
+Array datarefs output data like this (a float array, size 4):
+
+ufa sim/flightmodel/position/q [0.84599,-0.00730657,0.00933933,0.533067]
+
+Set array datarefs the same way. You can give less values than the dataref
+holds. For example this sets full throttle to engines 1 & 2
+
+set sim/flightmodel/engine/ENGN_thro [1,1]
+
 ExtPlane plugin outputs some log to stdout, so if you have problems with the
 plugin, start X-Plane in console and read the output.
-
- * Features *
-
- - Multiple concurrent connections
- - Set and get datarefs
- - Dataref types: int, float and double
- - Simulate key and button presses
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Comments and bug reports to ville.ranki@iki.fi

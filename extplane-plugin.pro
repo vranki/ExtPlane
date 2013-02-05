@@ -1,3 +1,17 @@
+#
+# ExtPlane plugin build configuration
+#
+# Change to -DXPLM200=1 for SDK 2.0.0 (X-Plane 9)
+QMAKE_CXXFLAGS += -DXPLM210=1
+
+# Set this to path where the X-Plane SDK is
+INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
+
+# You should not need to touch anything below this for normal build
+
+# Detailed X-Plane plugin build instructions here:
+# http://www.xsquawkbox.net/xpsdk/mediawiki/BuildInstall
+
 QT       += core network
 QT       -= gui
 
@@ -8,15 +22,14 @@ TEMPLATE = lib
 
 TARGET = extplane-plugin
 
-QMAKE_CXXFLAGS_DEBUG += -DXPLM200=1 -fPIC
-QMAKE_CXXFLAGS_RELEASE += -DXPLM200=1 -fPIC
+QMAKE_CXXFLAGS += -fPIC
 QMAKE_LFLAGS += -shared -static-libgcc -fPIC
 
 unix:!macx {
      DEFINES += APL=0 IBM=0 LIN=1
      QMAKE_CFLAGS += -fstack-protector
-     QMAKE_CXXFLAGS += -fstack-protector #-rdynamic -nodefaultlibs
-     QMAKE_LFLAGS += -shared
+     QMAKE_CXXFLAGS += -fstack-protector
+     QMAKE_LFLAGS += -shared -rdynamic -nodefaultlibs -undefined_warning
 }
 
 macx {
@@ -34,28 +47,27 @@ QMAKE_CLEAN += extplane.xpl
 
 SOURCES += main.cpp \
     xplaneplugin.cpp \
-    dataref.cpp \
     tcpserver.cpp \
     tcpclient.cpp \
     datarefprovider.cpp \
-    floatdataref.cpp \
-    floatarraydataref.cpp \
-    intdataref.cpp \
-    doubledataref.cpp
-
-INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
-
+    datarefs/dataref.cpp \
+    datarefs/floatdataref.cpp \
+    datarefs/floatarraydataref.cpp \
+    datarefs/intdataref.cpp \
+    datarefs/doubledataref.cpp \
+    datarefs/intarraydataref.cpp
 
 HEADERS += \
     xplaneplugin.h \
-    dataref.h \
     tcpserver.h \
     tcpclient.h \
     datarefprovider.h \
-    floatdataref.h \
-    floatarraydataref.h \
-    intdataref.h \
-    doubledataref.h
+    datarefs/dataref.h \
+    datarefs/floatdataref.h \
+    datarefs/floatarraydataref.h \
+    datarefs/intdataref.h \
+    datarefs/doubledataref.h \
+    datarefs/intarraydataref.h
 
 OTHER_FILES += README
 

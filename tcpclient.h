@@ -8,12 +8,10 @@
 #include <QSet>
 #include <QVector>
 #include <QHostAddress>
-#include "dataref.h"
-#include "floatdataref.h"
-#include "floatarraydataref.h"
-#include "intdataref.h"
-#include "datarefprovider.h"
-#include "doubledataref.h"
+
+class DataRef;
+class DataRefProvider;
+
 /**
   * Handles single client connection and tracks subscribed datarefs
   */
@@ -38,6 +36,7 @@ private:
     QMap<DataRef*, double> _refValueD;
     QMap<DataRef*, float> _refValueF;
     QMap<DataRef*, QVector<float> > _refValueFA;
+    QMap<DataRef*, QVector<int> > _refValueIA;
     QMap<DataRef*, int> _refValueI;
     QSet<int> _heldButtons;
     DataRefProvider *_refProvider;

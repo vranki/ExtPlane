@@ -7,11 +7,11 @@
 #include <QtCore/QCoreApplication>
 #include "XPLMDataAccess.h"
 #include "XPLMUtilities.h"
-#include "floatdataref.h"
-#include "intdataref.h"
-#include "doubledataref.h"
 #include "tcpserver.h"
 #include "datarefprovider.h"
+
+class DataRef;
+
 /**
   * The main plugin class
   */
@@ -23,7 +23,7 @@ public:
     float flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
     int pluginStart(char * outName, char * outSig, char *outDesc);
     void pluginStop();
-
+    void receiveMessage(XPLMPluginID inFromWho, long inMessage, void *  inParam);
 public: // DataRefProvider
     virtual DataRef *subscribeRef(QString name);
     virtual void unsubscribeRef(DataRef *ref);

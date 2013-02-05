@@ -1,4 +1,10 @@
 #include "tcpclient.h"
+#include "datarefs/floatdataref.h"
+#include "datarefs/floatarraydataref.h"
+#include "datarefs/intdataref.h"
+#include "datarefs/intarraydataref.h"
+#include "datarefs/doubledataref.h"
+#include "datarefprovider.h"
 
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
         QObject(parent), _socket(socket), _refProvider(refProvider)
@@ -38,7 +44,7 @@ void TcpClient::readClient() {
     while(_socket->canReadLine()) {
         QByteArray lineBA = _socket->readLine();
 
-        QString line = QString(lineBA);
+        QString line = QString(lineBA).trimmed();
         qDebug() << Q_FUNC_INFO << "Client says: " << line;
         // Split the command in strings
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
@@ -69,14 +75,17 @@ void TcpClient::readClient() {
                             _refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
                         } else if(ref->type() == xplmType_FloatArray) {
                             _refValueFA[ref] = qobject_cast<FloatArrayDataRef*>(ref)->value();
+                        } else if(ref->type() == xplmType_IntArray) {
+                            _refValueIA[ref] = qobject_cast<IntArrayDataRef*>(ref)->value();
                         }
-                        qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy;
+                        qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
                     } else {
                         qDebug() << Q_FUNC_INFO << "Ref not found" << refName;
                     }
                 } else { // Ref already subscribed - update accuracy
                     qDebug() << Q_FUNC_INFO << "Updating " << refName << " accuracy to " << accuracy;
                     _refAccuracy[ref] = accuracy;
+                    ref->updateValue();
                 }
             } else {
                 qDebug() << Q_FUNC_INFO << "Invalid sub command";
@@ -94,10 +103,14 @@ void TcpClient::readClient() {
         } else if(command == "set") {
             if(subLine.size() == 3) {
                 QString refName = subLine.value(1);
-                QString refValue = subLine.value(2);
+                QString refValue = subLine.value(2).trimmed();
                 DataRef *ref = getSubscribedRef(refName);
                 if (ref) {
-                    ref->setValue(refValue);
+                    if(ref->isWritable()) {
+                        ref->setValue(refValue);
+                    } else {
+                        qDebug() << Q_FUNC_INFO << "Ref " << ref->name() << " is not writable!";
+                    }
                 }
             } else {
                 qDebug() << Q_FUNC_INFO << "Invalid set command";
@@ -134,6 +147,8 @@ void TcpClient::readClient() {
             } else {
                 qDebug() << Q_FUNC_INFO << "Invalid rel command";
             }
+        } else {
+            qDebug() << Q_FUNC_INFO << "Unknown command " << command;
         }
     }
 }
@@ -145,7 +160,7 @@ void TcpClient::refChanged(DataRef *ref) {
         if(qAbs(refF->value() - _refValueF[ref]) < _refAccuracy[ref])
             return; // Hasn't changed enough
         _refValueF[ref] = refF->value();
-    } else if(ref->type()== xplmType_FloatArray) {                          // BB needs thought...
+    } else if(ref->type()== xplmType_FloatArray) {
         FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
         
         bool bigenough = false;
@@ -163,6 +178,27 @@ void TcpClient::refChanged(DataRef *ref) {
             for (int i=0; i<length;i++){
                 _refValueFA[ref][i] = values[i];
             }    
+        } else {
+            return;
+        }
+    } else if(ref->type()== xplmType_IntArray) {
+        IntArrayDataRef *refF = qobject_cast<IntArrayDataRef*>(ref);
+
+        bool bigenough = false;
+
+        QVector<int> values = refF->value();
+        long length = values.size();
+
+        for (int i=0; i<length;i++){
+            if (qAbs(values[i] - _refValueIA[ref][i]) > _refAccuracy[ref]) {
+                bigenough = true;
+                break;
+            }
+        }
+        if (bigenough){ // Values have changed enough
+            for (int i=0; i<length;i++){
+                _refValueIA[ref][i] = values[i];
+            }
         } else {
             return;
         }
