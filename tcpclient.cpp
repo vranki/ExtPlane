@@ -240,7 +240,7 @@ void TcpClient::refChanged(DataRef *ref) {
 
     if(_socket->isOpen()) {
         _socket->write(block);
-        _socket->flush();
+        //    _socket->flush(); Not really needed and may mess up performance
     }
 }
 
