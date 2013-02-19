@@ -147,6 +147,23 @@ void TcpClient::readClient() {
             } else {
                 qDebug() << Q_FUNC_INFO << "Invalid rel command";
             }
+        } else if(command == "extplane-set") {
+            if(subLine.size()==3) {
+                if(subLine.value(1) == "update_interval") {
+                    bool ok;
+                    float newInterval = subLine.value(2).toFloat(&ok);
+                    if(ok) {
+                        emit(setFlightLoopInterval(newInterval));
+                    } else {
+                        qDebug() << Q_FUNC_INFO << "Invalid interval";
+                    }
+                } else {
+                    qDebug() << Q_FUNC_INFO << "Invalid update_interval command";
+                }
+            } else {
+                qDebug() << Q_FUNC_INFO << "Invalid extplane-set command";
+            }
+
         } else {
             qDebug() << Q_FUNC_INFO << "Unknown command " << command;
         }

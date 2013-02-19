@@ -30,12 +30,15 @@ public: // DataRefProvider
     virtual void keyStroke(int keyid);
     virtual void buttonPress(int buttonid);
     virtual void buttonRelease(int buttonid);
+public slots:
+    void setFlightLoopInterval(float newInterval);
 private:
     QList<DataRef*> refs;
     int argc; // Fake argc and argv for QCoreApplication
     char *argv;
     QCoreApplication *app; // For Qt main loop
     TcpServer *server;
+    float flightLoopInterval; // Delay between loop calls (in seconds)
 };
 
 #endif // XPLANEPLUGIN_H

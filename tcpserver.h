@@ -19,6 +19,8 @@ class TcpServer : public QObject {
 public:
     TcpServer(QObject *parent, DataRefProvider *refProvider);
    ~TcpServer();
+signals:
+    void setFlightLoopInterval(float newInterval);
 public slots:
      void clientConnected();
      void clientDiscoed(TcpClient *client);

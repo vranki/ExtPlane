@@ -7,7 +7,7 @@
 #include "datarefs/doubledataref.h"
 
 XPlanePlugin::XPlanePlugin(QObject *parent) :
-    QObject(parent), argc(0), argv(0), app(0), server(0) {
+    QObject(parent), argc(0), argv(0), app(0), server(0), flightLoopInterval(0.31f) { // Default to 30hz
 }
 
 XPlanePlugin::~XPlanePlugin() {
@@ -19,13 +19,14 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTime
     foreach(DataRef *ref, refs)
         ref->updateValue();
     app->processEvents();
-    return 0.016; // 60hz
+    return flightLoopInterval;
 }
 
 int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     qDebug() << Q_FUNC_INFO << "ExtPlane plugin started";
     app = new QCoreApplication(argc, &argv);
     server = new TcpServer(this, this);
+    connect(server, SIGNAL(setFlightLoopInterval(float)), this, SLOT(setFlightLoopInterval(float)));
     strcpy(outName, "ExtPlane");
     strcpy(outSig, "org.vranki.extplaneplugin");
     strcpy(outDesc, "Read and write X-Plane datarefs from external programs using TCP socket.");
@@ -98,6 +99,15 @@ void XPlanePlugin::buttonPress(int buttonid) {
 void XPlanePlugin::buttonRelease(int buttonid) {
     qDebug() << Q_FUNC_INFO << buttonid;
     XPLMCommandButtonRelease(buttonid);
+}
+
+void XPlanePlugin::setFlightLoopInterval(float newInterval) {
+    if(newInterval > 0) {
+        flightLoopInterval = newInterval;
+        qDebug() << Q_FUNC_INFO << "new interval" << flightLoopInterval;
+    } else {
+        qDebug() << Q_FUNC_INFO << "Invalid interval " << newInterval;
+    }
 }
 
 void XPlanePlugin::pluginStop() {

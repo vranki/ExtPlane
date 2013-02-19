@@ -28,6 +28,7 @@ public slots:
     void socketError(QAbstractSocket::SocketError err);
 signals:
     void discoed(TcpClient *client);
+    void setFlightLoopInterval(float newInterval);
 private:
     DataRef *getSubscribedRef(QString name);
     QTcpSocket *_socket;
