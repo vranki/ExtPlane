@@ -12,14 +12,18 @@ TCP protocol.
  - Set and get datarefs
  - Dataref types supported: int, float, double, int[], float[]
  - Simulate key and button presses
- - Supports both X-Plane 9 and 10 (may need rebuild)
- - Open Source under GPL
+ - Supports both X-Plane 9 and 10
+ - Free & Open Source under GPLv3
 
 Known users:
 
 ExtPlane-Panel - a panel application @ https://github.com/vranki/ExtPlane-Panel
 
-GNU GPL, (c) Ville Ranki (ville.ranki@iki.fi)
+GNU GPLv3, (c) Ville Ranki <ville.ranki@iki.fi>
+
+Contributors: 
+
+Bob Gates
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -109,8 +113,9 @@ disconnect                     - Disconnect the TCP socket.
 extplane-set <setting> <value> - Set ExtPlane setting
   Settings are:
     update_interval <value>    - How often ExtPlane should update its data from X-Plane, in seconds.
-                                 Use as high value as possible here. For example 0.16 would mean 60hz,
-                                 0.32 = 30hz, 0.1 = 10hz etc.. Must be a positive float. Default is 0.32.
+                                 Use as high value as possible here for best performance. For example 0.16 
+				 would mean 60Hz, 0.33 = 30Hz, 0.1 = 10Hz etc.. Must be a positive float. 
+				 Default is 0.33.
 
  * Plugin output *
 
