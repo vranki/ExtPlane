@@ -14,6 +14,7 @@ TCP protocol.
  - Simulate key and button presses
  - Supports both X-Plane 9 and 10
  - Free & Open Source under GPLv3
+ - Client classes for Qt included
 
 Known users:
 
@@ -133,6 +134,13 @@ set sim/flightmodel/engine/ENGN_thro [1,1]
 
 ExtPlane plugin outputs some log to stdout, so if you have problems with the
 plugin, start X-Plane in console and read the output.
+
+
+ * Client library *
+
+See directory "client" for client code. Currently there is only client code for Qt.
+If you write client code for other environments (Python, Java..) please add them
+here.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Comments and bug reports to ville.ranki@iki.fi
