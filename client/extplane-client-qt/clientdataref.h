@@ -5,6 +5,12 @@
 
 /**
  * @brief The ClientDataRef class represents a single dataref in client side
+ *
+ * You get a ClientDataRef by calling ExtPlaneConnection::subscribeDataRef().
+ *
+ * To unsubscribe, call ClientDataRef::unsubscribe().
+ *
+ * Never call deleteLater() on this - memory is managed by ExtPlaneConnection.
  */
 class ClientDataRef : public QObject {
     Q_OBJECT
@@ -17,13 +23,11 @@ public:
     int subscribers();
     void setSubscribers(int sub);
     void setValue(double _newValue);
-    void unsubscribe();
+    void unsubscribe(); // Call to unsubscribe ref.
 signals:
     void changed(ClientDataRef *ref);
     void valueSet(ClientDataRef *ref);
     void unsubscribed(ClientDataRef *ref);
-public slots:
-
 private:
     QString _name;
     QString _value;

@@ -23,7 +23,7 @@ void ExtPlaneConnection::connectTo(QHostAddress addr, unsigned int port) {
 
 void ExtPlaneConnection::setUpdateInterval(double newInterval) {
     updateInterval = newInterval;
-    if(server_ok & updateInterval > 0) {
+    if(server_ok & (updateInterval > 0)) {
         QString line = "extplane-set update_interval " + QString::number(newInterval);
         writeLine(line);
     }
