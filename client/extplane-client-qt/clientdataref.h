@@ -7,6 +7,12 @@
 /**
  * Represents a single dataref in client side. Can contain multiple
  * values, if ref is a array.
+ *
+ * You get a ClientDataRef by calling ExtPlaneConnection::subscribeDataRef().
+ *
+ * To unsubscribe, call ClientDataRef::unsubscribe().
+ *
+ * Never call deleteLater() on this - memory is managed by ExtPlaneConnection.
  */
 class ClientDataRef : public QObject {
     Q_OBJECT
@@ -21,8 +27,8 @@ public:
     int subscribers();
     void setSubscribers(int sub);
     void setValue(double _newValue, int index=0);
-    void unsubscribe();
     bool isArray();
+    void unsubscribe(); // Call to unsubscribe ref.
 signals:
     void changed(ClientDataRef *ref);
     void valueSet(ClientDataRef *ref);
