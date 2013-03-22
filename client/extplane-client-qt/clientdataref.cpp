@@ -19,7 +19,12 @@ QStringList& ClientDataRef::valueStrings() {
 
 void ClientDataRef::updateValue(QString newValue) {
     if(!_values.isEmpty() && newValue == _values.first()) return;
-    _values[0] = newValue;
+
+    if(_values.isEmpty()) {
+        _values.push_back(newValue);
+    } else {
+        _values.replace(0, newValue);
+    }
     emit changed(this);
 }
 
