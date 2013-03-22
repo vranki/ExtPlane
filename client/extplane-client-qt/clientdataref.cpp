@@ -2,19 +2,30 @@
 
 ClientDataRef::ClientDataRef(QObject *parent, QString newName, double accuracy) : QObject(parent), _name(newName), _accuracy(accuracy) {
     _subscribers = 0;
+    _values.reserve(1); // Always at least 1 size
 }
 
-QString ClientDataRef::name() {
+QString& ClientDataRef::name() {
     return _name;
 }
 
-QString ClientDataRef::valueString() {
-    return _value;
+QString& ClientDataRef::valueString() {
+    return _values.first();
+}
+
+QStringList& ClientDataRef::valueStrings() {
+    return _values;
 }
 
 void ClientDataRef::updateValue(QString newValue) {
-    if(newValue == _value) return;
-    _value = newValue;
+    if(!_values.isEmpty() && newValue == _values.first()) return;
+    _values[0] = newValue;
+    emit changed(this);
+}
+
+void ClientDataRef::updateValue(QStringList &newValues) {
+    if(newValues == _values) return;
+    _values = newValues;
     emit changed(this);
 }
 
@@ -30,11 +41,17 @@ void ClientDataRef::setSubscribers(int sub) {
     _subscribers = sub;
 }
 
-void ClientDataRef::setValue(double _newValue) {
-    _value = QString::number(_newValue);
+void ClientDataRef::setValue(double _newValue, int index) {
+    if(_values.size() < index + 1)
+        _values.reserve(index+1);
+    _values[index] = QString::number(_newValue);
     emit valueSet(this);
 }
 
 void ClientDataRef::unsubscribe() {
     emit unsubscribed(this);
+}
+
+bool ClientDataRef::isArray() {
+    return _values.size() > 1;
 }

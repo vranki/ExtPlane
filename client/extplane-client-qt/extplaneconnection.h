@@ -31,6 +31,7 @@ public slots:
     virtual void buttonPress(int id);
     virtual void buttonRelease(int id);
     virtual void setValue(QString name, QString value);
+    virtual void setValues(QString name, QStringList values);
     virtual void setValue(ClientDataRef *ref);
     virtual void connectTo(QHostAddress addr, unsigned int port);
     void setUpdateInterval(double newInterval);

@@ -69,5 +69,4 @@ HEADERS += \
     datarefs/doubledataref.h \
     datarefs/intarraydataref.h
 
-OTHER_FILES += README
-
+OTHER_FILES += README client/extplane-client-qt/README

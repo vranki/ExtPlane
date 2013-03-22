@@ -18,7 +18,8 @@ public:
     virtual void keyPress(int id)=0;
     virtual void buttonPress(int id)=0;
     virtual void buttonRelease(int id)=0;
-    virtual void setValue(QString name, QString value)=0;
+    virtual void setValue(QString name, QString value)=0; // For single value
+    virtual void setValues(QString name, QStringList values)=0; // For arrays
 };
 
 #endif // CLIENTDATAREFPROVIDER_H

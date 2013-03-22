@@ -113,7 +113,7 @@ void ExtPlaneConnection::readClient() {
         QByteArray lineBA = readLine();
         QString line = QString(lineBA).trimmed();
         qDebug() << Q_FUNC_INFO << "Server says: " << line;
-        if(!server_ok) {
+        if(!server_ok) { // Waiting for handshake..
             if(line=="EXTPLANE 1") {
                 server_ok = true;
                 emit connectionMessage("");
@@ -123,27 +123,24 @@ void ExtPlaneConnection::readClient() {
                     subRef(ref);
             }
             return;
-        } else {
+        } else { // Handle updates
             QStringList cmd = line.split(" ", QString::SkipEmptyParts);
-            if (cmd.value(0)=="ufa"){
-                qDebug() << Q_FUNC_INFO << "Found float array: " << cmd;
+            if(cmd.size()==3) {
                 ClientDataRef *ref = dataRefs.value(cmd.value(1));
                 if(ref) {
-                    ref->updateValue(cmd.join(" "));
-                } else {
-                    qDebug() << Q_FUNC_INFO << "ref not subscribed " << cmd.value(2);
-                }
-                
-                
-                
-            } else if(cmd.size()==3) {
-                if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")) {
-                    ClientDataRef *ref = dataRefs.value(cmd.value(1));
-                    if(ref) {
+                    if (cmd.value(0)=="ufa" || cmd.value(0)=="uia"){ // Array dataref
+                        QString arrayString = cmd.value(2);
+                        Q_ASSERT(arrayString[0]=='[' && arrayString[arrayString.length()-1]==']');
+                        arrayString = arrayString.mid(1, arrayString.length()-2);
+                        QStringList arrayValues = arrayString.split(',');
+                        ref->updateValue(arrayValues);
+                    } else if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")) { // Single value dataref
                         ref->updateValue(cmd.value(2));
                     } else {
-                        qDebug() << Q_FUNC_INFO << "ref not subscribed " << cmd.value(2);
+                        qDebug() << Q_FUNC_INFO << "unsupported ref type " << cmd.value(0);
                     }
+                } else {
+                    qDebug() << Q_FUNC_INFO << "ref not subscribed " << cmd.value(2);
                 }
             }
         }
@@ -189,8 +186,18 @@ void ExtPlaneConnection::setValue(QString name, QString value) {
     QString line = "set " + name + " " + value;
     writeLine(line);
 }
+
+void ExtPlaneConnection::setValues(QString name, QStringList values) {
+    QString line = "set " + name + " [" + values.join(",") + "]";
+    writeLine(line);
+}
+
 void ExtPlaneConnection::setValue(ClientDataRef *ref) {
-    setValue(ref->name(), ref->valueString());
+    if(!ref->isArray()) {
+        setValue(ref->name(), ref->valueString());
+    } else {
+        setValues(ref->name(), ref->valueStrings());
+    }
 }
 
 void ExtPlaneConnection::tickTime(double dt, int total) {
