@@ -44,7 +44,7 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
         }
     }
 
-    XPLMDataRef ref = XPLMFindDataRef(name.toAscii());
+    XPLMDataRef ref = XPLMFindDataRef(name.toLatin1());
     if(ref) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(ref);
         DataRef *dr = 0;

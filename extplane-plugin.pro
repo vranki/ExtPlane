@@ -23,7 +23,8 @@ TEMPLATE = lib
 TARGET = extplane-plugin
 
 QMAKE_CXXFLAGS += -fPIC
-QMAKE_LFLAGS += -shared -static-libgcc -fPIC
+QMAKE_LFLAGS += -shared -fPIC
+#  -static-libgcc  <- fails on mac
 
 unix:!macx {
      DEFINES += APL=0 IBM=0 LIN=1
@@ -34,7 +35,9 @@ unix:!macx {
 
 macx {
      DEFINES += APL=1 IBM=0 LIN=0
-     QMAKE_LFLAGS += -flat_namespace -undefined warning -dynamiclib
+     QMAKE_LFLAGS += -dynamiclib
+     # -flat_namespace -undefined warning <- not needed or recommended anymore.
+
      # Build for multiple architectures.
      # The following line is only needed to build universal on PPC architectures.
      # QMAKE_MAC_SDK=/Devloper/SDKs/MacOSX10.4u.sdk
