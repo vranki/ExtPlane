@@ -13,9 +13,9 @@ ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : QTcpSocket(parent), up
     enableSimulatedRefs = false;
 }
 
-void ExtPlaneConnection::connectTo(QHostAddress addr, unsigned int port) {
+void ExtPlaneConnection::connectTo(QString host, unsigned int port) {
     close();
-    _addr = addr;
+    _host = host;
     _port = port;
     abort();
     tryReconnect();
@@ -30,10 +30,10 @@ void ExtPlaneConnection::setUpdateInterval(double newInterval) {
 }
 
 void ExtPlaneConnection::tryReconnect() {
-    emit connectionMessage(QString("Connecting to ExtPlane at %1:%2..").arg(_addr.toString()).arg(_port));
+    emit connectionMessage(QString("Connecting to ExtPlane at %1:%2..").arg(_host).arg(_port));
 
     reconnectTimer.stop();
-    connectToHost(_addr, _port);
+    connectToHost(_host, _port);
 }
 
 void ExtPlaneConnection::socketConnected() {

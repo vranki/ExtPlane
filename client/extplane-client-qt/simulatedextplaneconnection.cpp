@@ -5,8 +5,8 @@ SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtP
     enableSimulatedRefs = true;
 }
 
-void SimulatedExtPlaneConnection::connectTo(QHostAddress addr, unsigned int port) {
-    _addr = addr;
+void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
+    _host = host;
     _port = port;
     server_ok = true;
     emit connectionMessage("Connected to ExtPlane (simulated)");
