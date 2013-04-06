@@ -1,4 +1,6 @@
 #include "tcpserver.h"
+#include "tcpclient.h"
+#include "datarefprovider.h"
 
 TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent), server(this), _refProvider(refProvider) {
     if(!server.listen(QHostAddress::Any, EXTPLANE_PORT)) {
@@ -22,6 +24,7 @@ TcpServer::~TcpServer() {
 void TcpServer::clientConnected() {
     TcpClient *client = new TcpClient(this, server.nextPendingConnection(), _refProvider);
     connect(client, SIGNAL(discoed(TcpClient *)), this, SLOT(clientDiscoed(TcpClient *)));
+    connect(client, SIGNAL(setFlightLoopInterval(float)), this, SIGNAL(setFlightLoopInterval(float)));
     clientConnections.append(client);
 }
 

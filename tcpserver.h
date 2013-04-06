@@ -5,19 +5,22 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QList>
-#include "dataref.h"
-#include "tcpclient.h"
-#include "datarefprovider.h"
+#include "datarefs/dataref.h"
 /**
   * Creates the TCP socket and manages client connections
   */
 #define EXTPLANE_PORT 51000
+
+class TcpClient;
+class DataRefProvider;
 
 class TcpServer : public QObject {
     Q_OBJECT
 public:
     TcpServer(QObject *parent, DataRefProvider *refProvider);
    ~TcpServer();
+signals:
+    void setFlightLoopInterval(float newInterval);
 public slots:
      void clientConnected();
      void clientDiscoed(TcpClient *client);

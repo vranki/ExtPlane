@@ -1,7 +1,7 @@
 #ifndef INTDATAREF_H
 #define INTDATAREF_H
 
-#include <dataref.h>
+#include "dataref.h"
 
 class IntDataRef : public DataRef {
     Q_OBJECT

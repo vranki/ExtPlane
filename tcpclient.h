@@ -6,12 +6,12 @@
 #include <QTcpSocket>
 #include <QString>
 #include <QSet>
+#include <QVector>
 #include <QHostAddress>
-#include "dataref.h"
-#include "floatdataref.h"
-#include "intdataref.h"
-#include "datarefprovider.h"
-#include "doubledataref.h"
+
+class DataRef;
+class DataRefProvider;
+
 /**
   * Handles single client connection and tracks subscribed datarefs
   */
@@ -28,6 +28,7 @@ public slots:
     void socketError(QAbstractSocket::SocketError err);
 signals:
     void discoed(TcpClient *client);
+    void setFlightLoopInterval(float newInterval);
 private:
     DataRef *getSubscribedRef(QString name);
     QTcpSocket *_socket;
@@ -35,6 +36,8 @@ private:
     QMap<DataRef*, double> _refAccuracy;
     QMap<DataRef*, double> _refValueD;
     QMap<DataRef*, float> _refValueF;
+    QMap<DataRef*, QVector<float> > _refValueFA;
+    QMap<DataRef*, QVector<int> > _refValueIA;
     QMap<DataRef*, int> _refValueI;
     QSet<int> _heldButtons;
     DataRefProvider *_refProvider;

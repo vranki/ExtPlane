@@ -22,7 +22,7 @@ void DataRef::setSubscribers(int subs) {
     _subscribers = subs;
 }
 
-void DataRef::setCanWrite(bool cw) {
+void DataRef::setWritable(bool cw) {
     _writable = cw;
 }
 

@@ -1,10 +1,17 @@
 #include "xplaneplugin.h"
+#include "datarefs/dataref.h"
+#include "datarefs/floatdataref.h"
+#include "datarefs/floatarraydataref.h"
+#include "datarefs/intdataref.h"
+#include "datarefs/intarraydataref.h"
+#include "datarefs/doubledataref.h"
 
 XPlanePlugin::XPlanePlugin(QObject *parent) :
-    QObject(parent), argc(0), argv(0), app(0), server(0) {
+    QObject(parent), argc(0), argv(0), app(0), server(0), flightLoopInterval(0.31f) { // Default to 30hz
 }
 
 XPlanePlugin::~XPlanePlugin() {
+    qDebug() << Q_FUNC_INFO;
 }
 
 float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop,
@@ -12,13 +19,14 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTime
     foreach(DataRef *ref, refs)
         ref->updateValue();
     app->processEvents();
-    return 0.016; // 60hz
+    return flightLoopInterval;
 }
 
 int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     qDebug() << Q_FUNC_INFO << "ExtPlane plugin started";
     app = new QCoreApplication(argc, &argv);
     server = new TcpServer(this, this);
+    connect(server, SIGNAL(setFlightLoopInterval(float)), this, SLOT(setFlightLoopInterval(float)));
     strcpy(outName, "ExtPlane");
     strcpy(outSig, "org.vranki.extplaneplugin");
     strcpy(outDesc, "Read and write X-Plane datarefs from external programs using TCP socket.");
@@ -36,7 +44,7 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
         }
     }
 
-    XPLMDataRef ref = XPLMFindDataRef(name.toAscii());
+    XPLMDataRef ref = XPLMFindDataRef(name.toLatin1());
     if(ref) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(ref);
         DataRef *dr = 0;
@@ -46,10 +54,14 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
             dr = new FloatDataRef(this, name, ref);
         } else if(refType & xplmType_Int) {
             dr = new IntDataRef(this, name, ref);
+        } else if (refType & xplmType_FloatArray) {
+            dr = new FloatArrayDataRef(this, name, ref);
+        } else if (refType & xplmType_IntArray) {
+            dr = new IntArrayDataRef(this, name, ref);
         }
         if(dr) {
             dr->setSubscribers(1);
-            dr->setCanWrite(XPLMCanWriteDataRef(ref) != 0);
+            dr->setWritable(XPLMCanWriteDataRef(ref) != 0);
             qDebug() << Q_FUNC_INFO << "Subscribed to ref " << dr->name() << ", type: " << dr->typeString() << ", writable:" << dr->isWritable();
             refs.append(dr);
             return dr;
@@ -89,6 +101,15 @@ void XPlanePlugin::buttonRelease(int buttonid) {
     XPLMCommandButtonRelease(buttonid);
 }
 
+void XPlanePlugin::setFlightLoopInterval(float newInterval) {
+    if(newInterval > 0) {
+        flightLoopInterval = newInterval;
+        qDebug() << Q_FUNC_INFO << "new interval" << flightLoopInterval;
+    } else {
+        qDebug() << Q_FUNC_INFO << "Invalid interval " << newInterval;
+    }
+}
+
 void XPlanePlugin::pluginStop() {
     qDebug() << Q_FUNC_INFO;
     app->processEvents();
@@ -100,4 +121,8 @@ void XPlanePlugin::pluginStop() {
     app = 0;
     qDeleteAll(refs);
     refs.clear();
+}
+
+void XPlanePlugin::receiveMessage(XPLMPluginID inFromWho, long inMessage, void *inParam) {
+    qDebug() <<  Q_FUNC_INFO << inFromWho << inMessage;
 }
