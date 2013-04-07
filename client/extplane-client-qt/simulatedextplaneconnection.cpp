@@ -26,6 +26,8 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new SimulatedDataRef(this, 8.5, 8.6, 100.0, false, 0, name);
     } else if(name=="sim/cockpit/misc/compass_indicated") {
         simRef = new SimulatedDataRef(this, 0, 360, 100.0, true, 0, name);
+    } else if(name=="sim/flightmodel/position/hpath") {
+        simRef = new SimulatedDataRef(this, -360, 360, 100.0, true, 0, name);
     } else if(name=="sim/flightmodel/misc/h_ind") {
         simRef = new SimulatedDataRef(this, 0, 5000, 10.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot") {
