@@ -21,9 +21,9 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
     } else if(name=="sim/cockpit2/gauges/indicators/total_energy_fpm") {
         simRef = new SimulatedDataRef(this, -500, 500, 1.0, false, 0, name);
     } else if(name=="sim/flightmodel/position/latitude") {
-        simRef = new SimulatedDataRef(this, 47.3, 47.4, 10.0, false, 0, name);
+        simRef = new SimulatedDataRef(this, 47.3, 47.4, 100.0, false, 0, name);
     } else if(name=="sim/flightmodel/position/longitude") {
-        simRef = new SimulatedDataRef(this, 8.5, 8.6, 10.0, false, 0, name);
+        simRef = new SimulatedDataRef(this, 8.5, 8.6, 100.0, false, 0, name);
     } else if(name=="sim/cockpit/misc/compass_indicated") {
         simRef = new SimulatedDataRef(this, 0, 360, 100.0, true, 0, name);
     } else if(name=="sim/flightmodel/misc/h_ind") {

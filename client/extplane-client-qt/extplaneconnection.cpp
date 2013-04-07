@@ -134,7 +134,7 @@ void ExtPlaneConnection::readClient() {
                         arrayString = arrayString.mid(1, arrayString.length()-2);
                         QStringList arrayValues = arrayString.split(',');
                         ref->updateValue(arrayValues);
-                    } else if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")) { // Single value dataref
+                    } else if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")||(cmd.value(0)=="ud")) { // Single value dataref
                         ref->updateValue(cmd.value(2));
                     } else {
                         qDebug() << Q_FUNC_INFO << "unsupported ref type " << cmd.value(0);
