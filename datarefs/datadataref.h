@@ -15,10 +15,10 @@ public:
     virtual void updateValue();
     virtual QString valueString();
     virtual void setValue(QString &newValue);
+
 private:
     int _length; // Length of dataref, as given by X-Plane
-    char *_byteArray;
-    QByteArray _value;
+    QByteArray _value; // Value of dataref is stored here once retrieved from XPLM
 };
 
 #endif // DATADATAREF_H
