@@ -4,8 +4,9 @@
 # Change to -DXPLM200=1 for SDK 2.0.0 (X-Plane 9)
 QMAKE_CXXFLAGS += -DXPLM210=1
 
-# Set this to path where the X-Plane SDK is
+# If your X-Plane SDK is in another directory, add or change it here:
 INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
+INCLUDEPATH += ../XPlaneSDK/CHeaders/XPLM
 
 # You should not need to touch anything below this for normal build
 
@@ -43,6 +44,8 @@ macx {
      # QMAKE_MAC_SDK=/Devloper/SDKs/MacOSX10.4u.sdk
      # This line defines for wich architectures we build.
      CONFIG += x86 ppc
+     QMAKE_LFLAGS += -F../XPlaneSDK/Libraries/Mac
+     LIBS += -framework XPLM
 }
 
 QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) extplane.xpl
@@ -58,7 +61,8 @@ SOURCES += main.cpp \
     datarefs/floatarraydataref.cpp \
     datarefs/intdataref.cpp \
     datarefs/doubledataref.cpp \
-    datarefs/intarraydataref.cpp
+    datarefs/intarraydataref.cpp \
+    datarefs/datadataref.cpp
 
 HEADERS += \
     xplaneplugin.h \
@@ -70,6 +74,7 @@ HEADERS += \
     datarefs/floatarraydataref.h \
     datarefs/intdataref.h \
     datarefs/doubledataref.h \
-    datarefs/intarraydataref.h
+    datarefs/intarraydataref.h \
+    datarefs/datadataref.h
 
 OTHER_FILES += README client/extplane-client-qt/README
