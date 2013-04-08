@@ -128,14 +128,19 @@ void ExtPlaneConnection::readClient() {
             if(cmd.size()==3) {
                 ClientDataRef *ref = dataRefs.value(cmd.value(1));
                 if(ref) {
-                    if (cmd.value(0)=="ufa" || cmd.value(0)=="uia"){ // Array dataref
+                    if (cmd.value(0)=="ufa" || cmd.value(0)=="uia"){
+                        // Array dataref
                         QString arrayString = cmd.value(2);
                         Q_ASSERT(arrayString[0]=='[' && arrayString[arrayString.length()-1]==']');
                         arrayString = arrayString.mid(1, arrayString.length()-2);
                         QStringList arrayValues = arrayString.split(',');
                         ref->updateValue(arrayValues);
-                    } else if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")||(cmd.value(0)=="ud")) { // Single value dataref
+                    } else if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")||(cmd.value(0)=="ud")) {
+                        // Single value dataref
                         ref->updateValue(cmd.value(2));
+                    } else if (cmd.value(0)=="ub") {
+                        // Data dataref
+                        ref->updateValue(QByteArray::fromBase64(cmd.value(2).toUtf8()));
                     } else {
                         qDebug() << Q_FUNC_INFO << "unsupported ref type " << cmd.value(0);
                     }

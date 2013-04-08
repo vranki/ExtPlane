@@ -4,6 +4,7 @@
 #include "datarefs/intdataref.h"
 #include "datarefs/intarraydataref.h"
 #include "datarefs/doubledataref.h"
+#include "datarefs/datadataref.h"
 #include "datarefprovider.h"
 
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
@@ -77,6 +78,8 @@ void TcpClient::readClient() {
                             _refValueFA[ref] = qobject_cast<FloatArrayDataRef*>(ref)->value();
                         } else if(ref->type() == xplmType_IntArray) {
                             _refValueIA[ref] = qobject_cast<IntArrayDataRef*>(ref)->value();
+                        } else if(ref->type() == xplmType_Data) {
+                            _refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
                         }
                         qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
                     } else {
@@ -99,6 +102,7 @@ void TcpClient::readClient() {
                 _subscribedRefs.remove(ref);
                 _refAccuracy.remove(ref);
                 _refValueF.remove(ref);
+                //TODO: @vranki: what about _refValueFA,IA,B...?
             }
         } else if(command == "set") {
             if(subLine.size() == 3) {
@@ -229,6 +233,9 @@ void TcpClient::refChanged(DataRef *ref) {
         if(qAbs(refD->value() - _refValueD[ref]) < _refAccuracy[ref])
             return; // Hasn't changed enough
         _refValueD[ref] = refD->value();
+    } else if(ref->type()== xplmType_Data) {
+        DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
+        _refValueB[ref] = refB->value();
     } else {
         qDebug( ) << Q_FUNC_INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
         return;

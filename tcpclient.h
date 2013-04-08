@@ -39,6 +39,7 @@ private:
     QMap<DataRef*, QVector<float> > _refValueFA;
     QMap<DataRef*, QVector<int> > _refValueIA;
     QMap<DataRef*, int> _refValueI;
+    QMap<DataRef*, QByteArray> _refValueB;
     QSet<int> _heldButtons;
     DataRefProvider *_refProvider;
 

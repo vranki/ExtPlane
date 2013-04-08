@@ -54,6 +54,10 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new SimulatedDataRef(this, -360, 360, 30.0, false, 0, name);
     } else if(name=="sim/cockpit2/engine/indicators/engine_speed_rpm") {
         simRef = new SimulatedDataRef(this, 0, 50000, 5.0, false, -4, name);
+    } else if(name=="sim/aircraft/view/acf_tailnum") {
+        simRef = new FixedSimulatedDataRef(this, "EXTPL1", name);
+    } else if(name=="sim/aircraft/view/acf_descrip") {
+        simRef = new FixedSimulatedDataRef(this, "ExtPlane Simulated Connection", name);
     } else {
         // Fallback
         qWarning() << Q_FUNC_INFO << "the dataref " << name << "is not supported by simulation";

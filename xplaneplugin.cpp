@@ -5,6 +5,7 @@
 #include "datarefs/intdataref.h"
 #include "datarefs/intarraydataref.h"
 #include "datarefs/doubledataref.h"
+#include "datarefs/datadataref.h"
 
 XPlanePlugin::XPlanePlugin(QObject *parent) :
     QObject(parent), argc(0), argv(0), app(0), server(0), flightLoopInterval(0.31f) { // Default to 30hz
@@ -58,6 +59,8 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
             dr = new FloatArrayDataRef(this, name, ref);
         } else if (refType & xplmType_IntArray) {
             dr = new IntArrayDataRef(this, name, ref);
+        } else if (refType & xplmType_Data) {
+            dr = new DataDataRef(this, name, ref);
         }
         if(dr) {
             dr->setSubscribers(1);
