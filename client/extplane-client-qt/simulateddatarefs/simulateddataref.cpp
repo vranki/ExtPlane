@@ -1,7 +1,7 @@
 #include "simulateddataref.h"
 
-SimulatedDataRef::SimulatedDataRef(QObject *parent, double minV, double maxV, double changeDivisor, bool round, QString refName) :
-    QObject(parent), minValue(minV), maxValue(maxV), currentValue(0), change((maxValue - minValue)/changeDivisor), round(round), myClientRef(0, refName, 0)
+SimulatedDataRef::SimulatedDataRef(QObject *parent, double minV, double maxV, double changeDivisor, bool round, int arrayCount, QString refName) :
+    QObject(parent), minValue(minV), maxValue(maxV), currentValue(minV), change((maxValue - minValue)/changeDivisor), round(round), arrayCount(arrayCount), myClientRef(0, refName, 0)
 {
     connect(&changeTimer, SIGNAL(timeout()), this, SLOT(changeTimeout()));
     changeTimer.setSingleShot(false);
@@ -18,9 +18,50 @@ void SimulatedDataRef::tickTime(double dt, int total) {
 }
 
 void SimulatedDataRef::changeTimeout() {
-    myClientRef.updateValue(QString::number(currentValue));
+    if(arrayCount > 0) {
+        QString ret="[";
+        for(int i=0;i<arrayCount;i++){
+            ret += QString::number(currentValue) + (i < arrayCount -1 ? QString(",") : "");
+        }
+        ret += "]";
+        myClientRef.updateValue(ret);
+    } else if(arrayCount < 0) {
+        QString ret="";
+        for(int i=0;i<qAbs(arrayCount);i++){
+            ret += QString::number(currentValue) + (i < qAbs(arrayCount) -1 ? QString(" ") : "");
+        }
+        myClientRef.updateValue(ret);
+    } else {
+        myClientRef.updateValue(QString::number(currentValue));
+    }
 }
 
 ClientDataRef *SimulatedDataRef::clientRef() {
     return &myClientRef;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+FixedSimulatedDataRef::FixedSimulatedDataRef(QObject *parent, QString value, QString refName) :
+    SimulatedDataRef(parent,0,0,1,false,0,refName), _value(value)
+{
+
+}
+
+void FixedSimulatedDataRef::tickTime(double dt, int total) {
+
+}
+
+void FixedSimulatedDataRef::changeTimeout() {
+    myClientRef.updateValue(_value);
 }

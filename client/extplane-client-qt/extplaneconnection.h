@@ -33,7 +33,7 @@ public slots:
     virtual void setValue(QString name, QString value);
     virtual void setValues(QString name, QStringList values);
     virtual void setValue(ClientDataRef *ref);
-    virtual void connectTo(QHostAddress addr, unsigned int port);
+    virtual void connectTo(QString host, unsigned int port);
     void setUpdateInterval(double newInterval);
     void tickTime(double dt, int total);
 private slots:
@@ -49,7 +49,7 @@ protected:
     QMap<QString, ClientDataRef*> dataRefs;
     bool server_ok;
     QTimer reconnectTimer;
-    QHostAddress _addr;
+    QString _host;
     unsigned int _port;
     QList<SimulatedDataRef*> simulatedRefs;
     bool enableSimulatedRefs;
