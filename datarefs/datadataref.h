@@ -19,6 +19,7 @@ public:
 private:
     int _length; // Length of dataref, as given by X-Plane
     QByteArray _value; // Value of dataref is stored here once retrieved from XPLM
+    QByteArray _newValue; // Temp variable used while checking changes. Here to avoid resizing.
 };
 
 #endif // DATADATAREF_H

@@ -102,7 +102,10 @@ void TcpClient::readClient() {
                 _subscribedRefs.remove(ref);
                 _refAccuracy.remove(ref);
                 _refValueF.remove(ref);
-                //TODO: @vranki: what about _refValueFA,IA,B...?
+                _refValueFA.remove(ref);
+                _refValueB.remove(ref);
+                _refValueI.remove(ref);
+                _refValueIA.remove(ref);
             }
         } else if(command == "set") {
             if(subLine.size() == 3) {

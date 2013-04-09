@@ -1,5 +1,6 @@
 #include "simulatedextplaneconnection.h"
 #include "simulateddatarefs/simulateddataref.h"
+#include "simulateddatarefs/fixedsimulateddataref.h"
 
 SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
     enableSimulatedRefs = true;

@@ -6,7 +6,8 @@ DataDataRef::DataDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataR
     _typeString = "b";
     _type = xplmType_Data;
     _length = XPLMGetDatab(_ref, NULL, 0, 0);
-    _value = QByteArray(_length,0);
+    _value = QByteArray(_length, 0);
+    _newValue = QByteArray(_length, 0); // Init already here for perf reasons.
     qDebug() << Q_FUNC_INFO << "Inited data dataref with a length of =" << _length;
 }
 
@@ -16,19 +17,13 @@ QByteArray &DataDataRef::value() {
 
 void DataDataRef::updateValue() {
     // Read and verify data from XPLM
-    QByteArray newValue(_length,0);
-    int valuesCopied = XPLMGetDatab(_ref, newValue.data(), 0, _length);
+    int valuesCopied = XPLMGetDatab(_ref, _newValue.data(), 0, _length);
     Q_ASSERT(valuesCopied == _length);
 
-    // Copy to value while checking if something changed
-    bool notequal = false;
-    for(int i=0;i<_length;i++){
-        if(_value[i] != newValue[i]) {
-            _value[i] = newValue[i];
-            notequal = true;
-        }
+    if (_newValue != _value) {
+        _value = _newValue;
+        emit changed(this);
     }
-    if (notequal) emit changed(this);
 }
 
 void DataDataRef::setValue(QByteArray &newValue) {
