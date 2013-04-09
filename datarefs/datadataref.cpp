@@ -57,5 +57,6 @@ QString DataDataRef::valueString() {
 }
 
 void DataDataRef::setValue(QString &newValue) {
-    setValue(newValue.toUtf8());
+    QByteArray valueBA = newValue.toUtf8();
+    setValue(valueBA);
 }
