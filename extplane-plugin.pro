@@ -7,6 +7,7 @@ QMAKE_CXXFLAGS += -DXPLM210=1
 # If your X-Plane SDK is in another directory, add or change it here:
 INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
 INCLUDEPATH += ../XPlaneSDK/CHeaders/XPLM
+INCLUDEPATH += SDK/CHeaders/XPLM
 
 # You should not need to touch anything below this for normal build
 
