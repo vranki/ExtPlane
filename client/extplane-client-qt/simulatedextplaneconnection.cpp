@@ -59,7 +59,9 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new FixedSimulatedDataRef(this, "EXTPL1", name);
     } else if(name=="sim/aircraft/view/acf_descrip") {
         simRef = new FixedSimulatedDataRef(this, "ExtPlane Simulated Connection", name);
-    } else {
+    } else if(name=="sim/flightmodel/controls/parkbrake") {
+        simRef = new SimulatedDataRef(this, -1, 1, 1.0, true, 0, name);
+    }  else {
         // Fallback
         qWarning() << Q_FUNC_INFO << "the dataref " << name << "is not supported by simulation";
         simRef = new SimulatedDataRef(this, 0, 0, 1, false, 0, name);

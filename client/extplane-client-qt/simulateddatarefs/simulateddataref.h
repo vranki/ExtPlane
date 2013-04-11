@@ -25,7 +25,9 @@ public:
      * @param refName: the name of the DataRef (such as sim/flightmodel/position/vh_ind)
      */
     explicit SimulatedDataRef(QObject *parent, double minV, double maxV, double changeDivisor, bool round, int arrayCount, QString refName);
+    virtual ~SimulatedDataRef();
     ClientDataRef *clientRef();
+
 signals:
     
 public slots:

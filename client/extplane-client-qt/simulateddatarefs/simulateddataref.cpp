@@ -9,6 +9,10 @@ SimulatedDataRef::SimulatedDataRef(QObject *parent, double minV, double maxV, do
     changeTimer.start();
 }
 
+SimulatedDataRef::~SimulatedDataRef() {
+
+}
+
 void SimulatedDataRef::tickTime(double dt, int total) {
     currentValue += change*dt;
     if(currentValue > maxValue)
