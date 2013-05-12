@@ -3,6 +3,7 @@
 #include "clientdataref.h"
 #include "simulateddatarefs/simulateddataref.h"
 #include "extplaneclient.h"
+#include "../../util/console.h"
 
 ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : QTcpSocket(parent), updateInterval(0.333) {
     connect(this, SIGNAL(connected()), this, SLOT(socketConnected()));
@@ -42,7 +43,7 @@ void ExtPlaneConnection::socketConnected() {
 }
 
 void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {
-    qDebug() << Q_FUNC_INFO << errorString();
+    INFO << "Socket error:" << errorString();
     server_ok = false;
     emit connectionMessage(errorString() + " : " + peerName() + ":" + QString::number(peerPort()));
     reconnectTimer.setInterval(5000);
@@ -56,7 +57,7 @@ void ExtPlaneConnection::registerClient(ExtPlaneClient* client) {
 ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accuracy) {
     ClientDataRef *ref = dataRefs.value(name);
     if(ref){
-        qDebug() << Q_FUNC_INFO << "Ref already subscribed";
+        DEBUG << "Ref already subscribed";
         ref->setSubscribers(ref->subscribers()+1);
         if(accuracy < ref->accuracy()) {
             if(server_ok)
@@ -73,7 +74,7 @@ ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accurac
             subRef(ref);
     }
 
-    qDebug() << Q_FUNC_INFO << name << ref->subscribers() << server_ok;
+    DEBUG << name << ref->subscribers() << server_ok;
     return ref;
 }
 
@@ -83,10 +84,10 @@ ClientDataRef *ExtPlaneConnection::createDataRef(QString name, double accuracy) 
 }
 
 void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
-    qDebug() << Q_FUNC_INFO << ref << ref->name() << ref->subscribers();
+    DEBUG << ref << ref->name() << ref->subscribers();
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
-    qDebug() << Q_FUNC_INFO << "Ref not subscribed by anyone anymore";
+    DEBUG << "Ref not subscribed by anyone anymore";
     dataRefs.remove(ref->name());
     bool isSimulated = false;
     foreach(SimulatedDataRef *simRef, simulatedRefs) {
@@ -100,11 +101,11 @@ void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     if(!isSimulated) {
         if(server_ok)
             writeLine("unsub " + ref->name());
-        qDebug() << Q_FUNC_INFO << "Deleting ref " << ref->name() << ref;
+        DEBUG << "Deleting ref " << ref->name() << ref;
         ref->deleteLater();
     }
     foreach(ClientDataRef *ref, dataRefs) {
-        qDebug() << "refs now:" << ref->name();
+        DEBUG << "refs now:" << ref->name();
     }
 }
 
@@ -112,7 +113,7 @@ void ExtPlaneConnection::readClient() {
     while(canReadLine()) {
         QByteArray lineBA = readLine();
         QString line = QString(lineBA).trimmed();
-        qDebug() << Q_FUNC_INFO << "Server says: " << line;
+        DEBUG << "Server says: " << line;
         if(!server_ok) { // Waiting for handshake..
             if(line=="EXTPLANE 1") {
                 server_ok = true;
@@ -142,10 +143,10 @@ void ExtPlaneConnection::readClient() {
                         // Data dataref
                         ref->updateValue(QByteArray::fromBase64(cmd.value(2).toUtf8()));
                     } else {
-                        qDebug() << Q_FUNC_INFO << "unsupported ref type " << cmd.value(0);
+                        INFO << "Unsupported ref type " << cmd.value(0);
                     }
                 } else {
-                    qDebug() << Q_FUNC_INFO << "ref not subscribed " << cmd.value(2);
+                    INFO << "Ref not subscribed " << cmd.value(2);
                 }
             }
         }
@@ -153,7 +154,7 @@ void ExtPlaneConnection::readClient() {
 }
 
 void ExtPlaneConnection::subRef(ClientDataRef *ref) {
-    qDebug() << Q_FUNC_INFO;
+    DEBUG;
     Q_ASSERT(server_ok);
     QString subLine = "sub " + ref->name();
     if(ref->accuracy() != 0) {
@@ -164,7 +165,7 @@ void ExtPlaneConnection::subRef(ClientDataRef *ref) {
 
 void ExtPlaneConnection::writeLine(QString line) {
     if(!server_ok) {
-        qDebug() << Q_FUNC_INFO << "Connection not ok! Tried to write" << line;
+        DEBUG << "Connection not ok! Tried to write" << line;
         return;
     }
     line +="\n";

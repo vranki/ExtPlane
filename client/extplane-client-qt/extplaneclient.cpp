@@ -1,5 +1,5 @@
 #include "extplaneclient.h"
-#include <QDebug>
+#include "../../util/console.h"
 
 ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, ClientDataRefProvider *drp) :
     QObject(parent), _name(name), _connection(drp)
@@ -33,13 +33,13 @@ void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
     if (ok){
         emit refChanged(ref->name(), value);
     } else {
-        qDebug() << Q_FUNC_INFO << "unable to convert to double " << ref->valueString();
+        DEBUG << "unable to convert to double " << ref->valueString();
         emit refChanged(ref->name(), ref->valueString());
     }
 }
 
 void ExtPlaneClient::unsubscribeDataRef(QString name) {
-    qDebug() << Q_FUNC_INFO << name;
+    DEBUG << name;
     foreach(ClientDataRef *ref, _dataRefs) {
         if(ref->name() == name) {
             _dataRefs.removeOne(ref);
