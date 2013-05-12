@@ -11,7 +11,7 @@
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
         QObject(parent), _socket(socket), _refProvider(refProvider)
 {
-    INFO << "Client connected from " << socket->peerAddress();
+    INFO << "Client connected from " << socket->peerAddress().toString();
     connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(_socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
