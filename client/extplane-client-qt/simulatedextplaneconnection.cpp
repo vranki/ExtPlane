@@ -1,6 +1,7 @@
 #include "simulatedextplaneconnection.h"
 #include "simulateddatarefs/simulateddataref.h"
 #include "simulateddatarefs/fixedsimulateddataref.h"
+#include "../../util/console.h"
 
 SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
     enableSimulatedRefs = true;
@@ -63,7 +64,7 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new SimulatedDataRef(this, -1, 1, 1.0, true, 0, name);
     }  else {
         // Fallback
-        qWarning() << Q_FUNC_INFO << "the dataref " << name << "is not supported by simulation";
+        INFO << "the dataref " << name << "is not supported by simulation";
         simRef = new SimulatedDataRef(this, 0, 0, 1, false, 0, name);
     }
     simulatedRefs.append(simRef);
@@ -73,7 +74,7 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
 void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
-    qDebug() << Q_FUNC_INFO << "Ref not subscribed by anyone anymore";
+    DEBUG << "Ref not subscribed by anyone anymore";
     dataRefs.remove(ref->name());
 
     foreach(SimulatedDataRef *simRef, simulatedRefs) {
