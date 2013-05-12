@@ -2,6 +2,7 @@
 #include "XPLMDataAccess.h"
 #include "XPLMProcessing.h"
 #include "xplaneplugin.h"
+#include "util/console.h"
 
 XPlanePlugin *globalPlugin=0;
 
@@ -21,13 +22,13 @@ PLUGIN_API __attribute__((visibility("default"))) int XPluginStart(
     if(globalPlugin) {
         return globalPlugin->pluginStart(outName,outSig,outDesc);
     } else {
-        qDebug() <<  Q_FUNC_INFO << "Unable to create plugin";
+        INFO << "Unable to create plugin";
         return 0;
     }
 }
 
 PLUGIN_API __attribute__((visibility("default"))) void	XPluginStop(void) {
-    qDebug() <<  Q_FUNC_INFO;
+    DEBUG;
     XPLMUnregisterFlightLoopCallback(MyFlightLoopCallback, 0);
     globalPlugin->pluginStop();
     delete globalPlugin;
@@ -35,11 +36,11 @@ PLUGIN_API __attribute__((visibility("default"))) void	XPluginStop(void) {
 }
 
 PLUGIN_API __attribute__((visibility("default"))) void XPluginDisable(void) {
-    qDebug() <<  Q_FUNC_INFO;
+    DEBUG;
 }
 
 PLUGIN_API __attribute__((visibility("default"))) int XPluginEnable(void) {
-    qDebug() <<  Q_FUNC_INFO;
+    DEBUG;
     return 1;
 }
 

@@ -1,4 +1,5 @@
 #include "datadataref.h"
+#include "util/console.h"
 
 DataDataRef::DataDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref)
 {
@@ -8,7 +9,7 @@ DataDataRef::DataDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataR
     _length = XPLMGetDatab(_ref, NULL, 0, 0);
     _value = QByteArray(_length, 0);
     _newValue = QByteArray(_length, 0); // Init already here for perf reasons.
-    qDebug() << Q_FUNC_INFO << "Inited data dataref with a length of =" << _length;
+    DEBUG << "Inited data dataref with a length of =" << _length;
 }
 
 QByteArray &DataDataRef::value() {

@@ -1,4 +1,5 @@
 #include "floatdataref.h"
+#include "util/console.h"
 
 FloatDataRef::FloatDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref), _value(-999999.0f) {
     _typeString = "f";
@@ -19,7 +20,7 @@ void FloatDataRef::updateValue() {
 
 void FloatDataRef::setValue(float newValue) {
     if(!isWritable()) {
-        qDebug() << Q_FUNC_INFO << "Tried to write read-only dataref" << name();
+        INFO << "Tried to write read-only dataref" << name();
         return;
     }
     _value = newValue;
@@ -36,6 +37,6 @@ void FloatDataRef::setValue(QString &newValue) {
     if(ok) {
         setValue(value);
     } else {
-        qDebug() << Q_FUNC_INFO << "Cannot set value " << newValue;
+        INFO << "Cannot set value " << newValue;
     }
 }

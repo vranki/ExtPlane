@@ -1,4 +1,5 @@
 #include "doubledataref.h"
+#include "util/console.h"
 
 DoubleDataRef::DoubleDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref), _value(-999999.0f) {
     _typeString = "d";
@@ -19,10 +20,10 @@ void DoubleDataRef::updateValue() {
 
 void DoubleDataRef::setValue(double newValue) {
     if(!isWritable()) {
-        qDebug() << Q_FUNC_INFO << "Tried to write read-only dataref" << name();
+        INFO << "Tried to write read-only dataref" << name();
         return;
     }
-    qDebug() << Q_FUNC_INFO << name() << newValue;
+    DEBUG << name() << newValue;
     _value = newValue;
     XPLMSetDataf(ref(), _value);
 }
@@ -37,6 +38,6 @@ void DoubleDataRef::setValue(QString &newValue) {
     if(ok) {
         setValue(value);
     } else {
-        qDebug() << Q_FUNC_INFO << "Cannot set value " << newValue;
+        INFO << "Cannot set value " << newValue;
     }
 }

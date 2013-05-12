@@ -1,18 +1,19 @@
 #include "tcpserver.h"
 #include "tcpclient.h"
 #include "datarefprovider.h"
+#include "util/console.h"
 
 TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent), server(this), _refProvider(refProvider) {
     if(!server.listen(QHostAddress::Any, EXTPLANE_PORT)) {
-        qDebug() << Q_FUNC_INFO << "Unable to listen on port " << EXTPLANE_PORT;
+        INFO << "Unable to listen on port " << EXTPLANE_PORT;
         return;
     }
     connect(&server, SIGNAL(newConnection()), this, SLOT(clientConnected()));
-    qDebug() <<  Q_FUNC_INFO << "Listening on port " << EXTPLANE_PORT;
+    INFO << "Listening on port " << EXTPLANE_PORT;
 }
 
 TcpServer::~TcpServer() {
-    qDebug() << Q_FUNC_INFO;
+    DEBUG;
 
     while (!clientConnections.isEmpty()) {
         TcpClient *client = clientConnections.takeLast();
@@ -29,6 +30,6 @@ void TcpServer::clientConnected() {
 }
 
 void TcpServer::clientDiscoed(TcpClient *client) {
-    qDebug() << Q_FUNC_INFO << client;
+    DEBUG << client;
     clientConnections.removeOne(client);
 }

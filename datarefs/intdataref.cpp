@@ -1,4 +1,5 @@
 #include "intdataref.h"
+#include "util/console.h"
 
 IntDataRef::IntDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref), _value(-999999)
 {
@@ -20,10 +21,10 @@ void IntDataRef::updateValue() {
 
 void IntDataRef::setValue(int newValue) {
     if(!isWritable()) {
-        qDebug() << Q_FUNC_INFO << "Tried to write read-only dataref" << name();
+        INFO << "Tried to write read-only dataref" << name();
         return;
     }
-    qDebug() << Q_FUNC_INFO << name() << newValue;
+    DEBUG << name() << newValue;
     _value = newValue;
     XPLMSetDatai(ref(), _value);
 }
@@ -38,6 +39,6 @@ void IntDataRef::setValue(QString &newValue) {
     if(ok) {
         setValue(value);
     } else {
-        qDebug() << Q_FUNC_INFO << "Cannot set value " << newValue;
+        INFO << "Cannot set value " << newValue;
     }
 }

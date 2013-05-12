@@ -71,7 +71,6 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
 }
 
 void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
-    qDebug() << Q_FUNC_INFO << ref << ref->name() << ref->subscribers();
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
     qDebug() << Q_FUNC_INFO << "Ref not subscribed by anyone anymore";
@@ -84,20 +83,11 @@ void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
 	}
     }
     disconnect(ref, 0, this, 0);
-
-    foreach(ClientDataRef *ref, dataRefs) {
-	qDebug() << "refs now:" << ref->name();
-    }
 }
-
-
-
 
 void SimulatedExtPlaneConnection::writeLine(QString line) {
-    qDebug() << Q_FUNC_INFO << line << "(simulated)";
+    //qDebug() << Q_FUNC_INFO << line << "(simulated)";
 }
-
-
 
 void SimulatedExtPlaneConnection::tickTime(double dt, int total) {
     foreach(SimulatedDataRef *dr, simulatedRefs)

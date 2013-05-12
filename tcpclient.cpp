@@ -6,11 +6,12 @@
 #include "datarefs/doubledataref.h"
 #include "datarefs/datadataref.h"
 #include "datarefprovider.h"
+#include "util/console.h"
 
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
         QObject(parent), _socket(socket), _refProvider(refProvider)
 {
-    qDebug() << Q_FUNC_INFO << " client connected from " << socket->peerAddress();
+    INFO << "Client connected from " << socket->peerAddress();
     connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(_socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
@@ -23,7 +24,7 @@ TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refPr
 }
 
 TcpClient::~TcpClient() {
-    qDebug() << Q_FUNC_INFO;
+    DEBUG;
     _socket->disconnectFromHost();
     while(!_subscribedRefs.isEmpty()) {
         DataRef *ref = _subscribedRefs.values().first();
@@ -37,7 +38,7 @@ TcpClient::~TcpClient() {
 }
 
 void TcpClient::socketError(QAbstractSocket::SocketError err) {
-    qDebug() << Q_FUNC_INFO << _socket->errorString();
+    INFO << "Socket error:" << _socket->errorString();
     deleteLater();
 }
 
@@ -46,12 +47,12 @@ void TcpClient::readClient() {
         QByteArray lineBA = _socket->readLine();
 
         QString line = QString(lineBA).trimmed();
-        qDebug() << Q_FUNC_INFO << "Client says: " << line;
+        DEBUG << "Client says: " << line;
         // Split the command in strings
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
         QString command = subLine.value(0);
         if(command == "disconnect") {
-            qDebug() << Q_FUNC_INFO << "killing this client connection";
+            DEBUG << "killing this client connection";
             deleteLater();
         } else if(command == "sub") { // Subscribe command
             if(subLine.length() >= 2) {
@@ -81,17 +82,17 @@ void TcpClient::readClient() {
                         } else if(ref->type() == xplmType_Data) {
                             _refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
                         }
-                        qDebug() << Q_FUNC_INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
+                        INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
                     } else {
-                        qDebug() << Q_FUNC_INFO << "Ref not found" << refName;
+                        INFO << "Ref not found" << refName;
                     }
                 } else { // Ref already subscribed - update accuracy
-                    qDebug() << Q_FUNC_INFO << "Updating " << refName << " accuracy to " << accuracy;
+                    INFO << "Updating " << refName << " accuracy to " << accuracy;
                     _refAccuracy[ref] = accuracy;
                     ref->updateValue();
                 }
             } else {
-                qDebug() << Q_FUNC_INFO << "Invalid sub command";
+                INFO << "Invalid sub command";
             }
         } else if(command == "unsub") {
             QString refName = subLine.value(1);
@@ -116,11 +117,11 @@ void TcpClient::readClient() {
                     if(ref->isWritable()) {
                         ref->setValue(refValue);
                     } else {
-                        qDebug() << Q_FUNC_INFO << "Ref " << ref->name() << " is not writable!";
+                        INFO << "Ref " << ref->name() << " is not writable!";
                     }
                 }
             } else {
-                qDebug() << Q_FUNC_INFO << "Invalid set command";
+                INFO << "Invalid set command";
             }
         } else if(command == "key") {
             if(subLine.size() == 2) {
@@ -129,7 +130,7 @@ void TcpClient::readClient() {
                 if(ok)
                     _refProvider->keyStroke(keyId);
             } else {
-                qDebug() << Q_FUNC_INFO << "Invalid key command";
+                INFO << "Invalid key command";
             }
         } else if(command == "but") {
             if(subLine.size() == 2) {
@@ -140,7 +141,7 @@ void TcpClient::readClient() {
                     _heldButtons.insert(keyId);
                 }
             } else {
-                qDebug() << Q_FUNC_INFO << "Invalid but command";
+                INFO << "Invalid but command";
             }
         } else if(command == "rel") {
             if(subLine.size() == 2) {
@@ -149,10 +150,10 @@ void TcpClient::readClient() {
                 if(ok && _heldButtons.contains(keyId)) {
                     _refProvider->buttonRelease(keyId);
                 } else {
-                    qDebug() << Q_FUNC_INFO << "Invalid rel command, button not held";
+                    INFO << "Invalid rel command, button not held";
                 }
             } else {
-                qDebug() << Q_FUNC_INFO << "Invalid rel command";
+                INFO << "Invalid rel command";
             }
         } else if(command == "extplane-set") {
             if(subLine.size()==3) {
@@ -162,17 +163,17 @@ void TcpClient::readClient() {
                     if(ok) {
                         emit(setFlightLoopInterval(newInterval));
                     } else {
-                        qDebug() << Q_FUNC_INFO << "Invalid interval";
+                        INFO << "Invalid interval";
                     }
                 } else {
-                    qDebug() << Q_FUNC_INFO << "Invalid update_interval command";
+                    INFO << "Invalid update_interval command";
                 }
             } else {
-                qDebug() << Q_FUNC_INFO << "Invalid extplane-set command";
+                INFO << "Invalid extplane-set command";
             }
 
         } else {
-            qDebug() << Q_FUNC_INFO << "Unknown command " << command;
+            INFO << "Unknown command " << command;
         }
     }
 }
@@ -240,7 +241,7 @@ void TcpClient::refChanged(DataRef *ref) {
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
         _refValueB[ref] = refB->value();
     } else {
-        qDebug( ) << Q_FUNC_INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
+        INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
         return;
     }
     QByteArray block;

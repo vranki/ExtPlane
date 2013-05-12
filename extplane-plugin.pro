@@ -28,6 +28,14 @@ QMAKE_CXXFLAGS += -fPIC
 QMAKE_LFLAGS += -shared -fPIC
 #  -static-libgcc  <- fails on mac
 
+CONFIG(debug, debug|release) {
+    # Debug
+} else {
+    # Release
+    DEFINES += QT_NO_DEBUG
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
 unix:!macx {
      DEFINES += APL=0 IBM=0 LIN=1
      QMAKE_CFLAGS += -fstack-protector
@@ -76,6 +84,7 @@ HEADERS += \
     datarefs/intdataref.h \
     datarefs/doubledataref.h \
     datarefs/intarraydataref.h \
-    datarefs/datadataref.h
+    datarefs/datadataref.h \
+    util/console.h
 
 OTHER_FILES += README client/extplane-client-qt/README

@@ -1,11 +1,12 @@
 #include "intarraydataref.h"
+#include "util/console.h"
 #include <QStringList>
 
 IntArrayDataRef::IntArrayDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref) {
     _typeString = "ia";
     _type = xplmType_IntArray;
     _length = XPLMGetDatavi(_ref, NULL, 0, 0);
-    qDebug() << Q_FUNC_INFO << "Inited dataref with a length of =" << _length;
+    DEBUG << "Inited dataref with a length of =" << _length;
     _values.fill(-9999, _length); // Resize and initialize vector
     _valueArray = new int[_length];
 }
@@ -45,7 +46,7 @@ QString IntArrayDataRef::valueString() {
 void IntArrayDataRef::setValue(QString &newValue) {
     // Check that value starts with [ and ends with ]
     if(!newValue.startsWith('[') || !newValue.endsWith(']')) {
-        qDebug() << Q_FUNC_INFO << "Invalid array value";
+        INFO << "Invalid array value";
         return;
     }
 
@@ -61,7 +62,7 @@ void IntArrayDataRef::setValue(QString &newValue) {
         bool ok = true;
         int value = values[i].toInt(&ok);
         if(!ok) {
-            qDebug() << Q_FUNC_INFO << "Invalid value " << values[i] << "in array";
+            INFO << "Invalid value " << values[i] << "in array";
             return;
         }
         _valueArray[i]=value;

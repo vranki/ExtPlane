@@ -7,13 +7,14 @@
  */
 
 #include "floatarraydataref.h"
+#include "util/console.h"
 #include <QStringList>
 
 FloatArrayDataRef::FloatArrayDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref) {
     _typeString = "fa";
     _type = xplmType_FloatArray;
     _length = XPLMGetDatavf(_ref, NULL, 0, 0);
-    qDebug() << Q_FUNC_INFO << "Inited dataref with a length of =" << _length;
+    DEBUG << "Inited dataref with a length of =" << _length;
     _values.fill(-9999, _length); // Resize and initialize vector
     _valueArray = new float[_length];
 }
@@ -54,7 +55,7 @@ void FloatArrayDataRef::setValue(QString &newValue) {
 
     // Check that value starts with [ and ends with ]
     if(!newValue.startsWith('[') || !newValue.endsWith(']')) {
-        qDebug() << Q_FUNC_INFO << "Invalid array value";
+        INFO << "Invalid array value";
         return;
     }
 
@@ -70,7 +71,7 @@ void FloatArrayDataRef::setValue(QString &newValue) {
         bool ok = true;
         float value = values[i].toFloat(&ok);
         if(!ok) {
-            qDebug() << Q_FUNC_INFO << "Invalid value " << values[i] << "in array";
+            INFO << "Invalid value " << values[i] << "in array";
             return;
         }
         _valueArray[i]=value;
