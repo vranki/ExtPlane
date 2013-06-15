@@ -21,7 +21,7 @@ public:
      * @param maxV: the maximum value
      * @param changeDivisor: slows down the progression from minV to maxV (when 1, dx is 1)
      * @param round: if true, the value is rounded to a whole number
-     * @param arrayCount: If > 0 specifies the number of datarefs for array datarefs in the format "[x,y,z]". If < 0 specifies number of dararefs for array datarefs in the format "x y z". If 0 specifies a single dataref (non-array).
+     * @param arrayCount: If > 0 specifies the number of datarefs for an array dataref. If 0 specifies a single dataref (non-array).
      * @param refName: the name of the DataRef (such as sim/flightmodel/position/vh_ind)
      */
     explicit SimulatedDataRef(QObject *parent, double minV, double maxV, double changeDivisor, bool round, int arrayCount, QString refName);

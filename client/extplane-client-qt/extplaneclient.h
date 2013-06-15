@@ -26,12 +26,15 @@ public slots:
 
 signals:
     void refChanged(QString name, double value);
-    void refChanged(QString name, QString valueString);
+    void refChanged(QString name, QString value);
+    void refChanged(QString name, QStringList values);
+
 private slots:
     void cdrChanged(ClientDataRef *ref);
     void valueSet(ClientDataRef *ref);
     void unsubscribed(ClientDataRef *ref);
     void refDestroyed(QObject* refqo);
+
 private:
     QString _name;
     QList<ClientDataRef*> _dataRefs;

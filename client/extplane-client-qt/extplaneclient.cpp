@@ -28,13 +28,18 @@ void ExtPlaneClient::refDestroyed(QObject* refqo) {
 void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
     double value;
     bool ok;
-    
-    value = ref->valueString().toDouble(&ok);
-    if (ok){
-        emit refChanged(ref->name(), value);
+    if(ref->isArray()) {
+        emit refChanged(ref->name(), ref->valueStrings());
     } else {
-        DEBUG << "unable to convert to double " << ref->valueString();
-        emit refChanged(ref->name(), ref->valueString());
+        // Try to convert to double and forward to corresponding slot per default
+        // If that fails, we fallback to the string slot
+        // TODO: Is this really a nice solution?
+        value = ref->valueString().toDouble(&ok);
+        if (ok){
+            emit refChanged(ref->name(), value);
+        } else {
+            emit refChanged(ref->name(), ref->valueString());
+        }
     }
 }
 

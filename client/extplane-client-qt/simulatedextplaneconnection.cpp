@@ -55,14 +55,22 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
     } else if(name=="sim/cockpit2/autopilot/heading_dial_deg_mag_pilot") {
         simRef = new SimulatedDataRef(this, -360, 360, 30.0, false, 0, name);
     } else if(name=="sim/cockpit2/engine/indicators/engine_speed_rpm") {
-        simRef = new SimulatedDataRef(this, 0, 50000, 5.0, false, -4, name);
+        simRef = new SimulatedDataRef(this, 0, 50000, 5.0, false, 4, name);
     } else if(name=="sim/aircraft/view/acf_tailnum") {
         simRef = new FixedSimulatedDataRef(this, "EXTPL1", name);
     } else if(name=="sim/aircraft/view/acf_descrip") {
         simRef = new FixedSimulatedDataRef(this, "ExtPlane Simulated Connection", name);
     } else if(name=="sim/flightmodel/controls/parkbrake") {
         simRef = new SimulatedDataRef(this, -1, 1, 1.0, true, 0, name);
-    }  else {
+    } else if(name=="sim/aircraft/engine/acf_num_engines") {
+        simRef = new SimulatedDataRef(this, 1, 4, 20.0, true, 0, name);
+    } else if(name=="sim/cockpit2/engine/indicators/N1_percent") {
+        simRef = new SimulatedDataRef(this, 0, 100, 10.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
+    } else if(name=="sim/cockpit2/engine/indicators/EPR_ratio") {
+        simRef = new SimulatedDataRef(this, 1.0, 2.2, 10.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
+    } else if(name=="sim/cockpit2/engine/indicators/EGT_deg_C") {
+        simRef = new SimulatedDataRef(this, 0.0, 800, 100.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
+    } else {
         // Fallback
         INFO << "the dataref " << name << "is not supported by simulation";
         simRef = new SimulatedDataRef(this, 0, 0, 1, false, 0, name);

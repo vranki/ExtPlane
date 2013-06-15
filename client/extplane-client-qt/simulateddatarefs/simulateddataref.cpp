@@ -23,19 +23,15 @@ void SimulatedDataRef::tickTime(double dt, int total) {
 
 void SimulatedDataRef::changeTimeout() {
     if(arrayCount > 0) {
-        QString ret="[";
+        QStringList values;
         for(int i=0;i<arrayCount;i++){
-            ret += QString::number(currentValue) + (i < arrayCount -1 ? QString(",") : "");
+            // For every additional array value we use the current value divided by its index,
+            // this easily simulates different array values for a dataref that are constrained to
+            // the defined range.
+            values.push_back(QString("%1").arg(currentValue/(double)(i+1)));
         }
-        ret += "]";
-        myClientRef.updateValue(ret);
-    } else if(arrayCount < 0) {
-        QString ret="";
-        for(int i=0;i<qAbs(arrayCount);i++){
-            ret += QString::number(currentValue) + (i < qAbs(arrayCount) -1 ? QString(" ") : "");
-        }
-        myClientRef.updateValue(ret);
-    } else {
+        myClientRef.updateValue(values);
+    }else {
         myClientRef.updateValue(QString::number(currentValue));
     }
 }
