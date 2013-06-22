@@ -55,7 +55,7 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
     } else if(name=="sim/cockpit2/autopilot/heading_dial_deg_mag_pilot") {
         simRef = new SimulatedDataRef(this, -360, 360, 30.0, false, 0, name);
     } else if(name=="sim/cockpit2/engine/indicators/engine_speed_rpm") {
-        simRef = new SimulatedDataRef(this, 0, 50000, 5.0, false, 4, name);
+        simRef = new SimulatedDataRef(this, 0, 10000, 5.0, false, 4, name);
     } else if(name=="sim/aircraft/view/acf_tailnum") {
         simRef = new FixedSimulatedDataRef(this, "EXTPL1", name);
     } else if(name=="sim/aircraft/view/acf_descrip") {

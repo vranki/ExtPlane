@@ -33,7 +33,7 @@ private:
     DataRef *getSubscribedRef(QString name);
     QTcpSocket *_socket;
     QSet<DataRef*> _subscribedRefs;
-    QMap<DataRef*, double> _refAccuracy;
+    //QMap<DataRef*, double> _refAccuracy;
     QMap<DataRef*, double> _refValueD;
     QMap<DataRef*, float> _refValueF;
     QMap<DataRef*, QVector<float> > _refValueFA;

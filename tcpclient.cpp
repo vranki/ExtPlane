@@ -68,7 +68,8 @@ void TcpClient::readClient() {
                     if(ref) { // Succesfully subscribed
                         connect(ref, SIGNAL(changed(DataRef*)), this, SLOT(refChanged(DataRef*)));
                         _subscribedRefs.insert(ref);
-                        _refAccuracy[ref] = accuracy;
+                        ref->setAccuracy(accuracy);
+                        //TODO: why is ref->updateValue() not sufficient here?
                         if(ref->type() == xplmType_Float) {
                             _refValueF[ref] = qobject_cast<FloatDataRef*>(ref)->value();
                         } else if(ref->type() == xplmType_Int) {
@@ -88,7 +89,7 @@ void TcpClient::readClient() {
                     }
                 } else { // Ref already subscribed - update accuracy
                     INFO << "Updating " << refName << " accuracy to " << accuracy;
-                    _refAccuracy[ref] = accuracy;
+                    ref->setAccuracy(accuracy); //TODO: can we really just overwrite the accuracy? Shouldnt the lowest accuracy be taken or so?
                     ref->updateValue();
                 }
             } else {
@@ -101,7 +102,6 @@ void TcpClient::readClient() {
                 ref->disconnect(this);
                 _refProvider->unsubscribeRef(ref);
                 _subscribedRefs.remove(ref);
-                _refAccuracy.remove(ref);
                 _refValueF.remove(ref);
                 _refValueFA.remove(ref);
                 _refValueB.remove(ref);
@@ -182,7 +182,7 @@ void TcpClient::refChanged(DataRef *ref) {
     Q_ASSERT(_subscribedRefs.contains(ref));
     if(ref->type()== xplmType_Float) {
         FloatDataRef *refF = qobject_cast<FloatDataRef*>(ref);
-        if(qAbs(refF->value() - _refValueF[ref]) < _refAccuracy[ref])
+        if(qAbs(refF->value() - _refValueF[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueF[ref] = refF->value();
     } else if(ref->type()== xplmType_FloatArray) {
@@ -194,7 +194,7 @@ void TcpClient::refChanged(DataRef *ref) {
         long length = values.size();
         
         for (int i=0; i<length;i++){
-            if (qAbs(values[i] - _refValueFA[ref][i]) > _refAccuracy[ref]) {
+            if (qAbs(values[i] - _refValueFA[ref][i]) > ref->accuracy()) {
                 bigenough = true;
                 break;
             }
@@ -215,7 +215,7 @@ void TcpClient::refChanged(DataRef *ref) {
         long length = values.size();
 
         for (int i=0; i<length;i++){
-            if (qAbs(values[i] - _refValueIA[ref][i]) > _refAccuracy[ref]) {
+            if (qAbs(values[i] - _refValueIA[ref][i]) > ref->accuracy()) {
                 bigenough = true;
                 break;
             }
@@ -229,12 +229,12 @@ void TcpClient::refChanged(DataRef *ref) {
         }
     } else if(ref->type()== xplmType_Int) {
         IntDataRef *refI = qobject_cast<IntDataRef*>(ref);
-        if(qAbs(refI->value() - _refValueI[ref]) < _refAccuracy[ref])
+        if(qAbs(refI->value() - _refValueI[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueI[ref] = refI->value();
     } else if(ref->type()== xplmType_Double) {
         DoubleDataRef *refD = qobject_cast<DoubleDataRef*>(ref);
-        if(qAbs(refD->value() - _refValueD[ref]) < _refAccuracy[ref])
+        if(qAbs(refD->value() - _refValueD[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueD[ref] = refD->value();
     } else if(ref->type()== xplmType_Data) {
