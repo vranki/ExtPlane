@@ -18,8 +18,9 @@ XPlanePlugin::~XPlanePlugin() {
 
 float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop,
                                int inCounter, void *inRefcon) {
-    foreach(DataRef *ref, refs)
-        ref->updateValue();
+    // Tell each dataref to update its value through the XPLM api
+    foreach(DataRef *ref, refs) ref->updateValue();
+    // Tell Qt to process it's own runloop
     app->processEvents();
     return flightLoopInterval;
 }

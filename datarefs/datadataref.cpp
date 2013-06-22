@@ -9,6 +9,7 @@ DataDataRef::DataDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataR
     _length = XPLMGetDatab(_ref, NULL, 0, 0);
     _value = QByteArray(_length, 0);
     _newValue = QByteArray(_length, 0); // Init already here for perf reasons.
+    _lastUpdate.restart();
     DEBUG << "Inited data dataref with a length of =" << _length;
 }
 
@@ -17,13 +18,17 @@ QByteArray &DataDataRef::value() {
 }
 
 void DataDataRef::updateValue() {
-    // Read and verify data from XPLM
-    int valuesCopied = XPLMGetDatab(_ref, _newValue.data(), 0, _length);
-    Q_ASSERT(valuesCopied == _length);
-
-    if (_newValue != _value) {
-        _value = _newValue;
-        emit changed(this);
+    // Make sure it's time to update again based on the accuracy
+    if(this->accuracy() == 0 || _lastUpdate.elapsed() > this->accuracy()) {
+        // Read and verify data from XPLM
+        int valuesCopied = XPLMGetDatab(_ref, _newValue.data(), 0, _length);
+        _lastUpdate.restart();
+        Q_ASSERT(valuesCopied == _length);
+        // TODO: do we really want to make this comparison for large data datarefs? Probably as it's still cheaper than sending over the wire the new data
+        if (_newValue != _value) {
+            _value = _newValue;
+            emit changed(this);
+        }
     }
 }
 

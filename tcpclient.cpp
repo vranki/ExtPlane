@@ -238,6 +238,8 @@ void TcpClient::refChanged(DataRef *ref) {
             return; // Hasn't changed enough
         _refValueD[ref] = refD->value();
     } else if(ref->type()== xplmType_Data) {
+        // The accuracy is handled internally for the data dataref, when it emits the update signal
+        // it's time to send the update...
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
         _refValueB[ref] = refB->value();
     } else {
