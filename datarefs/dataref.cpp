@@ -37,3 +37,12 @@ XPLMDataTypeID DataRef::type() {
 QString DataRef::typeString() {
     return _typeString;
 }
+
+void DataRef::setAccuracy(double val) {
+    _accuracy = val;
+}
+
+void DataRef::updateAccuracy(double val) {
+    // Only update if the new accuracy is higher (eg the value is smaller than currently set)
+    if(val < _accuracy) _accuracy = val;
+}

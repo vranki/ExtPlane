@@ -24,7 +24,8 @@ public:
     virtual void setValue(QString &newValue) = 0;
     XPLMDataTypeID type(); // NOTE: always only one type, although XPLMDataTypeID can have many.
     QString typeString();
-    virtual void setAccuracy(double val) { _accuracy = val; }
+    virtual void setAccuracy(double val);
+    virtual void updateAccuracy(double val);
     double accuracy() { return _accuracy; }
 signals:
     void changed(DataRef *ref);

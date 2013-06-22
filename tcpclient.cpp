@@ -89,7 +89,7 @@ void TcpClient::readClient() {
                     }
                 } else { // Ref already subscribed - update accuracy
                     INFO << "Updating " << refName << " accuracy to " << accuracy;
-                    ref->setAccuracy(accuracy); //TODO: can we really just overwrite the accuracy? Shouldnt the lowest accuracy be taken or so?
+                    ref->setAccuracy(accuracy);
                     ref->updateValue();
                 }
             } else {
