@@ -22,6 +22,9 @@ CONFIG   -= app_bundle
 
 TEMPLATE = lib
 
+# X-Plane 2.0 required
+DEFINES += XPLM200
+
 TARGET = extplane-plugin
 
 QMAKE_CXXFLAGS += -fPIC
@@ -30,8 +33,10 @@ QMAKE_LFLAGS += -shared -fPIC
 
 CONFIG(debug, debug|release) {
     # Debug
+    message("Ext-Plane Debug Build");
 } else {
     # Release
+     message("Ext-Plane Release Build");
     DEFINES += QT_NO_DEBUG
     DEFINES += QT_NO_DEBUG_OUTPUT
 }
@@ -57,7 +62,20 @@ macx {
      LIBS += -framework XPLM
 }
 
-QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) extplane.xpl
+win32 {
+    !contains(QMAKE_HOST.arch, x86_64) {
+        message("Windows Platform (x86)");
+        LIBS += -lXPLM -lXPWidgets
+    } else {
+        message("Windows Platform (x86_64)");
+        LIBS += -lXPLM_64 -lXPWidgets_64
+    }
+    DEFINES += APL=0 IBM=1 LIN=0
+    LIBS += -L../XPlaneSDK/Libraries/Win
+    DEFINES += NOMINMAX #Qt5 bug
+}
+
+#QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) extplane.xpl
 QMAKE_CLEAN += extplane.xpl
 
 SOURCES += main.cpp \

@@ -1,5 +1,5 @@
 #include "intarraydataref.h"
-#include "util/console.h"
+#include "../util/console.h"
 #include <QStringList>
 
 IntArrayDataRef::IntArrayDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref) {
