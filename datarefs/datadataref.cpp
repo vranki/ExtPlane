@@ -1,5 +1,5 @@
 #include "datadataref.h"
-#include "util/console.h"
+#include "../util/console.h"
 
 DataDataRef::DataDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref)
 {

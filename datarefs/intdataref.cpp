@@ -1,5 +1,5 @@
 #include "intdataref.h"
-#include "util/console.h"
+#include "../util/console.h"
 
 IntDataRef::IntDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref), _value(-999999)
 {

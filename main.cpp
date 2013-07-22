@@ -1,12 +1,17 @@
 #include <QDebug>
+#include "XPLMPlugin.h"
 #include "XPLMDataAccess.h"
 #include "XPLMProcessing.h"
 #include "xplaneplugin.h"
 #include "util/console.h"
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 XPlanePlugin *globalPlugin=0;
 
-PLUGIN_API __attribute__((visibility("default"))) float	MyFlightLoopCallback(
+PLUGIN_API  float	MyFlightLoopCallback(
         float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop,
         int inCounter, void *inRefcon) {
     if(globalPlugin)
@@ -14,7 +19,7 @@ PLUGIN_API __attribute__((visibility("default"))) float	MyFlightLoopCallback(
     return 1;
 }
 
-PLUGIN_API __attribute__((visibility("default"))) int XPluginStart(
+PLUGIN_API  int XPluginStart(
         char * outName, char * outSig, char *outDesc) {
     XPLMRegisterFlightLoopCallback(MyFlightLoopCallback, 0.01, NULL);
     Q_ASSERT(!globalPlugin);
@@ -27,7 +32,7 @@ PLUGIN_API __attribute__((visibility("default"))) int XPluginStart(
     }
 }
 
-PLUGIN_API __attribute__((visibility("default"))) void	XPluginStop(void) {
+PLUGIN_API  void	XPluginStop(void) {
     DEBUG;
     XPLMUnregisterFlightLoopCallback(MyFlightLoopCallback, 0);
     globalPlugin->pluginStop();
@@ -35,16 +40,16 @@ PLUGIN_API __attribute__((visibility("default"))) void	XPluginStop(void) {
     globalPlugin = 0;
 }
 
-PLUGIN_API __attribute__((visibility("default"))) void XPluginDisable(void) {
+PLUGIN_API  void XPluginDisable(void) {
     DEBUG;
 }
 
-PLUGIN_API __attribute__((visibility("default"))) int XPluginEnable(void) {
+PLUGIN_API  int XPluginEnable(void) {
     DEBUG;
     return 1;
 }
 
-PLUGIN_API __attribute__((visibility("default"))) void XPluginReceiveMessage(
+PLUGIN_API  void XPluginReceiveMessage(
         XPLMPluginID inFromWho, long inMessage, void *inParam) {
     if(globalPlugin)
         globalPlugin->receiveMessage(inFromWho, inMessage, inParam);
