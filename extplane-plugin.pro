@@ -71,7 +71,8 @@ SOURCES += main.cpp \
     datarefs/intdataref.cpp \
     datarefs/doubledataref.cpp \
     datarefs/intarraydataref.cpp \
-    datarefs/datadataref.cpp
+    datarefs/datadataref.cpp \
+    customdata/navcustomdata.cpp
 
 HEADERS += \
     xplaneplugin.h \
@@ -85,6 +86,7 @@ HEADERS += \
     datarefs/doubledataref.h \
     datarefs/intarraydataref.h \
     datarefs/datadataref.h \
-    util/console.h
+    util/console.h \
+    customdata/navcustomdata.h
 
 OTHER_FILES += README client/extplane-client-qt/README

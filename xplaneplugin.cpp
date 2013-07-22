@@ -7,6 +7,7 @@
 #include "datarefs/doubledataref.h"
 #include "datarefs/datadataref.h"
 #include "util/console.h"
+#include "customdata/navcustomdata.h"
 
 XPlanePlugin::XPlanePlugin(QObject *parent) :
     QObject(parent), argc(0), argv(0), app(0), server(0), flightLoopInterval(0.31f) { // Default to 30hz
@@ -26,13 +27,49 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTime
 }
 
 int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
+    // Set plugin info
     INFO << "Plugin started";
+    strcpy(outName, "ExtPlane");
+    strcpy(outSig, "org.vranki.extplaneplugin");
+    strcpy(outDesc, "Read and write X-Plane datarefs from external programs using TCP sockets.");
+
+    // Init application and server
     app = new QCoreApplication(argc, &argv);
     server = new TcpServer(this, this);
     connect(server, SIGNAL(setFlightLoopInterval(float)), this, SLOT(setFlightLoopInterval(float)));
-    strcpy(outName, "ExtPlane");
-    strcpy(outSig, "org.vranki.extplaneplugin");
-    strcpy(outDesc, "Read and write X-Plane datarefs from external programs using TCP socket.");
+
+    // Register the nav custom data accessors
+    XPLMRegisterDataAccessor("extplane/navdata/5km",
+                                                 xplmType_Data,                                 // The types we support
+                                                 0,                                             // Writable
+                                                 NULL, NULL,                                    // Integer accessors
+                                                 NULL, NULL,                                    // Float accessors
+                                                 NULL, NULL,                                    // Doubles accessors
+                                                 NULL, NULL,                                    // Int array accessors
+                                                 NULL, NULL,                                    // Float array accessors
+                                                 NavCustomData::DataCallback_5km, NULL,         // Raw data accessors
+                                                 NULL, NULL);                                   // Refcons not used
+    XPLMRegisterDataAccessor("extplane/navdata/20km",
+                                                 xplmType_Data,                                 // The types we support
+                                                 0,                                             // Writable
+                                                 NULL, NULL,                                    // Integer accessors
+                                                 NULL, NULL,                                    // Float accessors
+                                                 NULL, NULL,                                    // Doubles accessors
+                                                 NULL, NULL,                                    // Int array accessors
+                                                 NULL, NULL,                                    // Float array accessors
+                                                 NavCustomData::DataCallback_20km, NULL,        // Raw data accessors
+                                                 NULL, NULL);                                   // Refcons not used
+    XPLMRegisterDataAccessor("extplane/navdata/100km",
+                                                 xplmType_Data,                                 // The types we support
+                                                 0,                                             // Writable
+                                                 NULL, NULL,                                    // Integer accessors
+                                                 NULL, NULL,                                    // Float accessors
+                                                 NULL, NULL,                                    // Doubles accessors
+                                                 NULL, NULL,                                    // Int array accessors
+                                                 NULL, NULL,                                    // Float array accessors
+                                                 NavCustomData::DataCallback_100km, NULL,       // Raw data accessors
+                                                 NULL, NULL);                                   // Refcons not used
+
     app->processEvents();
     return 1;
 }
