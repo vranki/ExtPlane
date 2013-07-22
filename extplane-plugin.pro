@@ -22,9 +22,6 @@ CONFIG   -= app_bundle
 
 TEMPLATE = lib
 
-# X-Plane 2.0 required
-DEFINES += XPLM200
-
 TARGET = extplane-plugin
 
 QMAKE_CXXFLAGS += -fPIC
@@ -75,7 +72,7 @@ win32 {
     DEFINES += NOMINMAX #Qt5 bug
 }
 
-#QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) extplane.xpl
+QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) extplane.xpl
 QMAKE_CLEAN += extplane.xpl
 
 SOURCES += main.cpp \
