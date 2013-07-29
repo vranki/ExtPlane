@@ -18,6 +18,7 @@ public:
     ~ExtPlaneClient();
     ClientDataRef* subscribeDataRef(QString name, double accuracy=0);
     void unsubscribeDataRef(QString name);
+    bool isDataRefSubscribed(QString name);
     void keyPress(int id);
     void buttonPress(int id);
     void buttonRelease(int id);

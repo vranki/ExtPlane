@@ -35,7 +35,7 @@ public slots:
 private slots:
     virtual void changeTimeout();
 protected:
-    double minValue, maxValue, change, currentValue;
+    double minValue, maxValue, change, currentValue, actualCurrentValue;
     bool round;
     int arrayCount;
     QTimer changeTimer;
