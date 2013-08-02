@@ -12,7 +12,7 @@
  *
  * To unsubscribe, call ClientDataRef::unsubscribe().
  *
- * Never call deleteLater() on this - memory is managed by ExtPlaneConnection.
+ * Never call delete or deleteLater() on this - memory is managed by ExtPlaneConnection.
  */
 class ClientDataRef : public QObject {
     Q_OBJECT

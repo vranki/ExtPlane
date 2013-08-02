@@ -17,7 +17,7 @@ void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
 ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double accuracy) {
     SimulatedDataRef *simRef = 0;
     if(name=="sim/cockpit2/gauges/indicators/airspeed_kts_pilot") {
-        simRef = new SimulatedDataRef(this, 0, 200, 2.0, false, 0, name);
+        simRef = new SimulatedDataRef(this, 0, 200, 5.0, false, 0, name);
     } else if(name=="sim/flightmodel/position/vh_ind") {
         simRef = new SimulatedDataRef(this, -5, 5, 1.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/total_energy_fpm") {
