@@ -1,7 +1,9 @@
 #include "simulateddataref.h"
 
+#include <qmath.h>
+
 SimulatedDataRef::SimulatedDataRef(QObject *parent, double minV, double maxV, double changeDivisor, bool round, int arrayCount, QString refName) :
-    QObject(parent), minValue(minV), maxValue(maxV), currentValue(minV), change((maxValue - minValue)/changeDivisor), round(round), arrayCount(arrayCount), myClientRef(0, refName, 0)
+    QObject(parent), minValue(minV), maxValue(maxV), currentValue(minV), actualCurrentValue(minV), change((maxValue - minValue)/changeDivisor), round(round), arrayCount(arrayCount), myClientRef(0, refName, 0)
 {
     connect(&changeTimer, SIGNAL(timeout()), this, SLOT(changeTimeout()));
     changeTimer.setSingleShot(false);
@@ -14,11 +16,14 @@ SimulatedDataRef::~SimulatedDataRef() {
 }
 
 void SimulatedDataRef::tickTime(double dt, int total) {
-    currentValue += change*dt;
-    if(currentValue > maxValue)
+    actualCurrentValue += change*dt;
+    if(actualCurrentValue > maxValue)
         change = -qAbs(change);
-    if(currentValue < minValue)
+    if(actualCurrentValue < minValue)
         change = qAbs(change);
+    if(round) currentValue = qRound(actualCurrentValue);
+    else currentValue = actualCurrentValue;
+
 }
 
 void SimulatedDataRef::changeTimeout() {

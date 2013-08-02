@@ -30,8 +30,10 @@ QMAKE_LFLAGS += -shared -fPIC
 
 CONFIG(debug, debug|release) {
     # Debug
+    message("Ext-Plane Debug Build")
 } else {
     # Release
+    message("Ext-Plane Release Build")
     DEFINES += QT_NO_DEBUG
     DEFINES += QT_NO_DEBUG_OUTPUT
 }
@@ -57,6 +59,19 @@ macx {
      LIBS += -framework XPLM
 }
 
+win32 {
+    !contains(QMAKE_HOST.arch, x86_64) {
+        message("Windows Platform (x86)")
+        LIBS += -lXPLM -lXPWidgets
+    } else {
+        message("Windows Platform (x86_64)")
+        LIBS += -lXPLM_64 -lXPWidgets_64
+    }
+    DEFINES += APL=0 IBM=1 LIN=0
+    LIBS += -L../XPlaneSDK/Libraries/Win
+    DEFINES += NOMINMAX #Qt5 bug
+}
+
 QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) extplane.xpl
 QMAKE_CLEAN += extplane.xpl
 
@@ -71,7 +86,8 @@ SOURCES += main.cpp \
     datarefs/intdataref.cpp \
     datarefs/doubledataref.cpp \
     datarefs/intarraydataref.cpp \
-    datarefs/datadataref.cpp
+    datarefs/datadataref.cpp \
+    customdata/navcustomdata.cpp
 
 HEADERS += \
     xplaneplugin.h \
@@ -85,6 +101,7 @@ HEADERS += \
     datarefs/doubledataref.h \
     datarefs/intarraydataref.h \
     datarefs/datadataref.h \
-    util/console.h
+    util/console.h \
+    customdata/navcustomdata.h
 
 OTHER_FILES += README client/extplane-client-qt/README

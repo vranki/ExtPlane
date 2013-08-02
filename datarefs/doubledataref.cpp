@@ -1,5 +1,5 @@
 #include "doubledataref.h"
-#include "util/console.h"
+#include "../util/console.h"
 
 DoubleDataRef::DoubleDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref), _value(-999999.0f) {
     _typeString = "d";

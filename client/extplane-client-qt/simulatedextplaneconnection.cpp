@@ -1,6 +1,7 @@
 #include "simulatedextplaneconnection.h"
 #include "simulateddatarefs/simulateddataref.h"
 #include "simulateddatarefs/fixedsimulateddataref.h"
+#include "simulateddatarefs/alternatingsimulateddataref.h"
 #include "../../util/console.h"
 
 SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
@@ -26,12 +27,18 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new SimulatedDataRef(this, 47.3, 47.4, 100.0, false, 0, name);
     } else if(name=="sim/flightmodel/position/longitude") {
         simRef = new SimulatedDataRef(this, 8.5, 8.6, 100.0, false, 0, name);
+    } else if(name=="sim/flightmodel/position/local_x") {
+        simRef = new SimulatedDataRef(this, 0, 100, 100.0, false, 0, name);
+    } else if(name=="sim/flightmodel/position/local_z") {
+        simRef = new SimulatedDataRef(this, 0, 100, 100.0, false, 0, name);
     } else if(name=="sim/cockpit/misc/compass_indicated") {
         simRef = new SimulatedDataRef(this, 0, 360, 100.0, true, 0, name);
     } else if(name=="sim/flightmodel/position/hpath") {
         simRef = new SimulatedDataRef(this, -360, 360, 100.0, true, 0, name);
     } else if(name=="sim/flightmodel/misc/h_ind") {
         simRef = new SimulatedDataRef(this, 0, 5000, 10.0, false, 0, name);
+    } else if(name=="sim/cockpit/electrical/avionics_on") {
+        simRef = new SimulatedDataRef(this, 0, 1, 10.0, true, 0, name);
     } else if(name=="sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot") {
         simRef = new SimulatedDataRef(this, 0, 1, 100.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/heading_vacuum_deg_mag_pilot") {
@@ -57,9 +64,11 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
     } else if(name=="sim/cockpit2/engine/indicators/engine_speed_rpm") {
         simRef = new SimulatedDataRef(this, 0, 10000, 5.0, false, 4, name);
     } else if(name=="sim/aircraft/view/acf_tailnum") {
-        simRef = new FixedSimulatedDataRef(this, "EXTPL1", name);
+        simRef = new AlternatingSimulatedDataRef(this, "EXTPL1,EXTPL2",5.0, name);
     } else if(name=="sim/aircraft/view/acf_descrip") {
         simRef = new FixedSimulatedDataRef(this, "ExtPlane Simulated Connection", name);
+    } else if(name=="extplane/navdata/20km") {
+        simRef = new NavDataFixedSimulatedDataRef(this, 20000, name);
     } else if(name=="sim/flightmodel/controls/parkbrake") {
         simRef = new SimulatedDataRef(this, -1, 1, 1.0, true, 0, name);
     } else if(name=="sim/aircraft/engine/acf_num_engines") {

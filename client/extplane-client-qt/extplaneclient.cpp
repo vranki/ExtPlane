@@ -55,6 +55,15 @@ void ExtPlaneClient::unsubscribeDataRef(QString name) {
     Q_ASSERT(false);
 }
 
+bool ExtPlaneClient::isDataRefSubscribed(QString name) {
+    foreach(ClientDataRef *ref, _dataRefs) {
+        if(ref->name() == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void ExtPlaneClient::keyPress(int id) {
     _connection->keyPress(id);
 }
