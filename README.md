@@ -22,6 +22,9 @@ Known users:
 * ExtPlane-Panel
     * A fully-featured interface for ExtPlane with tons of flight instruments and more
     * https://github.com/vranki/ExtPlane-Panel
+* Copilot X
+    * Voice command app for Android
+    * https://play.google.com/store/apps/details?id=com.appropel.xplanevoice
 
 License:
 
@@ -30,9 +33,9 @@ License:
 
 ## Downloading ##
 
-### Beta X-Plane Fat Plugin ###
+### X-Plane Fat Plugin ###
 
-* ExtPlane-Plugin v0.1b
+* ExtPlane-Plugin v0.1b (beta)
     * Windows 32bit, Windows 64bit, Mac OSX 64 bit
     * [http://sandbox.nerves.ch/ExtPlane/ExtPlane-Plugin-v0.1b.zip](http://goo.gl/XVp59C)
 

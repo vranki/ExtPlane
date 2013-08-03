@@ -104,4 +104,4 @@ HEADERS += \
     util/console.h \
     customdata/navcustomdata.h
 
-OTHER_FILES += README client/extplane-client-qt/README
+OTHER_FILES += README.md client/extplane-client-qt/README
