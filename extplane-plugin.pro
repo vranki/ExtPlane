@@ -40,9 +40,6 @@ CONFIG(debug, debug|release) {
 
 unix:!macx {
      DEFINES += APL=0 IBM=0 LIN=1
-     QMAKE_CFLAGS += -fstack-protector
-     QMAKE_CXXFLAGS += -fstack-protector
-     QMAKE_LFLAGS += -shared -rdynamic -nodefaultlibs -undefined_warning
 }
 
 macx {
