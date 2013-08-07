@@ -251,6 +251,23 @@ add it to the `client` directory.
 
 
 
+## Coding Guidelines ##
+
+### Headers ###
+Always group headers in a meaningful format (ie all Qt headers should be grouped together,
+and all ExtPlane headers grouped together). In addition, make sure that headers
+are always fully relative (ie use `../util/header.h` instead of `util/header.h`).
+This is required to build across all platforms.
+
+### Platform-Dependent Code ###
+When writing code which uses new features currently not implemented, always make
+sure to first try to use Qt cross-platform classes and libraries. When using
+platform dependent code, make sure to `#ifdef` the sections of code which will
+only work on a specific platform. You can use standard Qt defines, or additional
+defines such as `TERMIOS_AVAIALABLE` to help with this.
+
+
+
 ## Contact / Feedback ##
 
 Original Author:
