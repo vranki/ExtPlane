@@ -69,6 +69,8 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new FixedSimulatedDataRef(this, "ExtPlane Simulated Connection", name);
     } else if(name=="extplane/navdata/20km") {
         simRef = new NavDataFixedSimulatedDataRef(this, 20000, name);
+    } else if(name=="extplane/navdata/100km") {
+        simRef = new NavDataFixedSimulatedDataRef(this, 100000, name);
     } else if(name=="sim/flightmodel/controls/parkbrake") {
         simRef = new SimulatedDataRef(this, -1, 1, 1.0, true, 0, name);
     } else if(name=="sim/aircraft/engine/acf_num_engines") {

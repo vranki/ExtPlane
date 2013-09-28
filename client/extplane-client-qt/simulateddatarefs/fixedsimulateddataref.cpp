@@ -28,8 +28,8 @@ NavDataFixedSimulatedDataRef::NavDataFixedSimulatedDataRef(QObject *parent, floa
         // JUGBA:512:48.0517:-122.289:15717.4:-1094.2:0:0:0:JUGBA
         // WA53:1:47.604:-122.323:13271.5:-368.349:96.012:0:0:[H] Harborview Medical Center
         // ----:64:48.0528:-122.289:15719.3:-1096.42:172.212:0:196.948:KPAE 16R OM
-        double localX = (-200000 + qrand() % 400000) / 10.0;
-        double localY = (-200000 + qrand() % 400000) / 10.0;
+        double localX = (-((int)range*10) + qrand() % ((int)range*10*2)) / 10.0;
+        double localY = (-((int)range*10) + qrand() % ((int)range*10*2)) / 10.0;
         double lat = 47.4475;
         double lon = 8.0001;
         int typeRand = qrand() % 5;
@@ -44,11 +44,17 @@ NavDataFixedSimulatedDataRef::NavDataFixedSimulatedDataRef(QObject *parent, floa
         if(idRand == 1) id = "IBFI";
         if(idRand == 2) id = "JUGBA";
         if(idRand == 3) id = "WA53";
-        QString dataLine = QString("%1:%2:%3:%4:%5:%6:131.978:0:0:Seattle Tacoma Intl\n")
+        QString name = "Seattle Tacoma Intl";
+        if(idRand == 0) name = "Zurich Intl";
+        if(idRand == 1) name = "John F. Keneddy";
+        if(idRand == 2) name = "La Guardia";
+        if(idRand == 3) name = "Really Long Name Intl";
+        QString dataLine = QString("%1:%2:%3:%4:%5:%6:131.978:0:0:%7\n")
                 .arg(id)
                 .arg(type)
                 .arg(lat).arg(lon)
-                .arg(localX).arg(localY);
+                .arg(localX).arg(localY)
+                .arg(name);
         _value.append((dataLine));
     }
 }
