@@ -26,6 +26,7 @@ void DoubleDataRef::setValue(double newValue) {
     DEBUG << name() << newValue;
     _value = newValue;
     XPLMSetDataf(ref(), _value);
+    emit changed(this);
 }
 
 QString DoubleDataRef::valueString() {

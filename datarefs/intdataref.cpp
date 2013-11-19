@@ -27,6 +27,7 @@ void IntDataRef::setValue(int newValue) {
     DEBUG << name() << newValue;
     _value = newValue;
     XPLMSetDatai(ref(), _value);
+    emit changed(this);
 }
 
 QString IntDataRef::valueString() {

@@ -77,4 +77,5 @@ void FloatArrayDataRef::setValue(QString &newValue) {
         _valueArray[i]=value;
     }
     XPLMSetDatavf(_ref, _valueArray, 0, numberOfValuesToWrite);
+    emit changed(this);
 }

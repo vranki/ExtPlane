@@ -76,6 +76,8 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
 
 DataRef* XPlanePlugin::subscribeRef(QString name) {
     DEBUG << name;
+
+    // Search in list of already subscribed datarefs - if found return that
     foreach(DataRef *ref, refs) {
         if(ref->name()==name) {
             DEBUG << "Already subscribed to " << name;
@@ -84,6 +86,7 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
         }
     }
 
+    // Not yet subscribed - create a new dataref
     XPLMDataRef ref = XPLMFindDataRef(name.toLatin1());
     if(ref) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(ref);
