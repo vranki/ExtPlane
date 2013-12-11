@@ -68,4 +68,5 @@ void IntArrayDataRef::setValue(QString &newValue) {
         _valueArray[i]=value;
     }
     XPLMSetDatavi(_ref, _valueArray, 0, numberOfValuesToWrite);
+    emit changed(this);
 }

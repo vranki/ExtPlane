@@ -25,6 +25,7 @@ void FloatDataRef::setValue(float newValue) {
     }
     _value = newValue;
     XPLMSetDataf(ref(), _value);
+    emit changed(this);
 }
 
 QString FloatDataRef::valueString() {
