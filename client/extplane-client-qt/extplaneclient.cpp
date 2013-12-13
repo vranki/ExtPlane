@@ -79,6 +79,21 @@ void ExtPlaneClient::buttonRelease(int id) {
     _connection->buttonRelease(id);
 }
 
+void ExtPlaneClient::commandOnce(QString name) {
+    _connection->commandOnce(name);
+}
+
+void ExtPlaneClient::commandBegin(QString name) {
+    _runningCommands.insert(name);
+    _connection->commandBegin(name);
+}
+
+void ExtPlaneClient::commandEnd(QString name) {
+    if(!_runningCommands.contains(name)) return;
+    _runningCommands.remove(name);
+    _connection->commandEnd(name);
+}
+
 void ExtPlaneClient::setUpdateInterval(double newInterval) {}
 
 void ExtPlaneClient::valueSet(ClientDataRef *ref) {

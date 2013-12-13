@@ -188,6 +188,21 @@ void ExtPlaneConnection::buttonRelease(int id) {
     writeLine(line);
 }
 
+void ExtPlaneConnection::commandOnce(QString name) {
+    QString line = "cmd once " + name;
+    writeLine(line);
+}
+
+void ExtPlaneConnection::commandBegin(QString name) {
+    QString line = "cmd begin " + name;
+    writeLine(line);
+}
+
+void ExtPlaneConnection::commandEnd(QString name) {
+    QString line = "cmd end " + name;
+    writeLine(line);
+}
+
 void ExtPlaneConnection::setValue(QString name, QString value) {
     QString line = "set " + name + " " + value;
     writeLine(line);

@@ -22,6 +22,9 @@ public:
     void keyPress(int id);
     void buttonPress(int id);
     void buttonRelease(int id);
+    void commandOnce(QString name);
+    void commandBegin(QString name);
+    void commandEnd(QString name);
 public slots:
     void setUpdateInterval(double newInterval);
 
@@ -40,6 +43,7 @@ private:
     QString _name;
     QList<ClientDataRef*> _dataRefs;
     QSet<int> _heldButtons;
+    QSet<QString> _runningCommands;
 
     ClientDataRefProvider *_connection; // The actual connection class
 };
