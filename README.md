@@ -13,6 +13,7 @@ TCP protocol.
 * Set and get datarefs
 * Support for different dataref types: int, float, double, int[], float[], data
 * Simulate key and button presses
+* Execute commands
 * Supports both X-Plane 9 and 10
 * Free & open source under GPLv3
 * Client classes for Qt included
@@ -174,6 +175,14 @@ List of key and button id's can be found at:
 http://www.xsquawkbox.net/xpsdk/mediawiki/XPLMUtilities
 Note that the key and button id's are numbers, not names. X-Plane does not
 provide a way to lookup keys or buttons by name.
+
+### Commands ###
+
+* ** cmd once {command} **	Execute command. It begins and ends immediately.
+* ** cmd begin {command} **	Begin execution of command. Then it will be "held down".
+* ** cmd end {command} **	Stop execution of command, that was started before.
+
+Command identifiers are strings that look like datarefs.
 
 ### Other ###
 
