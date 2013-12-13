@@ -2,3 +2,6 @@
 moc_*.cpp
 *.o
 Makefile
+*.user
+*.xpl
+*.so*
