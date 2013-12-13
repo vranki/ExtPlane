@@ -7,6 +7,7 @@
 #include "datarefs/datadataref.h"
 #include "datarefprovider.h"
 #include "util/console.h"
+#include "XPLMUtilities.h"
 
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
         QObject(parent), _socket(socket), _refProvider(refProvider)
@@ -171,7 +172,26 @@ void TcpClient::readClient() {
             } else {
                 INFO << "Invalid extplane-set command";
             }
-
+        } else if (command == "cmd") {
+            if (subLine.size()==3) {
+                XPLMCommandRef cmdRef = XPLMFindCommand(subLine.value(2).toUtf8().constData());
+                if (cmdRef != NULL) {
+                    QString subCmd = subLine.value(1);
+                    if (subCmd == "once") {
+                        XPLMCommandOnce(cmdRef);
+                    } else if (subCmd == "begin") {
+                        XPLMCommandBegin(cmdRef);
+                    } else if (subCmd == "end") {
+                        XPLMCommandEnd(cmdRef);
+                    } else {
+                        INFO << "Invalid cmd command";
+                    }
+                } else {
+                    INFO << "Command not found";
+                }
+            } else {
+                INFO << "Invalid cmd command";
+            }
         } else {
             INFO << "Unknown command " << command;
         }

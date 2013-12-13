@@ -30,6 +30,9 @@ public slots:
     virtual void keyPress(int id);
     virtual void buttonPress(int id);
     virtual void buttonRelease(int id);
+    virtual void commandOnce(QString name);
+    virtual void commandBegin(QString name);
+    virtual void commandEnd(QString name);
     virtual void setValue(QString name, QString value);
     virtual void setValues(QString name, QStringList values);
     virtual void setValue(ClientDataRef *ref);
