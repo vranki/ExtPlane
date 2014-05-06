@@ -36,26 +36,22 @@ License:
 
 ### Ext-Plane Plugin + Panel ###
 
-* Linux 32bit
+* Linux 32bit, 15MB
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Linux32.zip](http://goo.gl/BNzoeZ)
-* Linux 64bit
+* Linux 64bit, 15MB
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Linux64.zip](http://goo.gl/akBtl4)
-* Windows 32bit
+* Windows 32bit, 12MB
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Win32.zip](http://goo.gl/Nupczn)
-* Windows 64bit
+* Windows 64bit, 13MB
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Win64.zip](http://goo.gl/6EHtei)
-* OS-X 64bit
+* OS-X 64bit, 15MB
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-OSX64.zip](http://goo.gl/8kLzJg)
 
-### Ext-Plane Plugin + Panel ###
+### Ext-Plane Plugin ###
 
-* Linux, Windows, OS-X (32bit & 64bit)
+* Linux, Windows, OS-X (32bit & 64bit), 8MB
     * [http://dankrusi.com/downloads/ExtPlane-Plugin-v0.1.zip](http://goo.gl/e2aU7b)
 
-
-### Binaries ###
-
-See the `binaries` folder for a list of pre-built plugin binaries for various platforms.
 
 
 ## Building ##
