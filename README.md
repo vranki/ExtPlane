@@ -32,13 +32,26 @@ License:
 * GNU GPLv3
 
 
-## Downloading ##
+## Downloads ##
 
-### X-Plane Fat Plugin ###
+### Ext-Plane Plugin + Panel ###
 
-* ExtPlane-Plugin v0.1b (beta)
-    * Windows 32bit, Windows 64bit, Mac OSX 64 bit
-    * [http://sandbox.nerves.ch/ExtPlane/ExtPlane-Plugin-v0.1b.zip](http://goo.gl/XVp59C)
+* Linux 32bit
+    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Linux32.zip](http://goo.gl/BNzoeZ)
+* Linux 64bit
+    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Linux64.zip](http://goo.gl/akBtl4)
+* Windows 32bit
+    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Win32.zip](http://goo.gl/Nupczn)
+* Windows 64bit
+    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Win64.zip](http://goo.gl/6EHtei)
+* OS-X 64bit
+    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-OSX64.zip](http://goo.gl/8kLzJg)
+
+### Ext-Plane Plugin + Panel ###
+
+* Linux, Windows, OS-X (32bit & 64bit)
+    * [http://dankrusi.com/downloads/ExtPlane-Plugin-v0.1.zip](http://goo.gl/e2aU7b)
+
 
 ### Binaries ###
 
