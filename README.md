@@ -16,7 +16,7 @@ TCP protocol.
 * Execute commands
 * Supports both X-Plane 9 and 10
 * Free & open source under GPLv3
-* Client classes for Qt included
+* Client libraries available for Qt (c++) and Java
 
 Known users:
 
@@ -77,6 +77,8 @@ cd ExtPlane
 qmake
 make
 ```
+Plugin file extplane.xpl is created in the build directory.
+
 
 ### OS X ###
 ```bash
@@ -210,6 +212,8 @@ Supported settings are:
     * Types may be `i` (int), `f` (float), `d` (double), `ia` (int array), `fa` (float array), or `b` (data).
 
 ### Int/Float/Double Datarefs ###
+
+Example output:
 ```
 ui sim/aircraft/engine/acf_num_engines 2
 uf sim/cockpit2/gauges/indicators/slip_deg -0.023
@@ -218,7 +222,7 @@ ud sim/flightmodel/misc/h_ind 267.32
 
 ### Int/Float Array Datarefs ###
 
-Array datarefs output data like this (a float array, size 4):
+Example output (a float array, size 4):
 ```
 ufa sim/flightmodel/position/q [0.84599,-0.00730657,0.00933933,0.533067]
 uia sim/cockpit2/engine/indicators/N1_percent [99,97]
@@ -266,7 +270,9 @@ add it to the `client` directory.
     * A cross-platform Qt client library that allows easy integration of ExtPlane with Qt projects.
       This library also provides a simulation mode for quick and easy testing.
     * https://github.com/vranki/ExtPlane/tree/master/client/extplane-client-qt
-
+* Java
+    * Created by Pau G
+    * In external git repo: https://github.com/pau662/ExtPlaneInterface/tree/master/
 
 
 ## Coding Guidelines ##
