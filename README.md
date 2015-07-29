@@ -16,7 +16,7 @@ TCP protocol.
 * Execute commands
 * Supports both X-Plane 9 and 10
 * Free & open source under GPLv3
-* Client libraries available for Qt (c++) and Java
+* Client libraries available for Qt (c++), Java and C#
 
 Known users:
 
@@ -273,6 +273,9 @@ add it to the `client` directory.
 * Java
     * Created by Pau G
     * In external git repo: https://github.com/pau662/ExtPlaneInterface/tree/master/
+* C# (Mono)
+    * Created by Johan Johansson
+    * In external git repo: https://github.com/swemaniac/ExtPlaneNet
 
 
 ## Coding Guidelines ##
