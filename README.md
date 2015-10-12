@@ -273,6 +273,9 @@ add it to the `client` directory.
 * Java
     * Created by Pau G
     * In external git repo: https://github.com/pau662/ExtPlaneInterface/tree/master/
+* Javascript
+    * Created by Wade
+    * In external git repo: https://github.com/wadeos/ExtPlaneJs
 
 
 ## Coding Guidelines ##
