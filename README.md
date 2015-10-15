@@ -66,9 +66,9 @@ The requirements for ExtPlane are as follows:
 ### Debian/Ubuntu Linux ###
 ```bash
 # 1: Install required libraries and tools
-sudo apt-get install git build-essential libqt4-dev
+sudo apt-get install git build-essential qt5-qmake qt5-default qtbase5-dev
 
-# 2: Download source code from GitHub
+# 2: Download X-Plane SDK and ExtPlane source code from GitHub
 git clone https://github.com/dankrusi/XPlaneSDK.git
 git clone https://github.com/vranki/ExtPlane.git
 
@@ -77,7 +77,12 @@ cd ExtPlane
 qmake
 make
 ```
-Plugin file extplane.xpl is created in the build directory.
+
+Plugin file extplane.xpl is created in the build directory. You can copy it to XPlane's plugin directory using:
+
+```bash
+cp extplane.xpl /path/to/xplane/Resources/plugins/extplane.xpl
+```
 
 
 ### OS X ###
@@ -306,5 +311,7 @@ Original Author:
 Contributors:
 - Dan Krusi <dan.krusi@nerves.ch>
 - Bob Gates
+
+Use GitHub's issue tracker to report bugs or feature requests.
 
 Contributions welcome!

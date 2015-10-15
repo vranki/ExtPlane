@@ -124,6 +124,9 @@ int NavCustomData::DataCallback_100km(void *inRefcon, void *outValue, int inOffs
 }
 
 int NavCustomData::DataCallback_Common(void *inRefcon, void *outValue, int inOffset, int inMaxLength, double radius, int expectedNavAids) {
+    Q_UNUSED(inRefcon);
+    Q_UNUSED(inOffset);
+    Q_UNUSED(inMaxLength);
 
     // Make sure the NavCustomData is initialized. This will happen once when the plugin is reloaded
     // upon the first call to the dataref
