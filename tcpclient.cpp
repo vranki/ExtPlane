@@ -39,6 +39,7 @@ TcpClient::~TcpClient() {
 }
 
 void TcpClient::socketError(QAbstractSocket::SocketError err) {
+    Q_UNUSED(err);
     INFO << "Socket error:" << _socket->errorString();
     deleteLater();
 }

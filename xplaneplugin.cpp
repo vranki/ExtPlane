@@ -8,6 +8,7 @@
 #include "datarefs/datadataref.h"
 #include "util/console.h"
 #include "customdata/navcustomdata.h"
+#include <clocale>
 
 XPlanePlugin::XPlanePlugin(QObject *parent) :
     QObject(parent), argc(0), argv(0), app(0), server(0), flightLoopInterval(0.31f) { // Default to 30hz
@@ -19,6 +20,10 @@ XPlanePlugin::~XPlanePlugin() {
 
 float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop,
                                int inCounter, void *inRefcon) {
+    Q_UNUSED(inElapsedSinceLastCall);
+    Q_UNUSED(inElapsedTimeSinceLastFlightLoop);
+    Q_UNUSED(inCounter);
+    Q_UNUSED(inRefcon);
     // Tell each dataref to update its value through the XPLM api
     foreach(DataRef *ref, refs) ref->updateValue();
     // Tell Qt to process it's own runloop
@@ -35,6 +40,8 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
 
     // Init application and server
     app = new QCoreApplication(argc, &argv);
+    setlocale(LC_NUMERIC, "C"); // See http://stackoverflow.com/questions/25661295/why-does-qcoreapplication-call-setlocalelc-all-by-default-on-unix-linux
+
     server = new TcpServer(this, this);
     connect(server, SIGNAL(setFlightLoopInterval(float)), this, SLOT(setFlightLoopInterval(float)));
 
@@ -168,5 +175,7 @@ void XPlanePlugin::pluginStop() {
 }
 
 void XPlanePlugin::receiveMessage(XPLMPluginID inFromWho, long inMessage, void *inParam) {
+    Q_UNUSED(inParam);
+
     DEBUG << inFromWho << inMessage;
 }
