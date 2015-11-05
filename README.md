@@ -35,7 +35,7 @@ License:
 
 * Ville Ranki's blog: ExtPlane-panel (English, 2010)
     * http://coshacks.blogspot.fi/2010/12/extplane-panel-for-x-plane.html
-* Nicolas Monternal's blog: Simulateur de vol: cockpit pour Xplane (French, 2015)
+* Nicolas Montarnal's blog: Simulateur de vol: cockpit pour Xplane (French, 2015)
     * http://nicolasmontarnal.blogspot.fr/2015/10/x-plane-mise-en-place-dinstruments-de.html
 
 ## Downloads ##
