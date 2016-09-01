@@ -264,6 +264,8 @@ ExtPlane can provide custom datarefs which simplify some common tasks or create 
       `KSEA:1:47.4475:-122.308:14461.6:-211.06:131.978:0:0:Seattle Tacoma Intl`
 * extplane/navdata/100km
     * Provides a list of nav aids within a 100km range of the aircraft's position.
+* extplane/atc/124thatc/latest
+    * Provides the latest ATC communication as a string from the 124th ATC plugin.
 
 
 

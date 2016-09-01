@@ -18,7 +18,13 @@ void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
 ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double accuracy) {
     SimulatedDataRef *simRef = 0;
     if(name=="sim/cockpit2/gauges/indicators/airspeed_kts_pilot") {
-        simRef = new SimulatedDataRef(this, 0, 200, 5.0, false, 0, name);
+        simRef = new SimulatedDataRef(this, 0, 200, 50.0, false, 0, name);
+    } else if(name=="sim/cockpit2/gauges/indicators/altitude_ft_pilot") {
+        simRef = new SimulatedDataRef(this, 4000, 6000, 50.0, false, 0, name);
+    } else if(name=="sim/cockpit2/gauges/indicators/airspeed_acceleration_kts_sec_pilot") {
+        simRef = new SimulatedDataRef(this, -40, 40, 5.0, false, 0, name);
+    } else if(name=="sim/cockpit2/gauges/indicators/vvi_fpm_pilot") {
+        simRef = new SimulatedDataRef(this, -8000, 8000, 5.0, false, 0, name);
     } else if(name=="sim/flightmodel/position/vh_ind") {
         simRef = new SimulatedDataRef(this, -5, 5, 1.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/total_energy_fpm") {
@@ -38,10 +44,12 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
     } else if(name=="sim/flightmodel/misc/h_ind") {
         simRef = new SimulatedDataRef(this, 0, 5000, 10.0, false, 0, name);
     } else if(name=="sim/cockpit/electrical/avionics_on") {
-        simRef = new SimulatedDataRef(this, 0, 1, 10.0, true, 0, name);
+        simRef = new SimulatedDataRef(this, 1, 1, 10.0, true, 0, name);
     } else if(name=="sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot") {
         simRef = new SimulatedDataRef(this, 0, 1, 100.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/heading_vacuum_deg_mag_pilot") {
+        simRef = new SimulatedDataRef(this, 0, 360, 100.0, false, 0, name);
+    } else if(name=="sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot") {
         simRef = new SimulatedDataRef(this, 0, 360, 100.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/pitch_vacuum_deg_pilot") {
         simRef = new SimulatedDataRef(this, -90, 90, 5.0, false, 0, name);
@@ -84,7 +92,7 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
     } else {
         // Fallback
         INFO << "the dataref " << name << "is not supported by simulation";
-        simRef = new SimulatedDataRef(this, 0, 0, 1, false, 0, name);
+        simRef = new SimulatedDataRef(this, -100, 100, 1, false, 0, name);
     }
     simulatedRefs.append(simRef);
     return simRef->clientRef();

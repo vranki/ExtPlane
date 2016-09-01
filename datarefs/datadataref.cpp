@@ -20,6 +20,13 @@ QByteArray &DataDataRef::value() {
 void DataDataRef::updateValue() {
     // Make sure it's time to update again based on the accuracy
     if(this->accuracy() == 0 || _lastUpdate.elapsed() > this->accuracy()) {
+        // Get a new length and check if our underlying struct needs to be updated
+        int len = XPLMGetDatab(_ref, NULL, 0, 0);
+        if(len != _length) {
+            // Update data struct for new length
+            _length = len;
+            _newValue = QByteArray(_length, 0);
+        }
         // Read and verify data from XPLM
         int valuesCopied = XPLMGetDatab(_ref, _newValue.data(), 0, _length);
         _lastUpdate.restart();

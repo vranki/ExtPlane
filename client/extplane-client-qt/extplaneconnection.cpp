@@ -113,7 +113,7 @@ void ExtPlaneConnection::readClient() {
     while(canReadLine()) {
         QByteArray lineBA = readLine();
         QString line = QString(lineBA).trimmed();
-        // DEBUG << "Server says: " << line;
+        //DEBUG << "Server says: " << line;
         if(!server_ok) { // Waiting for handshake..
             if(line=="EXTPLANE 1") {
                 server_ok = true;
