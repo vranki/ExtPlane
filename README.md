@@ -153,6 +153,9 @@ disconnect
 
 ## Protocol Input ##
 
+The protocol uses a simple TCP socket connection to port 51000.
+Commands and replies are sent as text strings as defined below.
+
 ### Datarefs ###
 
 * **sub {dataref} [accuracy]**   Subscribe to dataref, with optional accuracy.
