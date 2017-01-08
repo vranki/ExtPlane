@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS = extplane-server
+SUBDIRS = extplane-server \
+    extplane-transformer
 CONFIG += ordered
 
 include(common.pri)
