@@ -1,28 +1,32 @@
-#include "intarraydataref.h"
+/*
+ *  floatarraydataref.cpp
+ *  extplane-plugin
+ *
+ *  Created by bobgates on 2011/07/23.
+ *  Modified by Ville Ranki <ville.ranki@iki.fi>
+ */
+
+#include "floatarraydataref.h"
 #include "../util/console.h"
 #include <QStringList>
 
-IntArrayDataRef::IntArrayDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref) {
-    _typeString = "ia";
-    _type = xplmType_IntArray;
-    _length = XPLMGetDatavi(_ref, NULL, 0, 0);
-    DEBUG << "Inited dataref with a length of =" << _length;
-    _values.fill(-9999, _length); // Resize and initialize vector
-    _valueArray = new int[_length];
+FloatArrayDataRef::FloatArrayDataRef(QObject *parent, QString name, void *ref) : DataRef(parent, name, ref) {
+    _typeString = "fa";
+    _type = extplaneRefTypeFloatArray;
+    _length = 0;
+    _valueArray = 0;
 }
 
-IntArrayDataRef::~IntArrayDataRef() {
-    delete [] _valueArray;
+FloatArrayDataRef::~FloatArrayDataRef() {
+    if(_valueArray) delete [] _valueArray;
 }
 
-QVector<int> & IntArrayDataRef::value() {
+QVector<float> & FloatArrayDataRef::value() {
     return _values;
 }
 
-void IntArrayDataRef::updateValue() {
-    int valuesCopied = XPLMGetDatavi(_ref, _valueArray, 0, _length);
-    Q_ASSERT(valuesCopied == _length);
-
+// Copies values from valuearray to value list and emits changed as needed
+void FloatArrayDataRef::updateValue() {
     bool notequal = false;
     for(int i=0;i<_length;i++){
         if(_values[i] != _valueArray[i]) {
@@ -33,7 +37,7 @@ void IntArrayDataRef::updateValue() {
     if (notequal) emit changed(this);
 }
 
-QString IntArrayDataRef::valueString() {
+QString FloatArrayDataRef::valueString() {
     QString ret="[";
 
     for(int i=0;i<_length;i++){
@@ -43,7 +47,7 @@ QString IntArrayDataRef::valueString() {
     return ret;
 }
 
-void IntArrayDataRef::setValue(QString &newValue) {
+void FloatArrayDataRef::setValue(QString &newValue) {
     // Check that value starts with [ and ends with ]
     if(!newValue.startsWith('[') || !newValue.endsWith(']')) {
         INFO << "Invalid array value";
@@ -57,16 +61,27 @@ void IntArrayDataRef::setValue(QString &newValue) {
     // Limit number of values to write to ref length or number of given values
     int numberOfValuesToWrite = qMin(_length, values.size());
 
-    // Convert values to int and copy to _valueArray
+    // Convert values to float and copy to _valueArray
     for(int i=0;i<numberOfValuesToWrite;i++) {
         bool ok = true;
-        int value = values[i].toInt(&ok);
+        float value = values[i].toFloat(&ok);
         if(!ok) {
             INFO << "Invalid value " << values[i] << "in array";
             return;
         }
         _valueArray[i]=value;
     }
-    XPLMSetDatavi(_ref, _valueArray, 0, numberOfValuesToWrite);
-    emit changed(this);
+    updateValue();
+}
+
+void FloatArrayDataRef::setLength(int newLength)
+{
+    _values.fill(-9999, _length); // Resize and initialize vector
+    if(_valueArray) delete[] _valueArray;
+    _valueArray = new float[_length];
+}
+
+float *FloatArrayDataRef::valueArray()
+{
+    return _valueArray;
 }

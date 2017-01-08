@@ -5,14 +5,12 @@
 
 class FloatDataRef : public DataRef {
     Q_OBJECT
-
 public:
-    FloatDataRef(QObject *parent, QString name, XPLMDataRef ref);
+    FloatDataRef(QObject *parent, QString name, void* ref);
     float value();
-    void setValue(float newValue);
-    virtual void updateValue();
+    void updateValue(float newValue);
     virtual QString valueString();
-    virtual void setValue(QString &newValue);
+    void setValue(QString & newValue);
 private:
     float _value;
 };

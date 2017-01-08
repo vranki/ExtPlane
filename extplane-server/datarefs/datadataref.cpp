@@ -1,36 +1,26 @@
 #include "datadataref.h"
 #include "../util/console.h"
 
-DataDataRef::DataDataRef(QObject *parent, QString name, XPLMDataRef ref) : DataRef(parent, name, ref)
+DataDataRef::DataDataRef(QObject *parent, QString name, void *ref) : DataRef(parent, name, ref)
 {
-    // Init
     _typeString = "b";
-    _type = xplmType_Data;
-    _length = XPLMGetDatab(_ref, NULL, 0, 0);
-    _value = QByteArray(_length, 0);
-    _newValue = QByteArray(_length, 0); // Init already here for perf reasons.
+    _type = extplaneRefTypeData;
+    _length = 0;
     _lastUpdate.restart();
-    DEBUG << "Inited data dataref with a length of =" << _length;
 }
 
 QByteArray &DataDataRef::value() {
     return _value;
 }
 
+QByteArray &DataDataRef::newValue()
+{
+    return _newValue;
+}
+
 void DataDataRef::updateValue() {
     // Make sure it's time to update again based on the accuracy
     if(this->accuracy() == 0 || _lastUpdate.elapsed() > this->accuracy()) {
-        // Get a new length and check if our underlying struct needs to be updated
-        int len = XPLMGetDatab(_ref, NULL, 0, 0);
-        if(len != _length) {
-            // Update data struct for new length
-            _length = len;
-            _newValue = QByteArray(_length, 0);
-        }
-        // Read and verify data from XPLM
-        int valuesCopied = XPLMGetDatab(_ref, _newValue.data(), 0, _length);
-        _lastUpdate.restart();
-        Q_ASSERT(valuesCopied == _length);
         // TODO: do we really want to make this comparison for large data datarefs? Probably as it's still cheaper than sending over the wire the new data
         if (_newValue != _value) {
             _value = _newValue;
@@ -67,4 +57,12 @@ QString DataDataRef::valueString() {
 void DataDataRef::setValue(QString &newValue) {
     QByteArray valueBA = newValue.toUtf8();
     setValue(valueBA);
+}
+
+void DataDataRef::setLength(int newLength)
+{
+    if(_value.length() != newLength) {
+        _value = QByteArray(_length, 0);
+        _newValue = QByteArray(_length, 0); // Init already here for perf reasons.
+    }
 }

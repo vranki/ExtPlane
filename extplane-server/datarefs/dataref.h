@@ -4,7 +4,22 @@
 #include <QString>
 #include <QObject>
 #include <QDebug>
-#include "XPLMDataAccess.h"
+//#include "XPLMDataAccess.h"
+
+//typedef void* XPLMDataRef;
+typedef int extplaneRefID;
+
+// Ref types. These match X-Plane's ref type values.
+enum {
+    extplaneRefTypeUnknown = 0,
+    extplaneRefTypeInt = 1,
+    extplaneRefTypeFloat = 2,
+    extplaneRefTypeDouble = 4,
+    extplaneRefTypeFloatArray = 8,
+    extplaneRefTypeIntArray = 16,
+    extplaneRefTypeData = 32
+};
+
 
 /**
   * Base class for DataRefs.
@@ -12,17 +27,17 @@
 class DataRef : public QObject {
     Q_OBJECT
 public:
-    DataRef(QObject *parent, QString name, XPLMDataRef ref);
+    DataRef(QObject *parent, QString name, void* ref);
     QString &name();
-    XPLMDataRef ref();
+    void* ref();
     int subscribers();
     void setSubscribers(int subs);
-    virtual void updateValue() = 0;
     void setWritable(bool cw);
     bool isWritable();
     virtual QString valueString() = 0;
     virtual void setValue(QString &newValue) = 0;
-    XPLMDataTypeID type(); // NOTE: always only one type, although XPLMDataTypeID can have many.
+    extplaneRefID type(); // NOTE: always only one type, although XPLMDataTypeID can have many.
+    virtual void setType(extplaneRefID newType); // Only set after constructor
     QString typeString();
     virtual void setAccuracy(double val);
     virtual void updateAccuracy(double val);
@@ -31,8 +46,8 @@ signals:
     void changed(DataRef *ref);
 protected:
     QString _typeString;
-    XPLMDataTypeID _type;
-    XPLMDataRef _ref;
+    extplaneRefID _type;
+    void* _ref;
     double _accuracy;
 private:
     QString _name;

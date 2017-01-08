@@ -7,10 +7,9 @@ class DoubleDataRef : public DataRef {
     Q_OBJECT
 
 public:
-    DoubleDataRef(QObject *parent, QString name, XPLMDataRef ref);
+    DoubleDataRef(QObject *parent, QString name, void* ref);
     double value();
-    void setValue(double newValue);
-    virtual void updateValue();
+    virtual void updateValue(double newValue);
     virtual QString valueString();
     virtual void setValue(QString &newValue);
 private:

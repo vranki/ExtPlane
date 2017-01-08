@@ -2,9 +2,10 @@
 #define TCPSERVER_H
 
 #include <QObject>
+#include <QList>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <QList>
+
 #include "datarefs/dataref.h"
 /**
   * Creates the TCP socket and manages client connections

@@ -1,15 +1,24 @@
+include(../common.pri)
+
+message("Building X-Plane plugin with SDK in $$XPLANE_SDK_PATH")
+
 #
 # ExtPlane plugin build configuration
 #
 # Change to -DXPLM200=1 for SDK 2.0.0 (X-Plane 9)
 QMAKE_CXXFLAGS += -DXPLM210=1
-QMAKE_CXXFLAGS += -DXPLM200=1
+QMAKE_CXXFLAGS += -DXPLM200=0
 
 # If your X-Plane SDK is in another directory, add or change it here:
-INCLUDEPATH += $$(HOME)/SDK/CHeaders/XPLM
-INCLUDEPATH += ../XPlaneSDK/CHeaders/XPLM
-INCLUDEPATH += SDK/CHeaders/XPLM
-INCLUDEPATH += ../XPlane-SDK/CHeaders/XPLM
+
+message("SDK in $$XPLANE_SDK_PATH")
+
+INCLUDEPATH += $$XPLANE_SDK_PATH/CHeaders/XPLM
+
+INCLUDEPATH += ../extplane-server
+DEPENDPATH += . ../extplane-server
+INCLUDEPATH += ../extplane-server
+LIBS += -L../extplane-server -lextplane-server
 
 # You should not need to touch anything below this for normal build
 
@@ -32,10 +41,10 @@ QMAKE_LFLAGS += -shared -fPIC
 
 CONFIG(debug, debug|release) {
     # Debug
-    message("Ext-Plane Debug Build")
+    message("ExtPlane Debug Build")
 } else {
     # Release
-    message("Ext-Plane Release Build")
+    message("ExtPlane Release Build")
     DEFINES += QT_NO_DEBUG
     DEFINES += QT_NO_DEBUG_OUTPUT
 }
@@ -54,7 +63,7 @@ macx {
      # QMAKE_MAC_SDK=/Devloper/SDKs/MacOSX10.4u.sdk
      # This line defines for wich architectures we build.
      CONFIG += x86 ppc
-     QMAKE_LFLAGS += -F../XPlaneSDK/Libraries/Mac
+     QMAKE_LFLAGS += -F$$XPLANE_SDK_PATH/Libraries/Mac
      LIBS += -framework XPLM
 }
 
@@ -67,7 +76,7 @@ win32 {
         LIBS += -lXPLM_64 -lXPWidgets_64
     }
     DEFINES += APL=0 IBM=1 LIN=0
-    LIBS += -L../XPlaneSDK/Libraries/Win
+    LIBS += -L$$XPLANE_SDK_PATH/Libraries/Win
     DEFINES += NOMINMAX #Qt5 bug
 }
 
@@ -76,33 +85,10 @@ QMAKE_CLEAN += extplane.xpl
 
 SOURCES += main.cpp \
     xplaneplugin.cpp \
-    tcpserver.cpp \
-    tcpclient.cpp \
-    datarefprovider.cpp \
-    datarefs/dataref.cpp \
-    datarefs/floatdataref.cpp \
-    datarefs/floatarraydataref.cpp \
-    datarefs/intdataref.cpp \
-    datarefs/doubledataref.cpp \
-    datarefs/intarraydataref.cpp \
-    datarefs/datadataref.cpp \
     customdata/navcustomdata.cpp \
     customdata/atccustomdata.cpp
-
 HEADERS += \
     xplaneplugin.h \
-    tcpserver.h \
-    tcpclient.h \
-    datarefprovider.h \
-    datarefs/dataref.h \
-    datarefs/floatdataref.h \
-    datarefs/floatarraydataref.h \
-    datarefs/intdataref.h \
-    datarefs/doubledataref.h \
-    datarefs/intarraydataref.h \
-    datarefs/datadataref.h \
-    util/console.h \
     customdata/navcustomdata.h \
-    customdata/atccustomdata.h
+    customdata/atccustomdata.h \
 
-OTHER_FILES += README.md client/extplane-client-qt/README

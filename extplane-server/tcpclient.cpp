@@ -1,4 +1,5 @@
 #include "tcpclient.h"
+#include "datarefs/dataref.h"
 #include "datarefs/floatdataref.h"
 #include "datarefs/floatarraydataref.h"
 #include "datarefs/intdataref.h"
@@ -7,10 +8,10 @@
 #include "datarefs/datadataref.h"
 #include "datarefprovider.h"
 #include "util/console.h"
-#include "XPLMUtilities.h"
+#include "datarefs/dataref.h"
 
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
-        QObject(parent), _socket(socket), _refProvider(refProvider)
+    QObject(parent), _socket(socket), _refProvider(refProvider)
 {
     INFO << "Client connected from " << socket->peerAddress().toString();
     connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
@@ -71,18 +72,18 @@ void TcpClient::readClient() {
                         connect(ref, SIGNAL(changed(DataRef*)), this, SLOT(refChanged(DataRef*)));
                         _subscribedRefs.insert(ref);
                         ref->setAccuracy(accuracy);
-                        //TODO: why is ref->updateValue() not sufficient here?
-                        if(ref->type() == xplmType_Float) {
+
+                        if(ref->type() == extplaneRefTypeFloat) {
                             _refValueF[ref] = qobject_cast<FloatDataRef*>(ref)->value();
-                        } else if(ref->type() == xplmType_Int) {
+                        } else if(ref->type() == extplaneRefTypeInt) {
                             _refValueI[ref] = qobject_cast<IntDataRef*>(ref)->value();
-                        } else if(ref->type() == xplmType_Double) {
+                        } else if(ref->type() == extplaneRefTypeDouble) {
                             _refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
-                        } else if(ref->type() == xplmType_FloatArray) {
+                        } else if(ref->type() == extplaneRefTypeFloatArray) {
                             _refValueFA[ref] = qobject_cast<FloatArrayDataRef*>(ref)->value();
-                        } else if(ref->type() == xplmType_IntArray) {
+                        } else if(ref->type() == extplaneRefTypeIntArray) {
                             _refValueIA[ref] = qobject_cast<IntArrayDataRef*>(ref)->value();
-                        } else if(ref->type() == xplmType_Data) {
+                        } else if(ref->type() == extplaneRefTypeData) {
                             _refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
                         }
                         INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
@@ -92,7 +93,6 @@ void TcpClient::readClient() {
                 } else { // Ref already subscribed - update accuracy
                     INFO << "Updating " << refName << " accuracy to " << accuracy;
                     ref->setAccuracy(accuracy);
-                    ref->updateValue();
                 }
             } else {
                 INFO << "Invalid sub command";
@@ -113,11 +113,12 @@ void TcpClient::readClient() {
         } else if(command == "set") {
             if(subLine.size() == 3) {
                 QString refName = subLine.value(1);
-                QString refValue = subLine.value(2).trimmed();
                 DataRef *ref = getSubscribedRef(refName);
                 if (ref) {
                     if(ref->isWritable()) {
+                        QString refValue = subLine.value(2).trimmed();
                         ref->setValue(refValue);
+                        _refProvider->changeDataRef(ref);
                     } else {
                         INFO << "Ref " << ref->name() << " is not writable!";
                     }
@@ -175,21 +176,19 @@ void TcpClient::readClient() {
             }
         } else if (command == "cmd") {
             if (subLine.size()==3) {
-                XPLMCommandRef cmdRef = XPLMFindCommand(subLine.value(2).toUtf8().constData());
-                if (cmdRef != NULL) {
-                    QString subCmd = subLine.value(1);
-                    if (subCmd == "once") {
-                        XPLMCommandOnce(cmdRef);
-                    } else if (subCmd == "begin") {
-                        XPLMCommandBegin(cmdRef);
-                    } else if (subCmd == "end") {
-                        XPLMCommandEnd(cmdRef);
-                    } else {
-                        INFO << "Invalid cmd command";
-                    }
+                QString subCmd = subLine.value(1);
+                extplaneCommandType type = extplaneCommandTypeInvalid;
+                if (subCmd == "once") {
+                    type = extplaneCommandTypeOnce;
+                } else if (subCmd == "begin") {
+                    type = extplaneCommandTypeBegin;
+                } else if (subCmd == "end") {
+                    type = extplaneCommandTypeEnd;
                 } else {
-                    INFO << "Command not found";
+                    INFO << "Invalid cmd command";
                 }
+                QString commandName = subLine.value(2);
+                _refProvider->command(commandName, type);
             } else {
                 INFO << "Invalid cmd command";
             }
@@ -201,12 +200,12 @@ void TcpClient::readClient() {
 
 void TcpClient::refChanged(DataRef *ref) {
     Q_ASSERT(_subscribedRefs.contains(ref));
-    if(ref->type()== xplmType_Float) {
+    if(ref->type()== extplaneRefTypeFloat) {
         FloatDataRef *refF = qobject_cast<FloatDataRef*>(ref);
         if(qAbs(refF->value() - _refValueF[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueF[ref] = refF->value();
-    } else if(ref->type()== xplmType_FloatArray) {
+    } else if(ref->type()== extplaneRefTypeFloatArray) {
         FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
         
         bool bigenough = false;
@@ -223,11 +222,11 @@ void TcpClient::refChanged(DataRef *ref) {
         if (bigenough){ // Values have changed enough
             for (int i=0; i<length;i++){
                 _refValueFA[ref][i] = values[i];
-            }    
+            }
         } else {
             return;
         }
-    } else if(ref->type()== xplmType_IntArray) {
+    } else if(ref->type()== extplaneRefTypeIntArray) {
         IntArrayDataRef *refF = qobject_cast<IntArrayDataRef*>(ref);
 
         bool bigenough = false;
@@ -248,17 +247,17 @@ void TcpClient::refChanged(DataRef *ref) {
         } else {
             return;
         }
-    } else if(ref->type()== xplmType_Int) {
+    } else if(ref->type()== extplaneRefTypeInt) {
         IntDataRef *refI = qobject_cast<IntDataRef*>(ref);
         if(qAbs(refI->value() - _refValueI[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueI[ref] = refI->value();
-    } else if(ref->type()== xplmType_Double) {
+    } else if(ref->type()== extplaneRefTypeDouble) {
         DoubleDataRef *refD = qobject_cast<DoubleDataRef*>(ref);
         if(qAbs(refD->value() - _refValueD[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueD[ref] = refD->value();
-    } else if(ref->type()== xplmType_Data) {
+    } else if(ref->type()== extplaneRefTypeData) {
         // The accuracy is handled internally for the data dataref, when it emits the update signal
         // it's time to send the update...
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);

@@ -16,13 +16,14 @@ class DataDataRef : public DataRef {
     Q_OBJECT
 
 public:
-    DataDataRef(QObject *parent, QString name, XPLMDataRef ref);
+    DataDataRef(QObject *parent, QString name, void* ref);
     QByteArray &value();
-    void setValue(QByteArray &newValue);
+    QByteArray &newValue(); // Write to this and call updatevalue to change value
+    void setValue(QByteArray &newValue); // @todo implement
     virtual void updateValue();
     virtual QString valueString();
     virtual void setValue(QString &newValue);
-
+    void setLength(int newLength);
 private:
     int _length; // Length of dataref, as given by X-Plane
     QByteArray _value; // Value of dataref is stored here once retrieved from XPLM

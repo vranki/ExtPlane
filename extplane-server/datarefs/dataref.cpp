@@ -1,15 +1,20 @@
 #include "dataref.h"
 
-DataRef::DataRef(QObject *parent, QString name, XPLMDataRef ref) : QObject(parent), _ref(ref), _name(name), _subscribers(0), _writable(false) {
-    _type = XPLMGetDataRefTypes(_ref);
-    _typeString = "?";
+DataRef::DataRef(QObject *parent, QString name, void *ref) : QObject(parent),
+    _ref(ref),
+    _name(name),
+    _subscribers(0),
+    _writable(false),
+    _type(extplaneRefTypeUnknown),
+_typeString("?")
+{
 }
 
 QString &DataRef::name() {
     return _name;
 }
 
-XPLMDataRef DataRef::ref() {
+void *DataRef::ref() {
     return _ref;
 }
 
@@ -30,8 +35,13 @@ bool DataRef::isWritable() {
     return _writable;
 }
 
-XPLMDataTypeID DataRef::type() {
+extplaneRefID DataRef::type() {
     return _type;
+}
+
+void DataRef::setType(extplaneRefID newType)
+{
+    _type = newType;
 }
 
 QString DataRef::typeString() {

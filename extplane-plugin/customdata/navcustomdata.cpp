@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QThread>
 
-#include "../util/console.h"
+#include "../../extplane-server/util/console.h"
 
 // The average size of a navdata line in bytes
 #define NAVCUSTOMDATA_NAVADATA_SIZE_B 80

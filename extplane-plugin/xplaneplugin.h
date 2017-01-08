@@ -5,10 +5,9 @@
 #include <QDebug>
 #include <QStringList>
 #include <QtCore/QCoreApplication>
-#include "XPLMDataAccess.h"
-#include "XPLMUtilities.h"
-#include "tcpserver.h"
-#include "datarefprovider.h"
+#include "../extplane-server/tcpserver.h"
+#include "../extplane-server/datarefprovider.h"
+#include <XPLMDataAccess.h>
 
 class DataRef;
 
@@ -27,9 +26,13 @@ public:
 public: // DataRefProvider
     virtual DataRef *subscribeRef(QString name);
     virtual void unsubscribeRef(DataRef *ref);
+    virtual void updateDataRef(DataRef *ref); // Update ref value from simulator
     virtual void keyStroke(int keyid);
     virtual void buttonPress(int buttonid);
     virtual void buttonRelease(int buttonid);
+    virtual void changeDataRef(DataRef *ref);
+    virtual void command(QString &name, extplaneCommandType type);
+
 public slots:
     void setFlightLoopInterval(float newInterval);
 private:
