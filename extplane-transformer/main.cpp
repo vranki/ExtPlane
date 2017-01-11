@@ -1,17 +1,17 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "../extplane-server/tcpserver.h"
+#include <QtQml>
+#include "extplanetransformer.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
-
-    TcpServer tcpServer(0, 0);
-
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("tcpserver", &tcpServer);
+    //qmlRegisterType<TcpServer*>("org.extplane", 1, 0, "TcpServer");
+    ExtplaneTransformer transformer;
+    engine.rootContext()->setContextProperty("transformer", &transformer);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
     return app.exec();

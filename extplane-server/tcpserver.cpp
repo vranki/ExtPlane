@@ -6,29 +6,39 @@
 
 TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent),
     server(this),
-    _refProvider(refProvider),
+    _refProvider(0),
     _clientCount(0) {
-    if(!server.listen(QHostAddress::Any, EXTPLANE_PORT)) {
-        INFO << "Unable to listen on port " << EXTPLANE_PORT;
-        return;
-    }
     connect(&server, SIGNAL(newConnection()), this, SLOT(clientConnected()));
-    INFO << "Listening on port " << EXTPLANE_PORT;
+    setDataRefProvider(refProvider);
 }
 
 TcpServer::~TcpServer() {
     DEBUG;
-
-    while (!clientConnections.isEmpty()) {
-        TcpClient *client = clientConnections.takeLast();
-        client->disconnect(this);
-        delete client;
-    }
+    disconnectClients();
 }
 
 int TcpServer::clientCount() const
 {
     return _clientCount;
+}
+
+void TcpServer::setDataRefProvider(DataRefProvider *refProvider)
+{
+    if(_refProvider) {
+        disconnectClients();
+    }
+    _refProvider = refProvider;
+
+    if(_refProvider) {
+        if(!server.listen(QHostAddress::Any, EXTPLANE_PORT)) {
+            INFO << "Unable to listen on port " << EXTPLANE_PORT;
+            return;
+        }
+        INFO << "Listening on port " << EXTPLANE_PORT;
+    } else {
+        server.close();
+        INFO << "No dataref provider enabled - not listening. ";
+    }
 }
 
 void TcpServer::clientConnected() {
@@ -45,4 +55,13 @@ void TcpServer::clientDiscoed(TcpClient *client) {
     clientConnections.removeOne(client);
     _clientCount--;
     emit clientCountChanged(_clientCount);
+}
+
+void TcpServer::disconnectClients()
+{
+    while (!clientConnections.isEmpty()) {
+        TcpClient *client = clientConnections.takeLast();
+        client->disconnect(this);
+        client->deleteLater();
+    }
 }

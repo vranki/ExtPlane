@@ -17,14 +17,15 @@ ApplicationWindow {
             }
             ComboBox {
                 Layout.fillWidth: true
-                model: ["None", "Condor"]
+                model: transformer.dataSources
+                onCurrentTextChanged: transformer.dataSource = currentText;
             }
         }
     }
     statusBar: StatusBar {
         RowLayout {
 //            anchors.fill: parent
-            Label { text: tcpserver.clientCount + " client(s) connected." }
+            Label { text: transformer.tcpServer.clientCount + " client(s) connected." }
         }
     }
 }
