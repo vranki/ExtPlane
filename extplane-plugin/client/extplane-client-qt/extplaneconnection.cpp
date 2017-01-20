@@ -3,7 +3,7 @@
 #include "clientdataref.h"
 #include "simulateddatarefs/simulateddataref.h"
 #include "extplaneclient.h"
-#include "../../util/console.h"
+#include <../../../extplane-server/util/console.h>
 
 ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : QTcpSocket(parent), updateInterval(0.333) {
     connect(this, SIGNAL(connected()), this, SLOT(socketConnected()));

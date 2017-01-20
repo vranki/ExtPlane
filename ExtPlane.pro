@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 SUBDIRS = extplane-server \
+    extplane-plugin/client/extplane-client-qt \
     extplane-transformer
 CONFIG += ordered
 

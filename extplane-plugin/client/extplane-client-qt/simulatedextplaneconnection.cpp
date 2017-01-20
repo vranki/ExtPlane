@@ -2,7 +2,7 @@
 #include "simulateddatarefs/simulateddataref.h"
 #include "simulateddatarefs/fixedsimulateddataref.h"
 #include "simulateddatarefs/alternatingsimulateddataref.h"
-#include "../../util/console.h"
+#include <../../../extplane-server/util/console.h>
 
 SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
     enableSimulatedRefs = true;
