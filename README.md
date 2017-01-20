@@ -31,6 +31,12 @@ License:
 
 * GNU GPLv3
 
+## Articles and guides ##
+
+* Ville Ranki's blog: ExtPlane-panel (English, 2010)
+    * http://coshacks.blogspot.fi/2010/12/extplane-panel-for-x-plane.html
+* Nicolas Montarnal's blog: Simulateur de vol: cockpit pour Xplane (French, 2015)
+    * http://nicolasmontarnal.blogspot.fr/2015/10/x-plane-mise-en-place-dinstruments-de.html
 
 ## Downloads ##
 
@@ -51,7 +57,6 @@ License:
 
 * Linux, Windows, OS-X (32bit & 64bit), 8MB
     * [http://dankrusi.com/downloads/ExtPlane-Plugin-v0.1.zip](http://goo.gl/e2aU7b)
-
 
 
 ## Building ##
@@ -126,8 +131,6 @@ nmake
 # Visual Studio Express: http://www.microsoft.com/visualstudio/eng/downloads#d-2012-express
 ```
 
-
-
 ## Test Session ##
 
 Launch X-Plane in console and observe the output. You should see something like:
@@ -148,8 +151,10 @@ set sim/flightmodel/engine/ENGN_thro [0,0]
 disconnect
 ```
 
-
 ## Protocol Input ##
+
+The protocol uses a simple TCP socket connection to port 51000.
+Commands and replies are sent as text strings as defined below.
 
 ### Datarefs ###
 
@@ -262,6 +267,8 @@ ExtPlane can provide custom datarefs which simplify some common tasks or create 
       `KSEA:1:47.4475:-122.308:14461.6:-211.06:131.978:0:0:Seattle Tacoma Intl`
 * extplane/navdata/100km
     * Provides a list of nav aids within a 100km range of the aircraft's position.
+* extplane/atc/124thatc/latest
+    * Provides the latest ATC communication as a string from the 124th ATC plugin.
 
 
 
@@ -273,7 +280,7 @@ add it to the `client` directory.
 
 * Qt / C++
     * A cross-platform Qt client library that allows easy integration of ExtPlane with Qt projects.
-      This library also provides a simulation mode for quick and easy testing.
+      This library also provides a simulation mode for quick and easy testing. Used in ExtPlane-Panel.
     * https://github.com/vranki/ExtPlane/tree/master/client/extplane-client-qt
 * Java
     * Created by Pau G

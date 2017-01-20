@@ -8,6 +8,7 @@
 #include "datarefs/datadataref.h"
 #include "util/console.h"
 #include "customdata/navcustomdata.h"
+#include "customdata/atccustomdata.h"
 #include <clocale>
 
 XPlanePlugin::XPlanePlugin(QObject *parent) :
@@ -76,6 +77,16 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
                                                  NULL, NULL,                                    // Float array accessors
                                                  NavCustomData::DataCallback_100km, NULL,       // Raw data accessors
                                                  NULL, NULL);                                   // Refcons not used
+    XPLMRegisterDataAccessor("extplane/atc/124thatc/latest",
+                                                 xplmType_Data,                                 // The types we support
+                                                 0,                                             // Writable
+                                                 NULL, NULL,                                    // Integer accessors
+                                                 NULL, NULL,                                    // Float accessors
+                                                 NULL, NULL,                                    // Doubles accessors
+                                                 NULL, NULL,                                    // Int array accessors
+                                                 NULL, NULL,                                    // Float array accessors
+                                                 ATCCustomData::DataCallback, NULL,             // Raw data accessors
+                                                 NULL, NULL);
 
     app->processEvents();
     return 1;
