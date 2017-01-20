@@ -43,6 +43,7 @@ void ExtPlaneConnection::socketConnected() {
 }
 
 void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {
+    Q_UNUSED(err);
     INFO << "Socket error:" << errorString();
     server_ok = false;
     emit connectionMessage(errorString() + " : " + peerName() + ":" + QString::number(peerPort()));
