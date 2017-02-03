@@ -2,7 +2,7 @@
 #include "tcpserver.h"
 #include "tcpclient.h"
 #include "datarefprovider.h"
-#include "util/console.h"
+#include "console.h"
 
 TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent),
     server(this),

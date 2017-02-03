@@ -17,7 +17,7 @@ enum extplaneCommandType {
 class DataRefProvider {
 public:
     DataRefProvider();
-//    ~DataRefProvider();
+
     virtual DataRef *subscribeRef(QString name)=0;
     virtual void unsubscribeRef(DataRef *ref)=0;
 

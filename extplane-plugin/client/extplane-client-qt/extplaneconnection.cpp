@@ -3,23 +3,14 @@
 #include "clientdataref.h"
 #include "simulateddatarefs/simulateddataref.h"
 #include "extplaneclient.h"
-#include <../../../extplane-server/util/console.h>
+#include <console.h>
 
-ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : QTcpSocket(parent), updateInterval(0.333) {
-    connect(this, SIGNAL(connected()), this, SLOT(socketConnected()));
+ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent), updateInterval(0.333) {
+    connect(this, SIGNAL(tcpClientConnected()), this, SLOT(tcpClientConnected()));
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(tryReconnect()));
     server_ok = false;
     enableSimulatedRefs = false;
-}
-
-void ExtPlaneConnection::connectTo(QString host, unsigned int port) {
-    close();
-    _host = host;
-    _port = port;
-    abort();
-    tryReconnect();
 }
 
 void ExtPlaneConnection::setUpdateInterval(double newInterval) {
@@ -30,24 +21,13 @@ void ExtPlaneConnection::setUpdateInterval(double newInterval) {
     }
 }
 
-void ExtPlaneConnection::tryReconnect() {
-    emit connectionMessage(QString("Connecting to ExtPlane at %1:%2..").arg(_host).arg(_port));
 
-    reconnectTimer.stop();
-    connectToHost(_host, _port);
-}
-
-void ExtPlaneConnection::socketConnected() {
+void ExtPlaneConnection::tcpClientConnected() {
     emit connectionMessage("Connected to ExtPlane, waiting for handshake");
-    reconnectTimer.stop();
 }
 
 void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {
-    INFO << "Socket error:" << errorString();
     server_ok = false;
-    emit connectionMessage(errorString() + " : " + peerName() + ":" + QString::number(peerPort()));
-    reconnectTimer.setInterval(5000);
-    reconnectTimer.start();
 }
 
 void ExtPlaneConnection::registerClient(ExtPlaneClient* client) {
@@ -109,45 +89,41 @@ void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     }
 }
 
-void ExtPlaneConnection::readClient() {
-    while(canReadLine()) {
-        QByteArray lineBA = readLine();
-        QString line = QString(lineBA).trimmed();
-        //DEBUG << "Server says: " << line;
-        if(!server_ok) { // Waiting for handshake..
-            if(line=="EXTPLANE 1") {
-                server_ok = true;
-                emit connectionMessage("");
-                setUpdateInterval(updateInterval);
-                // Sub all refs
-                foreach(ClientDataRef *ref, dataRefs)
-                    subRef(ref);
-            }
-            return;
-        } else { // Handle updates
-            QStringList cmd = line.split(" ", QString::SkipEmptyParts);
-            if(cmd.size()==3) {
-                ClientDataRef *ref = dataRefs.value(cmd.value(1));
-                if(ref) {
-                    if (cmd.value(0)=="ufa" || cmd.value(0)=="uia"){
-                        // Array dataref
-                        QString arrayString = cmd.value(2);
-                        Q_ASSERT(arrayString[0]=='[' && arrayString[arrayString.length()-1]==']');
-                        arrayString = arrayString.mid(1, arrayString.length()-2);
-                        QStringList arrayValues = arrayString.split(',');
-                        ref->updateValue(arrayValues);
-                    } else if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")||(cmd.value(0)=="ud")) {
-                        // Single value dataref
-                        ref->updateValue(cmd.value(2));
-                    } else if (cmd.value(0)=="ub") {
-                        // Data dataref
-                        ref->updateValue(QByteArray::fromBase64(cmd.value(2).toUtf8()));
-                    } else {
-                        INFO << "Unsupported ref type " << cmd.value(0);
-                    }
+void ExtPlaneConnection::receivedLine(QString & line) {
+    //DEBUG << "Server says: " << line;
+    if(!server_ok) { // Waiting for handshake..
+        if(line=="EXTPLANE 1") {
+            server_ok = true;
+            emit connectionMessage("");
+            setUpdateInterval(updateInterval);
+            // Sub all refs
+            foreach(ClientDataRef *ref, dataRefs)
+                subRef(ref);
+        }
+        return;
+    } else { // Handle updates
+        QStringList cmd = line.split(" ", QString::SkipEmptyParts);
+        if(cmd.size()==3) {
+            ClientDataRef *ref = dataRefs.value(cmd.value(1));
+            if(ref) {
+                if (cmd.value(0)=="ufa" || cmd.value(0)=="uia"){
+                    // Array dataref
+                    QString arrayString = cmd.value(2);
+                    Q_ASSERT(arrayString[0]=='[' && arrayString[arrayString.length()-1]==']');
+                    arrayString = arrayString.mid(1, arrayString.length()-2);
+                    QStringList arrayValues = arrayString.split(',');
+                    ref->updateValue(arrayValues);
+                } else if ((cmd.value(0)=="uf")||(cmd.value(0)=="ui")||(cmd.value(0)=="ud")) {
+                    // Single value dataref
+                    ref->updateValue(cmd.value(2));
+                } else if (cmd.value(0)=="ub") {
+                    // Data dataref
+                    ref->updateValue(QByteArray::fromBase64(cmd.value(2).toUtf8()));
                 } else {
-                    INFO << "Ref not subscribed " << cmd.value(2);
+                    INFO << "Unsupported ref type " << cmd.value(0);
                 }
+            } else {
+                INFO << "Ref not subscribed " << cmd.value(2);
             }
         }
     }

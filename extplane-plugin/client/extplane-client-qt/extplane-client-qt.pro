@@ -3,6 +3,8 @@ QT       -= gui
 
 TEMPLATE = lib
 
+INCLUDEPATH += $$PWD/../../../util/
+
 HEADERS += \
     simulatedextplaneconnection.h \
     extplaneconnection.h \
@@ -11,7 +13,8 @@ HEADERS += \
     clientdataref.h \
     simulateddatarefs/alternatingsimulateddataref.h \
     simulateddatarefs/fixedsimulateddataref.h \
-    simulateddatarefs/simulateddataref.h
+    simulateddatarefs/simulateddataref.h \
+    ../../../util/basictcpclient.h
 
 SOURCES += \
     simulatedextplaneconnection.cpp \
@@ -21,5 +24,6 @@ SOURCES += \
     clientdataref.cpp \
     simulateddatarefs/alternatingsimulateddataref.cpp \
     simulateddatarefs/fixedsimulateddataref.cpp \
-    simulateddatarefs/simulateddataref.cpp
+    simulateddatarefs/simulateddataref.cpp \
+    ../../../util/basictcpclient.cpp
 

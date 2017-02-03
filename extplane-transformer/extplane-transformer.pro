@@ -2,13 +2,10 @@ QT += qml quick
 
 CONFIG += c++11
 
-SOURCES += main.cpp \
-    extplanetransformer.cpp \
-    datasources/flightgeardatasource.cpp
-
 RESOURCES += qml.qrc
 
 INCLUDEPATH += ../extplane-server
+INCLUDEPATH += $$PWD/../util/
 DEPENDPATH += . ../extplane-server
 LIBS += -L../extplane-server -lextplane-server
 
@@ -34,6 +31,15 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+
+SOURCES += main.cpp \
+    extplanetransformer.cpp \
+    datasources/flightgeardatasource.cpp \
+    ../util/basictcpclient.cpp \
+    datasource.cpp
+
 HEADERS += \
     extplanetransformer.h \
-    datasources/flightgeardatasource.h
+    datasources/flightgeardatasource.h \
+    ../util/basictcpclient.h \
+    datasource.h

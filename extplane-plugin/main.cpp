@@ -3,7 +3,7 @@
 #include "XPLMDataAccess.h"
 #include "XPLMProcessing.h"
 #include "xplaneplugin.h"
-#include "util/console.h"
+#include "console.h"
 
 #include <string.h>
 #include <stdio.h>

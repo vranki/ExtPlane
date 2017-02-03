@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QThread>
 
-#include "../../extplane-server/util/console.h"
+#include <console.h>
 
 #define LOG_FILENAME "Log.txt"
 #define UPDATE_INTERVAL_SECONDS 0.01

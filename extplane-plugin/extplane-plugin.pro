@@ -17,6 +17,7 @@ INCLUDEPATH += $$XPLANE_SDK_PATH/CHeaders/XPLM
 
 INCLUDEPATH += ../extplane-server
 DEPENDPATH += . ../extplane-server
+INCLUDEPATH += $$PWD/../util/
 LIBS += -L../extplane-server -lextplane-server
 
 # You should not need to touch anything below this for normal build

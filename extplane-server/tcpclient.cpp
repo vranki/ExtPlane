@@ -7,7 +7,7 @@
 #include "datarefs/doubledataref.h"
 #include "datarefs/datadataref.h"
 #include "datarefprovider.h"
-#include "util/console.h"
+#include "console.h"
 #include "datarefs/dataref.h"
 
 TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :

@@ -2,15 +2,13 @@
 #include "simulateddatarefs/simulateddataref.h"
 #include "simulateddatarefs/fixedsimulateddataref.h"
 #include "simulateddatarefs/alternatingsimulateddataref.h"
-#include <../../../extplane-server/util/console.h>
+#include <console.h>
 
 SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
     enableSimulatedRefs = true;
 }
 
 void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
-    _host = host;
-    _port = port;
     server_ok = true;
     emit connectionMessage("Connected to ExtPlane (simulated)");
 }

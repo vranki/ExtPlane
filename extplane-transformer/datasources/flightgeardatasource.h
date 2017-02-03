@@ -4,16 +4,22 @@
 #include <QObject>
 #include <datarefprovider.h>
 #include <QTcpSocket>
+#include "../util/basictcpclient.h"
+#include "datasource.h"
+#include <QTimer>
+#include <QMap>
+#include <QVector>
+#include "../extplane-server/datarefs/floatdataref.h"
 
-class FlightGearDataSource : public QObject, public DataRefProvider
+class FlightGearDataSource : public DataSource
 {
     Q_OBJECT
 
 public:
     FlightGearDataSource();
 
-    // DataRefProvider interface
 public:
+    virtual void connectToSource(QString host="", int port=0);
     DataRef *subscribeRef(QString name);
     void unsubscribeRef(DataRef *ref);
     void updateDataRef(DataRef *ref);
@@ -22,13 +28,16 @@ public:
     void buttonPress(int buttonid);
     void buttonRelease(int buttonid);
     void command(QString &name, extplaneCommandType type);
+
 private slots:
     void sessionOpened();
-    void readReply();
+    void readLine(QString line);
+    void gotNetworkError(QString errstring);
 
 private:
-
-    QTcpSocket tcpSocket;
+    BasicTcpClient tcpClient;
+    QMap<QString,QString> refMap;
+    QVector<FloatDataRef*> floatRefs;
 };
 
 #endif // FLIGHTGEARDATASOURCE_H

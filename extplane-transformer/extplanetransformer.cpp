@@ -2,10 +2,10 @@
 #include "datasources/flightgeardatasource.h"
 #include <datarefprovider.h>
 
-ExtplaneTransformer::ExtplaneTransformer() : QObject(), m_dataRefProvider(0)
+ExtplaneTransformer::ExtplaneTransformer() : QObject(), m_dataSource(0)
 {
     m_dataSources << "None" << "FlightGear";
-    m_dataSource = m_dataSources.first(); // None
+    m_dataSourceName = m_dataSources.first(); // None
     emit dataSourcesChanged(m_dataSources);
 }
 
@@ -21,26 +21,41 @@ QStringList ExtplaneTransformer::dataSources() const
 
 QString ExtplaneTransformer::dataSource() const
 {
-    return m_dataSource;
+    return m_dataSourceName;
+}
+
+QString ExtplaneTransformer::networkError() const
+{
+    return m_networkError;
 }
 
 void ExtplaneTransformer::setDataSource(QString dataSource)
 {
-    if (m_dataSource == dataSource)
+    if (m_dataSourceName == dataSource)
         return;
-    qDebug() << Q_FUNC_INFO << dataSource;
-    if(m_dataRefProvider) {
+
+    if(m_dataSource) {
         _server.setDataRefProvider(0);
-        delete m_dataRefProvider;
-        m_dataRefProvider = 0;
+        delete m_dataSource;
+        m_dataSource = 0;
     }
 
-    m_dataSource = dataSource;
-    if(m_dataSource == m_dataSources.first()) {
-        m_dataRefProvider = 0;
+    m_dataSourceName = dataSource;
+    if(m_dataSourceName == m_dataSources.first()) {
+        m_dataSource = 0;
     } else {
-        m_dataRefProvider = new FlightGearDataSource();
+        m_dataSource = new FlightGearDataSource();
+        connect(m_dataSource, &DataSource::sourceNetworkError,
+                this, &ExtplaneTransformer::sourceNetworkErrorChanged);
     }
-    _server.setDataRefProvider(m_dataRefProvider);
+    _server.setDataRefProvider(m_dataSource);
+    if(m_dataSource) m_dataSource->connectToSource();
+
     emit dataSourceChanged(dataSource);
+}
+
+void ExtplaneTransformer::sourceNetworkErrorChanged(QString errorString)
+{
+    m_networkError = errorString;
+    emit networkErrorChanged(errorString);
 }

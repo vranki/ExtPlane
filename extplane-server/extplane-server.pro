@@ -3,6 +3,8 @@ TEMPLATE = lib
 QT       += core network
 QT       -= gui
 
+INCLUDEPATH += $$PWD/../util/
+
 SOURCES += tcpserver.cpp \
     tcpclient.cpp \
     datarefprovider.cpp \
@@ -25,4 +27,4 @@ HEADERS += \
     datarefs/doubledataref.h \
     datarefs/intarraydataref.h \
     datarefs/datadataref.h \
-    util/console.h
+    console.h

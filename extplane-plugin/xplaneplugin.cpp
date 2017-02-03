@@ -6,7 +6,7 @@
 #include "../extplane-server/datarefs/intarraydataref.h"
 #include "../extplane-server/datarefs/doubledataref.h"
 #include "../extplane-server/datarefs/datadataref.h"
-#include "util/console.h"
+#include <console.h>
 #include "customdata/navcustomdata.h"
 #include "customdata/atccustomdata.h"
 #include <clocale>
