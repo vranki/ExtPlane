@@ -94,7 +94,9 @@ void ExtPlaneClient::commandEnd(QString name) {
     _connection->commandEnd(name);
 }
 
-void ExtPlaneClient::setUpdateInterval(double newInterval) {}
+void ExtPlaneClient::setUpdateInterval(double newInterval) {
+    Q_UNUSED(newInterval);
+}
 
 void ExtPlaneClient::valueSet(ClientDataRef *ref) {
     _connection->setValue(ref->name(), ref->valueString());

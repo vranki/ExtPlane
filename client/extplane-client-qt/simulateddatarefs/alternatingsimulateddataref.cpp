@@ -13,6 +13,7 @@ AlternatingSimulatedDataRef::AlternatingSimulatedDataRef(QObject *parent, QStrin
 }
 
 void AlternatingSimulatedDataRef::tickTime(double dt, int total) {
+    Q_UNUSED(total);
     _time += dt;
     if(_time > _secondsPerValue) {
         _time = 0;

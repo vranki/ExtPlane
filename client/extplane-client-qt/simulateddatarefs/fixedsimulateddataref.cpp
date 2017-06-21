@@ -6,6 +6,8 @@ FixedSimulatedDataRef::FixedSimulatedDataRef(QObject *parent, QString value, QSt
 }
 
 void FixedSimulatedDataRef::tickTime(double dt, int total) {
+    Q_UNUSED(dt);
+    Q_UNUSED(total);
 }
 
 void FixedSimulatedDataRef::changeTimeout() {

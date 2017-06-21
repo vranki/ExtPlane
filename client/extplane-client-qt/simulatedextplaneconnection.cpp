@@ -16,6 +16,7 @@ void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
 }
 
 ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double accuracy) {
+    Q_UNUSED(accuracy);
     SimulatedDataRef *simRef = 0;
     if(name=="sim/cockpit2/gauges/indicators/airspeed_kts_pilot") {
         simRef = new SimulatedDataRef(this, 0, 200, 50.0, false, 0, name);
@@ -107,19 +108,20 @@ void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     dataRefs.remove(ref->name());
 
     foreach(SimulatedDataRef *simRef, simulatedRefs) {
-	if(simRef->clientRef()==ref) {
-	    simRef->deleteLater();
+        if(simRef->clientRef()==ref) {
+            simRef->deleteLater();
             simulatedRefs.removeOne(simRef);
-	}
+        }
     }
     disconnect(ref, 0, this, 0);
 }
 
 void SimulatedExtPlaneConnection::writeLine(QString line) {
+    Q_UNUSED(line);
     //qDebug() << Q_FUNC_INFO << line << "(simulated)";
 }
 
 void SimulatedExtPlaneConnection::tickTime(double dt, int total) {
     foreach(SimulatedDataRef *dr, simulatedRefs)
-	dr->tickTime(dt, total);
+        dr->tickTime(dt, total);
 }

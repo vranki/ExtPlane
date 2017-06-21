@@ -43,6 +43,7 @@ void ExtPlaneConnection::socketConnected() {
 }
 
 void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {
+    Q_UNUSED(err);
     INFO << "Socket error:" << errorString();
     server_ok = false;
     emit connectionMessage(errorString() + " : " + peerName() + ":" + QString::number(peerPort()));
@@ -126,8 +127,10 @@ void ExtPlaneConnection::readClient() {
             return;
         } else { // Handle updates
             QStringList cmd = line.split(" ", QString::SkipEmptyParts);
-            if(cmd.size()==3) {
-                ClientDataRef *ref = dataRefs.value(cmd.value(1));
+            ClientDataRef *ref;
+            if(cmd.size()==3)
+            {
+                ref = dataRefs.value(cmd.value(1));
                 if(ref) {
                     if (cmd.value(0)=="ufa" || cmd.value(0)=="uia"){
                         // Array dataref
@@ -148,7 +151,15 @@ void ExtPlaneConnection::readClient() {
                 } else {
                     INFO << "Ref not subscribed " << cmd.value(2);
                 }
+            } else if(cmd.size()==2)    // Might be a data dataref being set to a null string
+            {
+                ref = dataRefs.value(cmd.value(1));
+                if (ref && cmd.value(0)=="ub")
+                {
+                    ref->updateValue(QString(""));  // If this is just a null data dataref then update it to a null string
+                }
             }
+
         }
     }
 }

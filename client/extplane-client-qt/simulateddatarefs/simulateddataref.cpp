@@ -16,6 +16,7 @@ SimulatedDataRef::~SimulatedDataRef() {
 }
 
 void SimulatedDataRef::tickTime(double dt, int total) {
+    Q_UNUSED(total);
     actualCurrentValue += change*dt;
     if(actualCurrentValue > maxValue)
         change = -qAbs(change);
