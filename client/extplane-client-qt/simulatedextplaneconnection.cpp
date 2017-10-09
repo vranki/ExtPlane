@@ -4,9 +4,9 @@
 #include "simulateddatarefs/alternatingsimulateddataref.h"
 #include "../../util/console.h"
 
-SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
-    enableSimulatedRefs = true;
-}
+SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) :
+    ExtPlaneConnection(parent),
+    enableSimulatedRefs(true) { }
 
 void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
     _host = host;
