@@ -19,7 +19,7 @@ QStringList ExtplaneTransformer::dataSources() const
     return m_dataSources;
 }
 
-QString ExtplaneTransformer::dataSource() const
+QString ExtplaneTransformer::dataSourceName() const
 {
     return m_dataSourceName;
 }
@@ -29,20 +29,25 @@ QString ExtplaneTransformer::networkError() const
     return m_networkError;
 }
 
-void ExtplaneTransformer::setDataSource(QString dataSource)
+QObject *ExtplaneTransformer::dataSource() const
+{
+    return m_dataSource;
+}
+
+void ExtplaneTransformer::setDataSourceName(const QString dataSource)
 {
     if (m_dataSourceName == dataSource)
         return;
 
     if(m_dataSource) {
-        _server.setDataRefProvider(0);
+        _server.setDataRefProvider(nullptr);
         delete m_dataSource;
-        m_dataSource = 0;
+        m_dataSource = nullptr;
     }
 
     m_dataSourceName = dataSource;
     if(m_dataSourceName == m_dataSources.first()) {
-        m_dataSource = 0;
+        m_dataSource = nullptr;
     } else {
         m_dataSource = new FlightGearDataSource();
         connect(m_dataSource, &DataSource::sourceNetworkError,
@@ -51,7 +56,7 @@ void ExtplaneTransformer::setDataSource(QString dataSource)
     _server.setDataRefProvider(m_dataSource);
     if(m_dataSource) m_dataSource->connectToSource();
 
-    emit dataSourceChanged(dataSource);
+    emit dataSourceChanged();
 }
 
 void ExtplaneTransformer::sourceNetworkErrorChanged(QString errorString)

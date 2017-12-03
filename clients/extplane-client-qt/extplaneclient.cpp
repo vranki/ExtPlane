@@ -1,5 +1,5 @@
 #include "extplaneclient.h"
-#include <console.h>
+#include "../../util/console.h"
 
 ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, ClientDataRefProvider *drp) :
     QObject(parent), _name(name), _connection(drp)

@@ -12,8 +12,12 @@
 #include <clocale>
 #include <XPLMUtilities.h>
 
-XPlanePlugin::XPlanePlugin(QObject *parent) :
-    QObject(parent), argc(0), argv(0), app(0), server(0), flightLoopInterval(0.31f) { // Default to 30hz
+XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent)
+  , argc(0)
+  , argv(nullptr)
+  , app(nullptr)
+  , server(nullptr)
+  , flightLoopInterval(0.31f) { // Default to 30hz
 }
 
 XPlanePlugin::~XPlanePlugin() {
@@ -97,7 +101,7 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
     DEBUG << name;
 
     // Search in list of already subscribed datarefs - if found return that
-    foreach(DataRef *ref, refs) {
+    for(DataRef *ref : refs) {
         if(ref->name() == name) {
             DEBUG << "Already subscribed to " << name;
             ref->setSubscribers(ref->subscribers() + 1);
@@ -136,7 +140,7 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
     } else {
         INFO << "Can't find dataref " << name;
     }
-    return 0;
+    return nullptr;
 }
 
 void XPlanePlugin::unsubscribeRef(DataRef *ref) {
@@ -170,6 +174,7 @@ void XPlanePlugin::updateDataRef(DataRef *ref)
         int valuesCopied = XPLMGetDatavf(faRef->ref(), faRef->valueArray(), 0, arrayLength);
         Q_ASSERT(valuesCopied == arrayLength);
         faRef->updateValue();
+        break;
     };
     case extplaneRefTypeIntArray:
     {
@@ -182,18 +187,21 @@ void XPlanePlugin::updateDataRef(DataRef *ref)
         int valuesCopied = XPLMGetDatavi(faRef->ref(), faRef->valueArray(), 0, arrayLength);
         Q_ASSERT(valuesCopied == arrayLength);
         faRef->updateValue();
+        break;
     };
     case extplaneRefTypeInt:
     {
         IntDataRef *iRef = qobject_cast<IntDataRef*>(ref);
         int newValue = XPLMGetDatai(ref->ref());
         iRef->updateValue(newValue);
+        break;
     };
     case extplaneRefTypeDouble:
     {
         DoubleDataRef *dRef = qobject_cast<DoubleDataRef*>(ref);
         double newValue = XPLMGetDatad(ref->ref());
         dRef->updateValue(newValue);
+        break;
     };
     case extplaneRefTypeData:
     {
@@ -202,8 +210,8 @@ void XPlanePlugin::updateDataRef(DataRef *ref)
         bRef->setLength(arrayLength);
         int valuesCopied = XPLMGetDatab(ref->ref(), bRef->newValue().data(), 0, arrayLength);
         Q_ASSERT(valuesCopied == arrayLength);
+        break;
     };
-
     default:
         break;
     }
@@ -241,21 +249,24 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
     {
         FloatArrayDataRef *faRef = qobject_cast<FloatArrayDataRef*>(ref);
         XPLMSetDatavf(ref->ref(), faRef->valueArray(), 0, faRef->value().length());
+        break;
     }
     case extplaneRefTypeIntArray:
     {
         IntArrayDataRef *iaRef = qobject_cast<IntArrayDataRef*>(ref);
         XPLMSetDatavi(ref->ref(), iaRef->valueArray(), 0, iaRef->value().length());
+        break;
     }
     case extplaneRefTypeInt:
     {
         XPLMSetDatai(ref->ref(), qobject_cast<IntDataRef*>(ref)->value());
+        break;
     }
     case extplaneRefTypeDouble:
     {
         XPLMSetDataf(ref->ref(), qobject_cast<DoubleDataRef*>(ref)->value());
+        break;
     }
-
     default:
         break;
     }
@@ -297,11 +308,11 @@ void XPlanePlugin::pluginStop() {
     DEBUG;
     app->processEvents();
     delete server;
-    server = 0;
+    server = nullptr;
     app->quit();
     app->processEvents();
     delete app;
-    app = 0;
+    app = nullptr;
     qDeleteAll(refs);
     refs.clear();
 }

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-XPlanePlugin *globalPlugin = 0;
+XPlanePlugin *globalPlugin = nullptr;
 
 PLUGIN_API float MyFlightLoopCallback(
         float inElapsedSinceLastCall,
@@ -25,7 +25,7 @@ PLUGIN_API int XPluginStart(
         char * outName,
         char * outSig,
         char *outDesc) {
-    XPLMRegisterFlightLoopCallback(MyFlightLoopCallback, 0.01, NULL);
+    XPLMRegisterFlightLoopCallback(MyFlightLoopCallback, 0.01f, NULL);
     Q_ASSERT(!globalPlugin);
     globalPlugin = new XPlanePlugin();
     if(globalPlugin) {
@@ -41,7 +41,7 @@ PLUGIN_API void XPluginStop() {
     XPLMUnregisterFlightLoopCallback(MyFlightLoopCallback, 0);
     globalPlugin->pluginStop();
     delete globalPlugin;
-    globalPlugin = 0;
+    globalPlugin = nullptr;
 }
 
 PLUGIN_API void XPluginDisable() {

@@ -14,6 +14,7 @@ class BasicTcpClient : public QTcpSocket
 
 public:
     explicit BasicTcpClient(QObject *parent = 0);
+    virtual ~BasicTcpClient() {}
     virtual void connectTo(QString host, unsigned int port);
     void writeLine(QString line);
     QString lineEnding() const;

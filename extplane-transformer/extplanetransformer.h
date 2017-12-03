@@ -11,24 +11,27 @@ class ExtplaneTransformer : public QObject
     Q_PROPERTY(QObject *tcpServer READ tcpServer NOTIFY tcpServerChanged)
     // First is always null
     Q_PROPERTY(QStringList dataSources READ dataSources NOTIFY dataSourcesChanged)
-    Q_PROPERTY(QString dataSource READ dataSource WRITE setDataSource NOTIFY dataSourceChanged)
+    Q_PROPERTY(QString dataSourceName READ dataSourceName WRITE setDataSourceName NOTIFY dataSourceChanged)
     Q_PROPERTY(QString networkError READ networkError NOTIFY networkErrorChanged)
+    Q_PROPERTY(QObject *dataSource READ dataSource NOTIFY dataSourceChanged)
 
 public:
     ExtplaneTransformer();
     TcpServer* tcpServer();
     QStringList dataSources() const;
-    QString dataSource() const;
+    QString dataSourceName() const;
     QString networkError() const;
+    QObject *dataSource() const;
 
 public slots:
-    void setDataSource(QString dataSource);
+    void setDataSourceName(const QString dataSourceName);
 
 signals:
     void tcpServerChanged(TcpServer* tcpServer);
     void dataSourcesChanged(QStringList dataSources);
-    void dataSourceChanged(QString dataSource);
+    void dataSourceChanged();
     void networkErrorChanged(QString networkError);
+
 private slots:
     void sourceNetworkErrorChanged(QString errorString);
 

@@ -1,6 +1,6 @@
 #include "alternatingsimulateddataref.h"
 
-#include <console.h>
+#include "../util/console.h"
 
 AlternatingSimulatedDataRef::AlternatingSimulatedDataRef(QObject *parent, QString values, double secondsPerValue, QString refName) :
     SimulatedDataRef(parent,0,0,1,false,0,refName)

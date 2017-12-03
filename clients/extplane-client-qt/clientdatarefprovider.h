@@ -13,6 +13,7 @@ class ClientDataRefProvider
 {
 public:
     ClientDataRefProvider();
+    virtual ~ClientDataRefProvider();
     virtual ClientDataRef *subscribeDataRef(QString name, double accuracy=0)=0;
     virtual void unsubscribeDataRef(ClientDataRef *ref)=0;
     virtual void keyPress(int id)=0;

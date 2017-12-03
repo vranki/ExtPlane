@@ -3,8 +3,7 @@
 #include <QThread>
 #include "../extplane-server/datarefs/floatdataref.h"
 
-FlightGearDataSource::FlightGearDataSource() : DataSource()
-{
+FlightGearDataSource::FlightGearDataSource() : DataSource() {
     connect(&tcpClient, &BasicTcpClient::tcpClientConnected,
             this, &FlightGearDataSource::sessionOpened);
     connect(&tcpClient, &BasicTcpClient::receivedLine,
@@ -22,6 +21,7 @@ FlightGearDataSource::FlightGearDataSource() : DataSource()
     refMap.insert("sim/cockpit2/gauges/indicators/slip_deg", "/instrumentation/slip-skid-ball/indicated-slip-skid");
 
     tcpClient.setLineEnding("\r\n");
+    setHelpText("Start FlightGear with --telnet=5401 to allow access to it's properties. Trying to connect to it..");
 }
 
 void FlightGearDataSource::connectToSource(QString host, int port)
@@ -77,6 +77,7 @@ void FlightGearDataSource::command(QString &name, extplaneCommandType type)
 
 void FlightGearDataSource::sessionOpened()
 {
+    setHelpText("Connected to FlightGear.");
     tcpClient.writeLine("data");
 }
 
@@ -86,7 +87,7 @@ void FlightGearDataSource::readLine(QString line)
         QStringList splitted = line.split('=');
         QString fgRef = splitted[0];
         QString valueStr = splitted[1];
-        foreach (FloatDataRef *ref, floatRefs) {
+        for(FloatDataRef *ref : floatRefs) {
             if(refMap.value(ref->name()) == fgRef) {
                 ref->updateValue(valueStr.toFloat());
             }

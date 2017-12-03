@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QStringList>
 #include "clientdatarefprovider.h"
-#include <basictcpclient.h>
+#include "../../util/basictcpclient.h"
 
 class SimulatedDataRef;
 class ExtPlaneClient;
@@ -19,6 +19,7 @@ class ExtPlaneConnection : public BasicTcpClient, public ClientDataRefProvider {
     Q_OBJECT
 public:
     explicit ExtPlaneConnection(QObject *parent = 0);
+    virtual ~ExtPlaneConnection() {}
     void registerClient(ExtPlaneClient* client);
 
 public slots:
@@ -33,7 +34,6 @@ public slots:
     virtual void setValue(QString name, QString value);
     virtual void setValues(QString name, QStringList values);
     virtual void setValue(ClientDataRef *ref);
-    virtual void connectTo(QString host, unsigned int port);
     void setUpdateInterval(double newInterval);
     void tickTime(double dt, int total);
     void receivedLine(QString &line);

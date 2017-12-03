@@ -1,11 +1,14 @@
-# ExtPlane-Plugin #
+# ExtPlane #
 
 ![Screenshot](http://s23.postimg.org/8xhypdei3/extplane_panel_screenshot_v2.png)
 
-A plugin for X-Plane that allows commanding the simulation from external programs through an easy-to-use
-TCP protocol.
+A plugin for X-Plane and other simulators that allows commanding the simulation from
+external programs through an easy-to-use TCP protocol.
 
+## Supported simulators ##
 
+* X-Plane 9, 10 & 11 - native support
+* FlightGear - basic support via Transformer (see later)
 
 ## Features ##
 
@@ -14,7 +17,6 @@ TCP protocol.
 * Support for different dataref types: int, float, double, int[], float[], data
 * Simulate key and button presses
 * Execute commands
-* Supports both X-Plane 9 and 10
 * Free & open source under GPLv3
 * Client libraries available for Qt (c++), Java and C#
 
@@ -26,6 +28,14 @@ Known users:
 * Copilot X
     * Voice command app for Android
     * https://play.google.com/store/apps/details?id=com.appropel.xplanevoice
+
+## Transformer ##
+
+ExtPlane-Transformer is an application that works as ExtPlane
+server and can transform output from ANY simulator to ExtPlane
+protocol. Work on Transformer is only beginning but expect to see
+support for more simulators in near future.
+
 
 License:
 

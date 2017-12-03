@@ -3,3 +3,7 @@
 ClientDataRefProvider::ClientDataRefProvider()
 {
 }
+
+ClientDataRefProvider::~ClientDataRefProvider()
+{
+}

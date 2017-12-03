@@ -9,12 +9,7 @@ message("Building X-Plane plugin with SDK in $$XPLANE_SDK_PATH")
 QMAKE_CXXFLAGS += -DXPLM210=1
 QMAKE_CXXFLAGS += -DXPLM200=0
 
-# If your X-Plane SDK is in another directory, add or change it here:
-
-message("SDK in $$XPLANE_SDK_PATH")
-
 INCLUDEPATH += $$XPLANE_SDK_PATH/CHeaders/XPLM
-
 INCLUDEPATH += ../extplane-server
 DEPENDPATH += . ../extplane-server
 INCLUDEPATH += $$PWD/../util/

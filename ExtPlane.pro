@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 SUBDIRS = extplane-server \
-    extplane-plugin/client/extplane-client-qt \
+    clients/extplane-client-qt \
     extplane-transformer
 CONFIG += ordered
 
@@ -13,4 +13,4 @@ SUBDIRS += extplane-plugin
 warning("No X-Plane SDK found in ../XPlaneSDK or ~/SDK - not building X-Plane plugin")
 }
 
-OTHER_FILES += README.md client/extplane-client-qt/README
+OTHER_FILES += README.md clients/extplane-client-qt/README

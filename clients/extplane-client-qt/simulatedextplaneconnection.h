@@ -14,6 +14,7 @@ class SimulatedExtPlaneConnection : public ExtPlaneConnection {
     Q_OBJECT
 public:
     explicit SimulatedExtPlaneConnection(QObject *parent = 0);
+    virtual ~SimulatedExtPlaneConnection() {}
 public slots:
     virtual void unsubscribeDataRef(ClientDataRef *ref);
     virtual void connectTo(QString host, unsigned int port);

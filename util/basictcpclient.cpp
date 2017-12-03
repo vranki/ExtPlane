@@ -1,5 +1,5 @@
 #include "basictcpclient.h"
-#include <console.h>
+#include "../util/console.h"
 
 BasicTcpClient::BasicTcpClient(QObject *parent) :  QTcpSocket(parent), _port(0), m_lineEnding("\n")
 {

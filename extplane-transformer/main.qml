@@ -18,13 +18,18 @@ ApplicationWindow {
             ComboBox {
                 Layout.fillWidth: true
                 model: transformer.dataSources
-                onCurrentTextChanged: transformer.dataSource = currentText;
+                onCurrentTextChanged: transformer.dataSourceName = currentText;
             }
+        }
+        TextArea {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            readOnly: true
+            text: transformer.dataSource ? transformer.dataSource.helpText : "Choose a data source to begin"
         }
     }
     statusBar: StatusBar {
         RowLayout {
-//            anchors.fill: parent
             Label { text: transformer.tcpServer.clientCount + " client(s) connected." }
             Label { text: transformer.networkError }
         }
