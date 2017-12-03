@@ -312,13 +312,29 @@ are always fully relative (ie use `../util/header.h` instead of `util/header.h`)
 This is required to build across all platforms.
 
 ### Platform-Dependent Code ###
+
 When writing code which uses new features currently not implemented, always make
 sure to first try to use Qt cross-platform classes and libraries. When using
 platform dependent code, make sure to `#ifdef` the sections of code which will
 only work on a specific platform. You can use standard Qt defines, or additional
 defines such as `TERMIOS_AVAIALABLE` to help with this.
 
+### Creating new data sources to support simulators ###
 
+Look at class DataSource. You'll need to subclass it and implement any
+virtual functions missing. The functions are documented in the source.
+You'll need to do a conversion between X-Plane dataref and the simulator's
+own value presentations. Usually they area easy to do but complex stuff
+such as navigation may be impossible to do with common API.
+
+When you have an implementation of a DataSource, add it to ExtPlaneTransformer
+class implementation. Then it should be available in the GUI.
+
+To create a custom GUI for the source, create a QML file named
+datasources/DataSource[sourcename].qml. This is not mandatory.
+
+See the existing datasources for examples. Thanks for contributing
+and make a github pull request when you're ready.
 
 ## Contact / Feedback ##
 

@@ -21,11 +21,10 @@ ApplicationWindow {
                 onCurrentTextChanged: transformer.dataSourceName = currentText;
             }
         }
-        TextArea {
+        Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            readOnly: true
-            text: transformer.dataSource ? transformer.dataSource.helpText : "Choose a data source to begin"
+            source: "datasources/DataSource" + transformer.dataSourceName + ".qml"
         }
     }
     statusBar: StatusBar {

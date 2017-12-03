@@ -7,3 +7,7 @@
 DataRefProvider::DataRefProvider()
 {
 }
+
+DataRefProvider::~DataRefProvider()
+{
+}

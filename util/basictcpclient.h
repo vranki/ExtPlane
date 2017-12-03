@@ -7,6 +7,10 @@
 #include <QAbstractSocket>
 #include <QTimer>
 
+/**
+ * @brief The BasicTcpClient class is a very basic text-based
+ * TCP client that can read and write lines to a TCP socket.
+ */
 class BasicTcpClient : public QTcpSocket
 {
     Q_OBJECT

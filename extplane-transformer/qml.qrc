@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>datasources/DataSourceFlightGear.qml</file>
+        <file>datasources/DataSourceNone.qml</file>
     </qresource>
 </RCC>

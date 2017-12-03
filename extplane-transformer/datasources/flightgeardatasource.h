@@ -19,7 +19,7 @@ public:
     FlightGearDataSource();
 
 public:
-    virtual void connectToSource(QString host="", int port=0);
+    virtual void connectToSource(QString host="localhost", int port=5401);
     DataRef *subscribeRef(QString name);
     void unsubscribeRef(DataRef *ref);
     void updateDataRef(DataRef *ref);
@@ -36,7 +36,7 @@ private slots:
 
 private:
     BasicTcpClient tcpClient;
-    QMap<QString,QString> refMap;
+    QMap<QString,QString> refMap; // Mapping of X-Plane datarefs to FG value names
     QVector<FloatDataRef*> floatRefs;
 };
 

@@ -19,15 +19,15 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
     refMap.insert("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot", "/instrumentation/altimeter/setting-inhg");
     refMap.insert("sim/flightmodel/position/vh_ind", "/instrumentation/vertical-speed-indicator/indicated-speed-fpm");
     refMap.insert("sim/cockpit2/gauges/indicators/slip_deg", "/instrumentation/slip-skid-ball/indicated-slip-skid");
+    // Please add more here
 
     tcpClient.setLineEnding("\r\n");
-    setHelpText("Start FlightGear with --telnet=5401 to allow access to it's properties. Trying to connect to it..");
+    setHelpText("Start FlightGear with --telnet=5401 to allow access to it's properties. \nSee http://wiki.flightgear.org/Telnet_usage for more info. \nTrying to connect to it..");
 }
 
 void FlightGearDataSource::connectToSource(QString host, int port)
 {
-    // @todo continue here..
-    tcpClient.connectToHost("localhost", 5401);
+    tcpClient.connectToHost(host, port);
 }
 
 DataRef *FlightGearDataSource::subscribeRef(QString name)
@@ -40,7 +40,7 @@ DataRef *FlightGearDataSource::subscribeRef(QString name)
         tcpClient.writeLine("subscribe " + fgRef);
         return newRef;
     }
-    return 0;
+    return nullptr;
 }
 
 void FlightGearDataSource::unsubscribeRef(DataRef *ref)
