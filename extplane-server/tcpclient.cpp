@@ -10,8 +10,11 @@
 #include "console.h"
 #include "datarefs/dataref.h"
 
-TcpClient::TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider) :
-    QObject(parent), _socket(socket), _refProvider(refProvider)
+TcpClient::TcpClient(QObject *parent,
+                     QTcpSocket *socket,
+                     DataRefProvider *refProvider) : QObject(parent)
+  , _socket(socket)
+  , _refProvider(refProvider)
 {
     INFO << "Client connected from " << socket->peerAddress().toString();
     connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
@@ -34,7 +37,7 @@ TcpClient::~TcpClient() {
         ref->disconnect(this);
         _refProvider->unsubscribeRef(ref);
     }
-    foreach(int but, _heldButtons)
+    for(int but : _heldButtons)
         _refProvider->buttonRelease(but);
     emit discoed(this);
 }
@@ -279,15 +282,15 @@ void TcpClient::refChanged(DataRef *ref) {
 
 QSet<QString> TcpClient::listRefs() {
     QSet<QString> refNames;
-    foreach(DataRef *ref, _subscribedRefs)
+    for(DataRef *ref : _subscribedRefs)
         refNames.insert(ref->name());
 
     return refNames;
 }
 DataRef *TcpClient::getSubscribedRef(QString name) {
-    foreach(DataRef* r, _subscribedRefs.values()) {
+    for(DataRef* r : _subscribedRefs.values()) {
         if(r->name()==name)
             return r;
     }
-    return 0;
+    return nullptr;
 }

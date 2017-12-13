@@ -11,6 +11,8 @@ SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) :
 }
 
 void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
+    Q_UNUSED(host);
+    Q_UNUSED(port);
     server_ok = true;
     emit connectionMessage("Connected to ExtPlane (simulated)");
 }
@@ -107,7 +109,7 @@ void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     DEBUG << "Ref not subscribed by anyone anymore";
     dataRefs.remove(ref->name());
 
-    foreach(SimulatedDataRef *simRef, simulatedRefs) {
+    for(SimulatedDataRef *simRef : simulatedRefs) {
         if(simRef->clientRef()==ref) {
             simRef->deleteLater();
             simulatedRefs.removeOne(simRef);
@@ -122,6 +124,6 @@ void SimulatedExtPlaneConnection::writeLine(QString line) {
 }
 
 void SimulatedExtPlaneConnection::tickTime(double dt, int total) {
-    foreach(SimulatedDataRef *dr, simulatedRefs)
+    for(SimulatedDataRef *dr : simulatedRefs)
         dr->tickTime(dt, total);
 }

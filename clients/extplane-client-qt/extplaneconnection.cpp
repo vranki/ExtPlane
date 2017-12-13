@@ -8,7 +8,8 @@
 ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent), updateInterval(0.333) {
     connect(this, SIGNAL(tcpClientConnected()), this, SLOT(tcpClientConnected()));
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
-    connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
+    // connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
+    connect(this, &BasicTcpClient::receivedLine, this, &ExtPlaneConnection::receivedLineSlot);
     server_ok = false;
     enableSimulatedRefs = false;
 }
@@ -72,7 +73,7 @@ void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     DEBUG << "Ref not subscribed by anyone anymore";
     dataRefs.remove(ref->name());
     bool isSimulated = false;
-    foreach(SimulatedDataRef *simRef, simulatedRefs) {
+    for(SimulatedDataRef *simRef : simulatedRefs) {
         if(simRef->clientRef()==ref) {
             simRef->deleteLater();
             simulatedRefs.removeOne(simRef);
@@ -86,13 +87,13 @@ void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
         DEBUG << "Deleting ref " << ref->name() << ref;
         ref->deleteLater();
     }
-    foreach(ClientDataRef *ref, dataRefs) {
+    for(ClientDataRef *ref : dataRefs) {
         DEBUG << "refs now:" << ref->name();
     }
 }
 
-void ExtPlaneConnection::receivedLine(QString & line) {
-    //DEBUG << "Server says: " << line;
+void ExtPlaneConnection::receivedLineSlot(QString & line) {
+    DEBUG << "Server says: " << line;
     if(!server_ok) { // Waiting for handshake..
         if(line=="EXTPLANE 1") {
             server_ok = true;

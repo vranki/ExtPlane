@@ -17,6 +17,7 @@ class ExtPlaneClient;
  */
 class ExtPlaneConnection : public BasicTcpClient, public ClientDataRefProvider {
     Q_OBJECT
+
 public:
     explicit ExtPlaneConnection(QObject *parent = 0);
     virtual ~ExtPlaneConnection() {}
@@ -36,7 +37,8 @@ public slots:
     virtual void setValue(ClientDataRef *ref);
     void setUpdateInterval(double newInterval);
     void tickTime(double dt, int total);
-    void receivedLine(QString &line);
+    void receivedLineSlot(QString &line);
+
 private slots:
     void tcpClientConnected();
     void socketError(QAbstractSocket::SocketError err);

@@ -1,19 +1,27 @@
 #include "basictcpclient.h"
 #include "../util/console.h"
 
-BasicTcpClient::BasicTcpClient(QObject *parent) :  QTcpSocket(parent), _port(0), m_lineEnding("\n")
+BasicTcpClient::BasicTcpClient(QObject *parent) : QTcpSocket(parent)
+  , m_lineEnding("\n")
+  , m_port(0)
 {
     connect(this, SIGNAL(connected()), this, SLOT(socketConnected()));
-    connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+    connect(this, SIGNAL(error(QAbstractSocket::SocketError)),
+            this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(tryReconnect()));
 }
 
 
-void BasicTcpClient::connectTo(QString host, unsigned int port) {
+void BasicTcpClient::connectTo(QString host, int port) {
     close();
-    _host = host;
-    _port = port;
+    if(host.isEmpty() || !port) {
+        INFO << "host or port not set - can't connect" << host << port;
+        return;
+    }
+    m_host = host;
+    m_port = port;
+    emit connectionChanged();
     abort();
     tryReconnect();
 }
@@ -41,10 +49,14 @@ void BasicTcpClient::setLineEnding(QString lineEnding)
 
 
 void BasicTcpClient::tryReconnect() {
-    emit connectionMessage(QString("Connecting to %1:%2..").arg(_host).arg(_port));
-
-    reconnectTimer.stop();
-    connectToHost(_host, _port);
+    if(m_host.isEmpty() || !m_port) {
+        emit connectionMessage("Please set host and port to connect");
+        return;
+    } else {
+        emit connectionMessage(QString("Connecting to %1:%2..").arg(m_host).arg(m_port));
+        reconnectTimer.stop();
+        connectToHost(m_host, static_cast<quint16>(m_port));
+    }
 }
 
 void BasicTcpClient::socketConnected() {
@@ -54,8 +66,9 @@ void BasicTcpClient::socketConnected() {
 
 
 void BasicTcpClient::socketError(QAbstractSocket::SocketError err) {
+    Q_UNUSED(err);
     INFO << "Socket error:" << errorString();
-    emit networkError(errorString() + " : " + _host + ":" + QString::number(_port));
+    emit networkError(errorString() + " : " + m_host + ":" + QString::number(m_port));
     emit connectionMessage(errorString() + " : " + peerName() + ":" + QString::number(peerPort()));
     reconnectTimer.setInterval(5000);
     reconnectTimer.start();

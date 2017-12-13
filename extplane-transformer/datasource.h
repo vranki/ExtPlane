@@ -17,9 +17,9 @@ class DataSource : public QObject, public DataRefProvider
     Q_PROPERTY(QString helpText READ helpText NOTIFY helpTextChanged)
 
 public:
-    explicit DataSource(QObject *parent = 0);
+    explicit DataSource(QObject *parent = nullptr);
     // Connect to host & port supplied by user, or localhost & default port if not set.
-    virtual void connectToSource(QString host="", int port=0)=0;
+    virtual void connectToSource()=0;
     QString helpText() const;
 
 signals:

@@ -6,5 +6,5 @@ TextArea {
     Layout.fillWidth: true
     Layout.fillHeight: true
     readOnly: true
-    text: transformer.dataSource.helpText
+    text: transformer.dataSource ? transformer.dataSource.helpText : ""
 }

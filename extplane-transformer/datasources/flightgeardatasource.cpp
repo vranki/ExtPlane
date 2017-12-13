@@ -25,9 +25,9 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
     setHelpText("Start FlightGear with --telnet=5401 to allow access to it's properties. \nSee http://wiki.flightgear.org/Telnet_usage for more info. \nTrying to connect to it..");
 }
 
-void FlightGearDataSource::connectToSource(QString host, int port)
+void FlightGearDataSource::connectToSource()
 {
-    tcpClient.connectToHost(host, port);
+    tcpClient.connectToHost("localhost" , 5401);
 }
 
 DataRef *FlightGearDataSource::subscribeRef(QString name)
@@ -77,7 +77,7 @@ void FlightGearDataSource::command(QString &name, extplaneCommandType type)
 
 void FlightGearDataSource::sessionOpened()
 {
-    setHelpText("Connected to FlightGear.");
+    setHelpText(QString("Connected to FlightGear at %1:%2").arg(tcpClient.peerName()).arg(tcpClient.peerPort()));
     tcpClient.writeLine("data");
 }
 

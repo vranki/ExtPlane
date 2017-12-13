@@ -42,7 +42,6 @@ private:
     QMap<DataRef*, QByteArray> _refValueB;
     QSet<int> _heldButtons;
     DataRefProvider *_refProvider;
-
 };
 
 #endif // TCPCLIENT_H

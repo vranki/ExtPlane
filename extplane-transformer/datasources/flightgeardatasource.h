@@ -19,7 +19,7 @@ public:
     FlightGearDataSource();
 
 public:
-    virtual void connectToSource(QString host="localhost", int port=5401);
+    virtual void connectToSource();
     DataRef *subscribeRef(QString name);
     void unsubscribeRef(DataRef *ref);
     void updateDataRef(DataRef *ref);

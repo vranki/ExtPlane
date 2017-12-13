@@ -15,11 +15,13 @@ class BasicTcpClient : public QTcpSocket
 {
     Q_OBJECT
     Q_PROPERTY(QString lineEnding READ lineEnding WRITE setLineEnding NOTIFY lineEndingChanged)
+    Q_PROPERTY(QString peerName READ peerName NOTIFY connectionChanged)
+    Q_PROPERTY(int peerPort READ peerPort NOTIFY connectionChanged)
 
 public:
-    explicit BasicTcpClient(QObject *parent = 0);
+    explicit BasicTcpClient(QObject *parent = nullptr);
     virtual ~BasicTcpClient() {}
-    virtual void connectTo(QString host, unsigned int port);
+    virtual void connectTo(QString host = QString(), int port=0);
     void writeLine(QString line);
     QString lineEnding() const;
 
@@ -28,10 +30,11 @@ public slots:
 
 signals:
     void tcpClientConnected();
-    void receivedLine(QString line);
+    void receivedLine(QString & line);
     void connectionMessage(QString text);
     void networkError(QString errorString);
     void lineEndingChanged(QString lineEnding);
+    void connectionChanged();
 
 private slots:
     void socketConnected();
@@ -41,9 +44,9 @@ private slots:
 
 private:
     QTimer reconnectTimer;
-    QString _host;
-    unsigned int _port;
     QString m_lineEnding;
+    QString m_host;
+    int m_port;
 };
 
 #endif // BASICTCPCLIENT_H
