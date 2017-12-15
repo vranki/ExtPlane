@@ -13,3 +13,9 @@ void DataSource::setHelpText(QString newText)
     m_helpText = newText;
     emit helpTextChanged(m_helpText);
 }
+
+void DataSource::setNetworkError(QString newError)
+{
+    m_networkError = newError;
+    emit sourceNetworkError(m_networkError);
+}

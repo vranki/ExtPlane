@@ -30,8 +30,9 @@ signals:
 protected:
     // Sets the help text. Use this to change the text.
     void setHelpText(QString newText);
+    void setNetworkError(QString newError);
 private:
-    QString m_helpText;
+    QString m_helpText, m_networkError;
 };
 
 #endif // DATASOURCE_H

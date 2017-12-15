@@ -23,6 +23,6 @@
  *
  * @see qCritical()
  */
-#define INFO qCritical() << "ExtPlane-Plugin:"
+#define INFO qCritical() << "ExtPlane:" << Q_FUNC_INFO
 
 #endif // CONSOLE_H

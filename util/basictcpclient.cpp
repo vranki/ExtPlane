@@ -10,11 +10,14 @@ BasicTcpClient::BasicTcpClient(QObject *parent) : QTcpSocket(parent)
             this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(tryReconnect()));
+    reconnectTimer.setSingleShot(false);
 }
 
 
 void BasicTcpClient::connectTo(QString host, int port) {
     close();
+    reconnectTimer.setInterval(5000);
+    reconnectTimer.start();
     if(host.isEmpty() || !port) {
         INFO << "host or port not set - can't connect" << host << port;
         return;
@@ -54,7 +57,6 @@ void BasicTcpClient::tryReconnect() {
         return;
     } else {
         emit connectionMessage(QString("Connecting to %1:%2..").arg(m_host).arg(m_port));
-        reconnectTimer.stop();
         connectToHost(m_host, static_cast<quint16>(m_port));
     }
 }
@@ -70,8 +72,6 @@ void BasicTcpClient::socketError(QAbstractSocket::SocketError err) {
     INFO << "Socket error:" << errorString();
     emit networkError(errorString() + " : " + m_host + ":" + QString::number(m_port));
     emit connectionMessage(errorString() + " : " + peerName() + ":" + QString::number(peerPort()));
-    reconnectTimer.setInterval(5000);
-    reconnectTimer.start();
 }
 
 void BasicTcpClient::readClient() {
