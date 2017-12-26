@@ -3,9 +3,10 @@ compiler:
   - gcc
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -qq libqt4-dev build-essential
- - wget http://www.xsquawkbox.net/xpsdk/XPSDK212.zip
+ - sudo apt-get install -qq qtbase5-dev qt5-default build-essential wget
+ - wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
  - unzip *.zip
+ - mv SDK XPlaneSDK
  - qmake
 script: make
 branches:
