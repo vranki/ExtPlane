@@ -1,6 +1,9 @@
 TEMPLATE = lib
 CONFIG += staticlib c++11
 
+# Needed for windows mxe build (hope this doesn't break anything..)
+DESTDIR = $$PWD
+
 QT       += core network
 QT       -= gui
 
