@@ -44,7 +44,7 @@ private slots:
 private:
     BasicTcpClient tcpClient;
     QMap<QString,QString> refMap; // Mapping of X-Plane datarefs to FG value names
-    QVector<FloatDataRef*> floatRefs; // All float datarefs used
+    QList<FloatDataRef*> floatRefs; // All float datarefs used
 };
 
 #endif // FLIGHTGEARDATASOURCE_H
