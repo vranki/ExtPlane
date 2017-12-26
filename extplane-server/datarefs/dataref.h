@@ -26,6 +26,7 @@ enum {
   */
 class DataRef : public QObject {
     Q_OBJECT
+
 public:
     DataRef(QObject *parent, QString name, void* ref);
     QString &name();
@@ -42,17 +43,22 @@ public:
     virtual void setAccuracy(double val);
     virtual void updateAccuracy(double val);
     double accuracy() { return _accuracy; }
+    void setUnsubscribeAfterChange();
+    bool shouldUnsubscribeAfterChange();
 signals:
     void changed(DataRef *ref);
+
 protected:
     QString _typeString;
     extplaneRefID _type;
     void* _ref;
     double _accuracy;
+
 private:
     QString _name;
     int _subscribers;
     bool _writable;
+    bool _unsubscribeAfterChange;
 };
 
 #endif // DATAREF_H

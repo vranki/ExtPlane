@@ -1,14 +1,14 @@
 #include "dataref.h"
 
-DataRef::DataRef(QObject *parent, QString name, void *ref) : QObject(parent),
-    _ref(ref),
-    _name(name),
-    _subscribers(0),
-    _writable(false),
-    _type(extplaneRefTypeUnknown),
-_typeString("?")
-{
-}
+DataRef::DataRef(QObject *parent, QString name, void *ref) : QObject(parent)
+  , _ref(ref)
+  , _name(name)
+  , _subscribers(0)
+  , _writable(false)
+  , _type(extplaneRefTypeUnknown)
+  , _typeString("?")
+  , _unsubscribeAfterChange(false)
+{ }
 
 QString &DataRef::name() {
     return _name;
@@ -55,4 +55,12 @@ void DataRef::setAccuracy(double val) {
 void DataRef::updateAccuracy(double val) {
     // Only update if the new accuracy is higher (eg the value is smaller than currently set)
     if(val < _accuracy) _accuracy = val;
+}
+
+void DataRef::setUnsubscribeAfterChange() {
+    _unsubscribeAfterChange = true;
+}
+
+bool DataRef::shouldUnsubscribeAfterChange() {
+    return _unsubscribeAfterChange;
 }

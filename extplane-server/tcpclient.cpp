@@ -30,7 +30,6 @@ TcpClient::TcpClient(QObject *parent,
 
 TcpClient::~TcpClient() {
     DEBUG;
-    _socket->disconnectFromHost();
     while(!_subscribedRefs.isEmpty()) {
         DataRef *ref = _subscribedRefs.values().first();
         _subscribedRefs.remove(ref);
@@ -60,7 +59,7 @@ void TcpClient::readClient() {
         if(command == "disconnect") {
             DEBUG << "killing this client connection";
             deleteLater();
-        } else if(command == "sub") { // Subscribe command
+        } else if(command == "sub" || command == "get") { // Subscribe or get command
             if(subLine.length() >= 2) {
                 QString refName = subLine[1].trimmed();
 
@@ -90,6 +89,7 @@ void TcpClient::readClient() {
                             _refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
                         }
                         INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
+                        if(command == "get") ref->setUnsubscribeAfterChange();
                     } else {
                         INFO << "Ref not found" << refName;
                     }
@@ -102,17 +102,7 @@ void TcpClient::readClient() {
             }
         } else if(command == "unsub") {
             QString refName = subLine.value(1);
-            DataRef *ref = getSubscribedRef(refName);
-            if(ref) {
-                ref->disconnect(this);
-                _refProvider->unsubscribeRef(ref);
-                _subscribedRefs.remove(ref);
-                _refValueF.remove(ref);
-                _refValueFA.remove(ref);
-                _refValueB.remove(ref);
-                _refValueI.remove(ref);
-                _refValueIA.remove(ref);
-            }
+            unsubscribeRef(refName);
         } else if(command == "set") {
             if(subLine.size() == 3) {
                 QString refName = subLine.value(1);
@@ -250,17 +240,17 @@ void TcpClient::refChanged(DataRef *ref) {
         } else {
             return;
         }
-    } else if(ref->type()== extplaneRefTypeInt) {
+    } else if(ref->type() == extplaneRefTypeInt) {
         IntDataRef *refI = qobject_cast<IntDataRef*>(ref);
         if(qAbs(refI->value() - _refValueI[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueI[ref] = refI->value();
-    } else if(ref->type()== extplaneRefTypeDouble) {
+    } else if(ref->type() == extplaneRefTypeDouble) {
         DoubleDataRef *refD = qobject_cast<DoubleDataRef*>(ref);
         if(qAbs(refD->value() - _refValueD[ref]) < ref->accuracy())
             return; // Hasn't changed enough
         _refValueD[ref] = refD->value();
-    } else if(ref->type()== extplaneRefTypeData) {
+    } else if(ref->type() == extplaneRefTypeData) {
         // The accuracy is handled internally for the data dataref, when it emits the update signal
         // it's time to send the update...
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
@@ -272,12 +262,14 @@ void TcpClient::refChanged(DataRef *ref) {
     QByteArray block;
     QTextStream out(&block, QIODevice::WriteOnly);
     out << "u" << ref->typeString() << " " << ref->name() << " " << ref->valueString() << "\n";
-    out.flush();
+    out.flush(); // Is this optimal for performance? Should be studied.
 
     if(_socket->isOpen()) {
         _socket->write(block);
         //    _socket->flush(); Not really needed and may mess up performance
     }
+    if(ref->shouldUnsubscribeAfterChange())
+        unsubscribeRef(ref->name());
 }
 
 QSet<QString> TcpClient::listRefs() {
@@ -287,10 +279,25 @@ QSet<QString> TcpClient::listRefs() {
 
     return refNames;
 }
-DataRef *TcpClient::getSubscribedRef(QString name) {
+DataRef *TcpClient::getSubscribedRef(QString &name) {
     for(DataRef* r : _subscribedRefs.values()) {
-        if(r->name()==name)
+        if(r->name() == name)
             return r;
     }
     return nullptr;
+}
+
+void TcpClient::unsubscribeRef(QString &name)
+{
+    DataRef *ref = getSubscribedRef(name);
+    if(ref) {
+        ref->disconnect(this);
+        _refProvider->unsubscribeRef(ref);
+        _subscribedRefs.remove(ref);
+        _refValueF.remove(ref);
+        _refValueFA.remove(ref);
+        _refValueB.remove(ref);
+        _refValueI.remove(ref);
+        _refValueIA.remove(ref);
+    }
 }

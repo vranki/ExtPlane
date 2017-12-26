@@ -11,6 +11,7 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
     connect(&tcpClient, &BasicTcpClient::networkError,
             this, &FlightGearDataSource::gotNetworkError);
 
+    // Fill the mappings of X-Plane <-> FlightGear data refs.
     refMap.insert("sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot", "/instrumentation/magnetic-compass/indicated-heading-deg");
     refMap.insert("sim/cockpit2/gauges/indicators/airspeed_kts_pilot", "/instrumentation/airspeed-indicator/indicated-speed-kt");
     refMap.insert("sim/cockpit2/gauges/indicators/pitch_vacuum_deg_pilot", "/instrumentation/attitude-indicator/indicated-pitch-deg");
@@ -30,7 +31,7 @@ void FlightGearDataSource::connectToSource() {
     tcpClient.connectTo("localhost" , 5401);
 }
 
-DataRef *FlightGearDataSource::subscribeRef(QString name)
+DataRef *FlightGearDataSource::subscribeRef(QString &name)
 {
     qDebug() << Q_FUNC_INFO << name;
     if(refMap.contains(name)) {
@@ -47,7 +48,8 @@ void FlightGearDataSource::unsubscribeRef(DataRef *ref)
 {
     qDebug() << Q_FUNC_INFO << ref->name();
     tcpClient.writeLine("unsubscribe " + refMap.value(ref->name()));
-    refMap.remove(ref->name());
+    if(ref->type() == extplaneRefTypeFloat)
+        floatRefs.removeOne(qobject_cast<FloatDataRef*> (ref));
     ref->deleteLater();
 }
 
@@ -77,7 +79,7 @@ void FlightGearDataSource::command(QString &name, extplaneCommandType type)
 
 void FlightGearDataSource::sessionOpened()
 {
-    setNetworkError(QString::null);
+    setNetworkError(QString());
     setHelpText(QString("Connected to FlightGear at %1:%2").arg(tcpClient.peerName()).arg(tcpClient.peerPort()));
     tcpClient.writeLine("data");
 }

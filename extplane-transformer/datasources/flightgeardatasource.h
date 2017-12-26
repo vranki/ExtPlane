@@ -11,6 +11,13 @@
 #include <QVector>
 #include "../extplane-server/datarefs/floatdataref.h"
 
+
+
+/**
+ * @brief The FlightGearDataSource class implements DataSource API
+ * for FlightGear flight simulator. It is used by ExtPlane transformer
+ * to use FlightGear as data source.
+ */
 class FlightGearDataSource : public DataSource
 {
     Q_OBJECT
@@ -20,7 +27,7 @@ public:
 
 public:
     virtual void connectToSource();
-    DataRef *subscribeRef(QString name);
+    DataRef *subscribeRef(QString &name);
     void unsubscribeRef(DataRef *ref);
     void updateDataRef(DataRef *ref);
     void changeDataRef(DataRef *ref);
@@ -37,7 +44,7 @@ private slots:
 private:
     BasicTcpClient tcpClient;
     QMap<QString,QString> refMap; // Mapping of X-Plane datarefs to FG value names
-    QVector<FloatDataRef*> floatRefs;
+    QVector<FloatDataRef*> floatRefs; // All float datarefs used
 };
 
 #endif // FLIGHTGEARDATASOURCE_H

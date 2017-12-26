@@ -12,19 +12,22 @@
 class DataRef;
 
 /**
-  * The main plugin class
+  * The main X-Plane plugin class
   */
 class XPlanePlugin : public QObject, public DataRefProvider {
     Q_OBJECT
 public:
-    explicit XPlanePlugin(QObject *parent = 0);
+    explicit XPlanePlugin(QObject *parent = nullptr);
+
     ~XPlanePlugin();
+    // X-Plane API
     float flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
     int pluginStart(char * outName, char * outSig, char *outDesc);
     void pluginStop();
     void receiveMessage(XPLMPluginID inFromWho, long inMessage, void *  inParam);
-public: // DataRefProvider
-    virtual DataRef *subscribeRef(QString name);
+
+public: // DataRefProvider implementation
+    virtual DataRef *subscribeRef(QString &name);
     virtual void unsubscribeRef(DataRef *ref);
     virtual void updateDataRef(DataRef *ref); // Update ref value from simulator
     virtual void keyStroke(int keyid);
@@ -35,6 +38,7 @@ public: // DataRefProvider
 
 public slots:
     void setFlightLoopInterval(float newInterval);
+
 private:
     QList<DataRef*> refs;
     int argc; // Fake argc and argv for QCoreApplication

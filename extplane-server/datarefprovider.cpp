@@ -4,10 +4,6 @@
 #include "datarefs/floatarraydataref.h"
 #include "console.h"
 
-DataRefProvider::DataRefProvider()
-{
-}
+DataRefProvider::DataRefProvider() {}
 
-DataRefProvider::~DataRefProvider()
-{
-}
+DataRefProvider::~DataRefProvider() {}

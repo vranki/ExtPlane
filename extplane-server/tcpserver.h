@@ -19,7 +19,7 @@ class TcpServer : public QObject {
     Q_PROPERTY(int clientCount READ clientCount NOTIFY clientCountChanged)
 
 public:
-    TcpServer(QObject *parent=0, DataRefProvider *refProvider=0);
+    TcpServer(QObject *parent=nullptr, DataRefProvider *refProvider=0);
     ~TcpServer();
     int clientCount() const;
     void setDataRefProvider(DataRefProvider *refProvider);

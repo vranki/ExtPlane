@@ -4,6 +4,7 @@
 
 class DataRef;
 
+// Command types used with command()
 enum extplaneCommandType {
     extplaneCommandTypeInvalid = 0,
     extplaneCommandTypeOnce,
@@ -18,20 +19,22 @@ class DataRefProvider {
 public:
     DataRefProvider();
     virtual ~DataRefProvider();
-    // Subscribe to a named dataref and return pointer to a DataRef instance
-    virtual DataRef *subscribeRef(QString name)=0;
+    // Subscribe to a named dataref and return pointer to a DataRef instance. Must send the
+    // initial value of dataref once.
+    virtual DataRef *subscribeRef(QString &name)=0;
     // Unsubscribe the given dataref
     virtual void unsubscribeRef(DataRef *ref)=0;
-
     // Update ref value from simulator
     virtual void updateDataRef(DataRef *ref)=0;
     // Change ref value to simulator
     virtual void changeDataRef(DataRef *ref)=0;
-
+    // Cause a key stroke in simulator (X-Plane keyid)
     virtual void keyStroke(int keyid)=0;
+    // Press (and hold) a button (X-Plane button id)
     virtual void buttonPress(int buttonid)=0;
+    // Release a button (X-Plane button id)
     virtual void buttonRelease(int buttonid)=0;
-
+    // Run a named command
     virtual void command(QString &name, extplaneCommandType type)=0;
 };
 

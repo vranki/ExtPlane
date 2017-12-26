@@ -2,7 +2,9 @@
 #include "datasources/flightgeardatasource.h"
 #include <datarefprovider.h>
 
-ExtplaneTransformer::ExtplaneTransformer() : QObject(), m_dataSource(0)
+ExtplaneTransformer::ExtplaneTransformer() :
+    QObject()
+  , m_dataSource(nullptr)
 {
     m_dataSources << "None" << "FlightGear";
     m_dataSourceName = m_dataSources.first(); // None

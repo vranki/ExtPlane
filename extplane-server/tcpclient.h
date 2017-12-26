@@ -30,10 +30,10 @@ signals:
     void discoed(TcpClient *client);
     void setFlightLoopInterval(float newInterval);
 private:
-    DataRef *getSubscribedRef(QString name);
+    DataRef *getSubscribedRef(QString &name);
+    void unsubscribeRef(QString &name);
     QTcpSocket *_socket;
     QSet<DataRef*> _subscribedRefs;
-    //QMap<DataRef*, double> _refAccuracy;
     QMap<DataRef*, double> _refValueD;
     QMap<DataRef*, float> _refValueF;
     QMap<DataRef*, QVector<float> > _refValueFA;
@@ -42,6 +42,8 @@ private:
     QMap<DataRef*, QByteArray> _refValueB;
     QSet<int> _heldButtons;
     DataRefProvider *_refProvider;
+    // Unsubscribe these refs after they have changed (used to implement "get" command)
+    QVector<DataRef*> refsToUnsubscribeAfterChange();
 };
 
 #endif // TCPCLIENT_H

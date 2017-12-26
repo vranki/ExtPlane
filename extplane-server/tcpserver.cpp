@@ -4,10 +4,10 @@
 #include "datarefprovider.h"
 #include "console.h"
 
-TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent),
-    server(this),
-    _refProvider(0),
-    _clientCount(0) {
+TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent)
+    , server(this)
+    , _refProvider(nullptr)
+    , _clientCount(0) {
     connect(&server, SIGNAL(newConnection()), this, SLOT(clientConnected()));
     setDataRefProvider(refProvider);
 }
@@ -17,8 +17,7 @@ TcpServer::~TcpServer() {
     disconnectClients();
 }
 
-int TcpServer::clientCount() const
-{
+int TcpServer::clientCount() const {
     return _clientCount;
 }
 

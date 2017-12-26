@@ -17,7 +17,7 @@ XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent)
   , argv(nullptr)
   , app(nullptr)
   , server(nullptr)
-  , flightLoopInterval(0.31f) { // Default to 30hz
+  , flightLoopInterval(1.0f / 30.f) { // Default to 30hz
 }
 
 XPlanePlugin::~XPlanePlugin() {
@@ -31,7 +31,7 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall, float inElapsedTime
     Q_UNUSED(inCounter);
     Q_UNUSED(inRefcon);
     // Tell each dataref to update its value through the XPLM api
-    foreach(DataRef *ref, refs) updateDataRef(ref);
+    for(DataRef *ref : refs) updateDataRef(ref);
     // Tell Qt to process it's own runloop
     app->processEvents();
     return flightLoopInterval;
@@ -97,7 +97,7 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     return 1;
 }
 
-DataRef* XPlanePlugin::subscribeRef(QString name) {
+DataRef* XPlanePlugin::subscribeRef(QString &name) {
     DEBUG << name;
 
     // Search in list of already subscribed datarefs - if found return that
@@ -133,6 +133,7 @@ DataRef* XPlanePlugin::subscribeRef(QString name) {
             dr->setWritable(XPLMCanWriteDataRef(ref) != 0);
             DEBUG << "Subscribed to ref " << dr->name() << ", type: " << dr->typeString() << ", writable:" << dr->isWritable();
             refs.append(dr);
+            emit dr->changed(dr); // Force update to all clients
             return dr;
         } else {
             INFO << "Dataref type " << refType << "not supported";
@@ -264,7 +265,7 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
     }
     case extplaneRefTypeDouble:
     {
-        XPLMSetDataf(ref->ref(), qobject_cast<DoubleDataRef*>(ref)->value());
+        XPLMSetDatad(ref->ref(), qobject_cast<DoubleDataRef*>(ref)->value());
         break;
     }
     default:
@@ -290,7 +291,7 @@ void XPlanePlugin::command(QString &name, extplaneCommandType type)
             break;
         }
     } else {
-        INFO << "Command not found";
+        INFO << "Command" << name << "not found";
     }
 
 }

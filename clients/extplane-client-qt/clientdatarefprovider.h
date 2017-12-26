@@ -16,6 +16,7 @@ public:
     virtual ~ClientDataRefProvider();
     virtual ClientDataRef *subscribeDataRef(QString name, double accuracy=0)=0;
     virtual void unsubscribeDataRef(ClientDataRef *ref)=0;
+    // virtual void getDataRef(QString name)=0; // get command not supported yet
     virtual void keyPress(int id)=0;
     virtual void buttonPress(int id)=0;
     virtual void buttonRelease(int id)=0;
