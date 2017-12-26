@@ -5,7 +5,6 @@ DataDataRef::DataDataRef(QObject *parent, QString name, void *ref) : DataRef(par
 {
     _typeString = "b";
     _type = extplaneRefTypeData;
-    _length = 0;
     _lastUpdate.restart();
 }
 
@@ -61,8 +60,9 @@ void DataDataRef::setValue(QString &newValue) {
 
 void DataDataRef::setLength(int newLength)
 {
+    Q_ASSERT(newLength > 0);
     if(_value.length() != newLength) {
-        _value = QByteArray(_length, 0);
-        _newValue = QByteArray(_length, 0); // Init already here for perf reasons.
+        _value = QByteArray(newLength, 0);
+        _newValue = QByteArray(newLength, 0); // Init already here for perf reasons.
     }
 }

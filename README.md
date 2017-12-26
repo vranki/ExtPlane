@@ -7,7 +7,7 @@ external programs through an easy-to-use TCP protocol.
 
 ## Supported simulators ##
 
-* X-Plane 9, 10 & 11 - native support
+* X-Plane 9, 10 & 11 - native support. X-Plane 11 currently only tested.
 * FlightGear - basic support via Transformer (see later)
 
 ## Features ##
@@ -71,17 +71,17 @@ License:
 
 ## Building ##
 
-ExtPlane uses the Qt Framework for cross-platform compatibility. Before building you'll need to setup Qt 4.5 or greater to compile. You'll also need to check out the X-Plane SDK (http://www.xsquawkbox.net/xpsdk/mediawiki/Download) to the directory next to the ExtPlane directory. The X-Plane SDK can be either at ~/SDK or ../SDK or ../XPlaneSDK relative to the ExtPlane directory.
+ExtPlane uses the Qt Framework for cross-platform compatibility. Before building you'll need to setup Qt 5 or greater to compile. You'll also need to check out the X-Plane SDK (http://www.xsquawkbox.net/xpsdk/mediawiki/Download) to the directory next to the ExtPlane directory. The X-Plane SDK can be either at ~/SDK or ../SDK or ../XPlaneSDK relative to the ExtPlane directory.
 
 The requirements for ExtPlane are as follows:
 * C++ Toolchain
-* Qt Framework 4.5+
-* X-Plane SDK 2.0+
+* Qt Framework 5+
+* X-Plane SDK 3.0+
 
 ### Debian/Ubuntu Linux ###
 ```bash
 # 1: Install required libraries and tools
-sudo apt-get install git build-essential qt5-qmake qt5-default qtbase5-dev
+sudo apt install git build-essential qt5-qmake qt5-default qtbase5-dev
 
 # 2: Download X-Plane SDK and ExtPlane source code from GitHub
 git clone https://github.com/dankrusi/XPlaneSDK.git
@@ -96,7 +96,7 @@ make
 Plugin file extplane.xpl is created in the build directory. You can copy it to XPlane's plugin directory using:
 
 ```bash
-cp extplane.xpl /path/to/xplane/Resources/plugins/extplane.xpl
+cp extplane-plugin/extplane.xpl /path/to/xplane/Resources/plugins/extplane.xpl
 ```
 
 
@@ -158,6 +158,7 @@ key 0
 key 0
 set sim/flightmodel/engine/ENGN_thro [1,0]
 set sim/flightmodel/engine/ENGN_thro [0,0]
+get sim/aircraft/engine/acf_num_engines
 disconnect
 ```
 

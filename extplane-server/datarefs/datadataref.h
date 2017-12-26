@@ -25,7 +25,6 @@ public:
     virtual void setValue(QString &newValue);
     void setLength(int newLength);
 private:
-    int _length; // Length of dataref, as given by X-Plane
     QByteArray _value; // Value of dataref is stored here once retrieved from XPLM
     QByteArray _newValue; // Temp variable used while checking changes. Here to avoid resizing.
     QTime _lastUpdate; // Timer used for tracking the last update time

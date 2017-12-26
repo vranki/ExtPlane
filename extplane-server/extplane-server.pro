@@ -1,4 +1,5 @@
 TEMPLATE = lib
+CONFIG += staticlib
 
 QT       += core network
 QT       -= gui
@@ -27,4 +28,6 @@ HEADERS += \
     datarefs/doubledataref.h \
     datarefs/intarraydataref.h \
     datarefs/datadataref.h \
-    console.h
+    ../util/console.h
+
+QMAKE_CLEAN += extplane.xpl

@@ -5,9 +5,13 @@ message("Building X-Plane plugin with SDK in $$XPLANE_SDK_PATH")
 #
 # ExtPlane plugin build configuration
 #
-# Change to -DXPLM200=1 for SDK 2.0.0 (X-Plane 9)
+
+
+# X-Plane SDK version. The example shows ALL can be 1 at the same time.
+# Defaults to SDK 3.0.0 (X-Plane 11)
+QMAKE_CXXFLAGS += -DXPLM300=1
 QMAKE_CXXFLAGS += -DXPLM210=1
-QMAKE_CXXFLAGS += -DXPLM200=0
+QMAKE_CXXFLAGS += -DXPLM200=1
 
 INCLUDEPATH += $$XPLANE_SDK_PATH/CHeaders/XPLM
 INCLUDEPATH += ../extplane-server

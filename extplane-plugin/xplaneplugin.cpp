@@ -157,6 +157,8 @@ void XPlanePlugin::unsubscribeRef(DataRef *ref) {
 
 void XPlanePlugin::updateDataRef(DataRef *ref)
 {
+    Q_ASSERT(ref);
+
     switch (ref->type()) {
     case extplaneRefTypeFloat:
     {
@@ -207,10 +209,12 @@ void XPlanePlugin::updateDataRef(DataRef *ref)
     case extplaneRefTypeData:
     {
         DataDataRef *bRef = qobject_cast<DataDataRef*>(ref);
+        Q_ASSERT(bRef);
         int arrayLength = XPLMGetDatab(ref->ref(), NULL, 0, 0);
         bRef->setLength(arrayLength);
         int valuesCopied = XPLMGetDatab(ref->ref(), bRef->newValue().data(), 0, arrayLength);
         Q_ASSERT(valuesCopied == arrayLength);
+        bRef->updateValue();
         break;
     };
     default:

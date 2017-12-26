@@ -1,13 +1,10 @@
+#include <cstdlib>
 #include <QDebug>
-#include "XPLMPlugin.h"
-#include "XPLMDataAccess.h"
-#include "XPLMProcessing.h"
+#include <XPLMPlugin.h>
+#include <XPLMDataAccess.h>
+#include <XPLMProcessing.h>
 #include "xplaneplugin.h"
 #include "console.h"
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 XPlanePlugin *globalPlugin = nullptr;
 
