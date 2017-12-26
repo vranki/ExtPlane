@@ -27,7 +27,7 @@ LIBS += -L../extplane-server -lextplane-server
 QT       += core network
 QT       -= gui
 
-CONFIG   += console warn_on release shared
+CONFIG   += console warn_on release shared c++11
 CONFIG   -= app_bundle
 
 TEMPLATE = lib

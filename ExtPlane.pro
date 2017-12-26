@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 SUBDIRS = extplane-server \
     clients/extplane-client-qt \
     extplane-transformer
-CONFIG += ordered c++11
+CONFIG += ordered
 
 include(common.pri)
 

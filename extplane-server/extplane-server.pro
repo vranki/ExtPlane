@@ -1,5 +1,5 @@
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib c++11
 
 QT       += core network
 QT       -= gui

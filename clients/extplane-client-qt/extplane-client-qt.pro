@@ -2,6 +2,7 @@ QT       += network
 QT       -= gui
 
 TEMPLATE = lib
+CONFIG += c++11
 
 INCLUDEPATH += $$PWD/../../util/
 
@@ -26,4 +27,3 @@ SOURCES += \
     simulateddatarefs/fixedsimulateddataref.cpp \
     simulateddatarefs/simulateddataref.cpp \
     ../../util/basictcpclient.cpp
-
