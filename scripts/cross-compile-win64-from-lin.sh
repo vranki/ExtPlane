@@ -1,8 +1,6 @@
 #!/bin/bash
-
-# NOTE: THIS IS WIP, doesn't work yet. Feel free to fix.
-
-# This script compiles ExtPlane plugin for windows from Linux host.
+#
+# This script compiles ExtPlane plugin for windows 64bit from Linux host.
 # Uses mxe cross-compile environment.
 #
 # Make sure XPlaneSDK is installed in directory next to ExtPlane.
@@ -19,20 +17,36 @@
 #
 # ./ExtPlane/scripts/cross-compile-win64-from-lin.sh
 #
-# good luck!
+# If mxe complains about some dependencies missing, please
+# install them.
+#
+# Good luck!
+#
 
-# This fails if it's already installed and that's ok:
-git clone https://github.com/mxe/mxe.git
-pushd mxe
-# Make sure we have up to date mxe installation..
-git pull
-# This takes long time, if first installation:
-make qt5
-popd
+if [ ! -d ExtPlane ] ; then
+   echo "Run this from directory where ExtPlane subdirectory is. Read the comments in script."
+   exit -1
+fi
+
+# Get mxe if needed..
+if [ ! -d mxe ] ; then
+  git clone https://github.com/mxe/mxe.git
+  pushd mxe
+  # This takes long time, if first installation:
+  make MXE_TARGETS=x86_64-w64-mingw32.static -j`nproc` qt5
+  popd
+fi
+
 PATH=${PWD}/mxe/usr/bin:$PATH
 pushd ExtPlane
+echo
+echo Cleaning up ExtPlane directory..
+echo
 make clean distclean
-../mxe/usr/i686-w64-mingw32.static/qt5/bin/qmake
+echo
+echo Starting ExtPlane build
+echo
+../mxe/usr/x86_64-w64-mingw32.static/qt5/bin/qmake -r
 make
 popd
 

@@ -141,6 +141,11 @@ nmake
 # Visual Studio Express: http://www.microsoft.com/visualstudio/eng/downloads#d-2012-express
 ```
 
+### Cross-compile to Windows from Linux ###
+
+This is possible using mxe cross-compilation tool. See file
+scripts/cross-compile-win64-from-lin.sh for instructions.
+
 ## Test Session ##
 
 Launch X-Plane in console and observe the output. You should see something like:
