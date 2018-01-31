@@ -31,4 +31,5 @@ deploy:
   file: extplane-plugin/extplane.zip
   on:
     repo: vranki/ExtPlane
+  skip_cleanup: true
 
