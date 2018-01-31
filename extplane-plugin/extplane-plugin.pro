@@ -33,27 +33,16 @@ CONFIG   -= debug_and_release
 TEMPLATE = lib
 
 TARGET = extplane-plugin
-DESTDIR = .
 
 QMAKE_LFLAGS += -shared -fPIC
 #  -static-libgcc  <- fails on mac
-
-CONFIG(debug, debug|release) {
-    # Debug
-    message("ExtPlane Debug Build")
-    debug.DESTDIR = .
-} else {
-    # Release
-    message("ExtPlane Release Build")
-    DEFINES += QT_NO_DEBUG
-    DEFINES += QT_NO_DEBUG_OUTPUT
-    release.DESTDIR = .
-}
 
 unix:!macx {
     message("Linux Platform")
     DEFINES += APL=0 IBM=0 LIN=1
     QMAKE_CXXFLAGS += -fPIC
+    XPLDIR = extplane/64
+    XPLFILE = lin.xpl
 }
 
 macx {
@@ -70,6 +59,8 @@ macx {
      QMAKE_LFLAGS += -F$$XPLANE_SDK_PATH/Libraries/Mac
      QMAKE_CXXFLAGS += -fPIC
      LIBS += -framework XPLM
+     XPLDIR = extplane
+     XPLFILE = mac.xpl
 }
 
 win32 {
@@ -78,17 +69,34 @@ win32 {
     LIBS += -L$$XPLANE_SDK_PATH/Libraries/Win
 # We should test for target arch, not host arch, but this doesn't work. Fix.
 #    !contains(QMAKE_TARGET.arch, x86_64) {
+    XPLFILE = win.xpl
     !contains(QMAKE_HOST.arch, x86_64) {
         message("Windows 32 bit Platform")
         LIBS += -lXPLM -lXPWidgets
+        XPLDIR = extplane/32
     } else {
         message("Windows 64 bit Platform")
         LIBS += -lXPLM_64 -lXPWidgets_64
+        XPLDIR = extplane/64
     }
 }
 
-QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) extplane.xpl
-QMAKE_CLEAN += extplane.xpl
+message("Plugin file will be copied to $$XPLDIR/$$XPLFILE")
+
+CONFIG(debug, debug|release) {
+    # Debug
+    message("ExtPlane Debug Build")
+    debug.DESTDIR = $$DESTDIR
+} else {
+    # Release
+    message("ExtPlane Release Build")
+    DEFINES += QT_NO_DEBUG
+    DEFINES += QT_NO_DEBUG_OUTPUT
+    release.DESTDIR = $$DESTDIR
+}
+
+# Copy the built library to the correct x-plane plugin directory
+QMAKE_POST_LINK += $(MKDIR) $$XPLDIR ; $(COPY_FILE) $(TARGET) $$XPLDIR/$$XPLFILE
 
 SOURCES += main.cpp \
     xplaneplugin.cpp \

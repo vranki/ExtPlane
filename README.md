@@ -93,13 +93,6 @@ qmake
 make
 ```
 
-Plugin file extplane.xpl is created in the build directory. You can copy it to XPlane's plugin directory using:
-
-```bash
-cp extplane-plugin/extplane.xpl /path/to/xplane/Resources/plugins/extplane.xpl
-```
-
-
 ### OS X ###
 ```bash
 # 1: Install required libraries and tools
@@ -139,6 +132,25 @@ nmake
 # Windows 7 SDK: http://www.microsoft.com/en-us/download/confirmation.aspx?id=8279
 # Windows 8 SDK: http://msdn.microsoft.com/en-us/library/windows/desktop/hh852363.aspx
 # Visual Studio Express: http://www.microsoft.com/visualstudio/eng/downloads#d-2012-express
+```
+
+### After the build ###
+
+A fat plugin will be in extplane-plugin/extplane. It will contain
+platform specific plugins you have built. For example after
+building linux & windows plugins it should look like this:
+
+```
+extplane-plugin/extplane
+└── 64
+    ├── lin.xpl
+    └── win.xpl
+```
+
+You can copy the whole directory to XPlane's plugin directory:
+
+```bash
+cp -R extplane-plugin/extplane /path/to/xplane/Resources/plugins
 ```
 
 ### Cross-compile to Windows from Linux ###
