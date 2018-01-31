@@ -7,8 +7,8 @@ before_install:
   wget
 - wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
 - unzip *.zip
-- mv SDK XPlaneSDK
-- qmake
+- mv SDK ../XPlaneSDK
+- qmake -r
 script: make
 branches:
   only:
