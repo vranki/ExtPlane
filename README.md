@@ -309,7 +309,7 @@ add it to the `client` directory.
 * Qt / C++
     * A cross-platform Qt client library that allows easy integration of ExtPlane with Qt projects.
       This library also provides a simulation mode for quick and easy testing. Used in ExtPlane-Panel.
-    * https://github.com/vranki/ExtPlane/tree/master/client/extplane-client-qt
+    * https://github.com/vranki/ExtPlane/tree/master/clients/extplane-client-qt
 * Java
     * Created by Pau G
     * https://github.com/pau662/ExtPlaneInterface/tree/master/
