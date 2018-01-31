@@ -21,7 +21,6 @@ notifications:
     on_success: change
     on_failure: always
 before_deploy:
-- tree
 - pushd extplane-plugin ; zip -r extplane.zip extplane ; popd
 deploy:
   provider: releases
