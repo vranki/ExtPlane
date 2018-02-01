@@ -20,4 +20,7 @@ make
 pushd extplane-plugin
 zip -r extplane.zip extplane
 popd
+pushd extplane-transformer
+zip extplane-transformer.zip extplane-transformer_linux extplane-transformer.exe
+popd
 

@@ -1,7 +1,7 @@
 QT += qml quick
 
 CONFIG += c++11
-
+CONFIG -= debug_and_release
 RESOURCES += qml.qrc
 
 INCLUDEPATH += ../extplane-server
@@ -34,6 +34,9 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+unix:!macx {
+    QMAKE_POST_LINK += $(COPY_FILE) $(TARGET) $(TARGET)-linux
+}
 
 SOURCES += main.cpp \
     extplanetransformer.cpp \

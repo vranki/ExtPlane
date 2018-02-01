@@ -3,9 +3,7 @@ compiler:
 - gcc
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -qq qtbase5-dev qtdeclarative5-dev qt5-default build-essential 
-wget git unzip autoconf autopoint bison flex gperf intltool libtool ruby scons p7zip-full python3
-libgdk-pixbuf2.0-dev libffi-dev
+- sudo apt-get install -qq qtbase5-dev qtdeclarative5-dev qt5-default build-essential wget git unzip autoconf autopoint bison flex gperf intltool libtool ruby scons p7zip-full python3 libgdk-pixbuf2.0-dev libffi-dev
 - wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
 - unzip *.zip
 - mv SDK ../XPlaneSDK
@@ -14,14 +12,12 @@ branches:
   only:
   - master
 notifications:
-  recipients:
-  - ville.ranki@iki.fi
-  - dan.krusi@nerves.ch
   email:
+    recipients:
+      - ville.ranki@iki.fi
+      - dan.krusi@nerves.ch
     on_success: change
-    on_failure: always
-before_deploy:
-- 
+    on_failure: change
 deploy:
   provider: releases
   api_key:
