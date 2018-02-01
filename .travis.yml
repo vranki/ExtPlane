@@ -7,7 +7,7 @@ before_install:
 - wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
 - unzip *.zip
 - mv SDK ../XPlaneSDK
-script: travis_wait 30 ./scripts/ci-build.sh
+script: travis_wait 60 ./scripts/ci-build.sh
 branches:
   only:
   - master
