@@ -7,7 +7,7 @@ before_install:
 - wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
 - unzip *.zip
 - mv SDK ../XPlaneSDK
-script: ./scripts/ci-build.sh
+script: travis_wait 30 ./scripts/ci-build.sh
 branches:
   only:
   - master
@@ -22,7 +22,9 @@ deploy:
   provider: releases
   api_key:
     secure: mGPELl1Bc2nkK6JPsyorKkYC7uAwP4H5AfGev5vpIoOfC0Kp/ubRNVKE3771/tzPw4P2QpYDTvl9dL0hGJcoVEUeomRuBoNViueAzpZVJQSNo68lbse+SAMi2JHSs+p0uyDdIVY51Hu5NFQYnDWvxIgbv4RF8mztymdSS1CtDlU=
-  file: extplane-plugin/extplane.zip
+  file:
+    - "extplane-plugin/extplane.zip"
+    - "extplane-transformer/extplane-transformer.zip"
   skip_cleanup: true
   on:
     repo: vranki/ExtPlane
