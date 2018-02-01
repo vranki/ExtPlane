@@ -28,6 +28,10 @@ Known users:
 * Copilot X
     * Voice command app for Android
     * https://play.google.com/store/apps/details?id=com.appropel.xplanevoice
+* XPlaneCDU
+    * A remote control interface for the Control Display Unit (CDU) for Android.
+    * https://play.google.com/store/apps/details?id=net.waynepiekarski.xplanecdu&hl=en
+    * https://github.com/waynepiekarski/XPlaneCDU
 
 ## Transformer ##
 
