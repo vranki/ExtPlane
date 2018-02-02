@@ -15,6 +15,11 @@ if [ ! -d ../XPlaneSDK ] ; then
   mv SDK ../XPlaneSDK
 fi
 
+# For some reason mxe dir stays after cache clean, make sure it's deleted or valid
+if [ ! -f ../mxe/.git ] ; then
+  rm -rf ../mxe
+fi
+
 # Get mxe if needed..
 if [ ! -d ../mxe ] ; then
   pushd ..
