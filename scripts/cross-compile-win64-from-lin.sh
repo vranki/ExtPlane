@@ -28,15 +28,8 @@ if [ ! -d ../ExtPlane ] ; then
    exit -1
 fi
 
-# Get mxe if needed..
 if [ ! -d ../mxe ] ; then
-  pushd ..
-  git clone https://github.com/mxe/mxe.git
-  pushd mxe
-  # This takes long time, if first installation:
-  make MXE_TARGETS=x86_64-w64-mingw32.static -j`nproc` qt5
-  popd
-  popd
+   echo "mxe must be installed in ../mxe!"
 fi
 
 PATH=${PWD}/../mxe/usr/bin:$PATH
