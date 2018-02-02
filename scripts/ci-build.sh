@@ -24,6 +24,9 @@ fi
 
 # Build mxe if needed
 pushd ../mxe
+  echo mxe dir:
+  ls
+  git pull
   make MXE_TARGETS=x86_64-w64-mingw32.static -j`nproc` qt5
 popd
 
