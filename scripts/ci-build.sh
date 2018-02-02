@@ -23,17 +23,19 @@ fi
 # Get mxe if needed..
 if [ ! -d ../mxe ] ; then
   pushd ..
-  git clone https://github.com/mxe/mxe.git
+  wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
+  tar xvfz mxe.tar.gz
+#  git clone https://github.com/mxe/mxe.git
   popd
 fi
 
 # Build mxe if needed
-pushd ../mxe
-  echo mxe dir:
-  ls
-  git pull
-  make MXE_TARGETS=x86_64-w64-mingw32.static -j`nproc` qt5
-popd
+#pushd ../mxe
+#  echo mxe dir:
+#  ls
+#  git pull
+#  make MXE_TARGETS=x86_64-w64-mingw32.static -j`nproc` qt5
+#popd
 
 # Build for linux first..
 qmake -r

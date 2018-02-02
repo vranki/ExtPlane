@@ -4,7 +4,7 @@ compiler:
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq qtbase5-dev qtdeclarative5-dev qt5-default build-essential wget git unzip autoconf autopoint bison flex gperf intltool libtool ruby scons p7zip-full python3 libgdk-pixbuf2.0-dev libffi-dev
-script: travis_wait 120 ./scripts/ci-build.sh
+script: ./scripts/ci-build.sh
 branches:
   only:
   - master
