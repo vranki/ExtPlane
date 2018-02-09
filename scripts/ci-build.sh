@@ -9,7 +9,8 @@
 #
 
 # Get X-Plane SDK if needed..
-if [ ! -d ../XPlaneSDK ] ; then
+if [ ! -d ../XPlaneSDK/CHeaders ] ; then
+  rm -rf ../XPlaneSDK
   wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
   unzip *.zip
   mv SDK ../XPlaneSDK
