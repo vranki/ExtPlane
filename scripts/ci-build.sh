@@ -21,10 +21,11 @@ if [ ! -f ../mxe/.git ] ; then
 fi
 
 # Get mxe if needed..
+# (broken atm, need to recompile mxe in 16.04 container..)
 if [ ! -d ../mxe ] ; then
   pushd ..
-  wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
-  tar xvfz mxe.tar.gz
+#  wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
+#  tar xvfz mxe.tar.gz
 #  git clone https://github.com/mxe/mxe.git
   popd
 fi
@@ -44,13 +45,14 @@ qmake -r
 make
 
 # Build for windows..
-./scripts/cross-compile-win64-from-lin.sh
+#./scripts/cross-compile-win64-from-lin.sh
 
 # Zip the results for release
 pushd extplane-plugin
 zip -r extplane.zip extplane
 popd
 pushd extplane-transformer
-zip extplane-transformer.zip extplane-transformer_linux extplane-transformer.exe
+zip extplane-transformer.zip extplane-transformer_linux 
+#extplane-transformer.exe
 popd
 

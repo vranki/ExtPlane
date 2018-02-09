@@ -17,10 +17,16 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
     refMap.insert("sim/cockpit2/gauges/indicators/pitch_vacuum_deg_pilot", "/instrumentation/attitude-indicator/indicated-pitch-deg");
     refMap.insert("sim/cockpit2/gauges/indicators/roll_vacuum_deg_pilot", "/instrumentation/attitude-indicator/indicated-roll-deg");
     refMap.insert("sim/flightmodel/misc/h_ind", "/instrumentation/altimeter/indicated-altitude-ft");
-    refMap.insert("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot", "/instrumentation/altimeter/setting-inhg");
     refMap.insert("sim/flightmodel/position/vh_ind", "/instrumentation/vertical-speed-indicator/indicated-speed-fpm");
     refMap.insert("sim/cockpit2/gauges/indicators/slip_deg", "/instrumentation/slip-skid-ball/indicated-slip-skid");
     // Please add more here
+
+
+    // These are updated for every frame, so they should be polled at some
+    // interval. Subscribing causes Error:Tied properties cannot register listeners
+    // todo: implement polling mechanism
+    // refMap.insert("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot", "/instrumentation/altimeter/setting-inhg");
+
 
     tcpClient.setLineEnding("\r\n");
     setHelpText("Start FlightGear with --telnet=5401 to allow access to it's properties. \nSee http://wiki.flightgear.org/Telnet_usage for more info. \nTrying to connect to it..");

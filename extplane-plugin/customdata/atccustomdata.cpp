@@ -58,7 +58,7 @@ void ATCCustomData::updateData() {
         }
 
         // Debug output line
-        DEBUG << line;
+        DEBUG << QString::fromStdString(line);
 
         // Remember the position of the next line in case the next read fails
         _gPos = _gLogFileIFS.tellg();
@@ -74,7 +74,7 @@ void ATCCustomData::updateData() {
                 // Communication!
                 // Trim and save to data
                 std::string comm = line.substr(index+strlen(LOG_PREFIX_MONITOR_COMM));
-                DEBUG << "COMM: " << comm;
+                DEBUG << "COMM: " << QString::fromStdString(comm);
                 _data = QString("%1").arg(comm.c_str());
             }
         }

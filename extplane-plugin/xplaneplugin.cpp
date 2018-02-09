@@ -104,7 +104,7 @@ DataRef* XPlanePlugin::subscribeRef(QString &name) {
     for(DataRef *ref : refs) {
         if(ref->name() == name) {
             DEBUG << "Already subscribed to " << name;
-            ref->setSubscribers(ref->subscribers() + 1);
+            ref->setSubscriberCount(ref->subscriberCount() + 1);
             emit ref->changed(ref); // Force update to all clients
             return ref;
         }
@@ -129,7 +129,7 @@ DataRef* XPlanePlugin::subscribeRef(QString &name) {
             dr = new DataDataRef(this, name, ref);
         }
         if(dr) {
-            dr->setSubscribers(1);
+            dr->setSubscriberCount(1);
             dr->setWritable(XPLMCanWriteDataRef(ref) != 0);
             DEBUG << "Subscribed to ref " << dr->name() << ", type: " << dr->typeString() << ", writable:" << dr->isWritable();
             refs.append(dr);
@@ -146,9 +146,9 @@ DataRef* XPlanePlugin::subscribeRef(QString &name) {
 
 void XPlanePlugin::unsubscribeRef(DataRef *ref) {
     Q_ASSERT(refs.contains(ref));
-    DEBUG << ref->name() << ref->subscribers();
-    ref->setSubscribers(ref->subscribers() - 1);
-    if(ref->subscribers() == 0) {
+    DEBUG << ref->name() << ref->subscriberCount();
+    ref->setSubscriberCount(ref->subscriberCount() - 1);
+    if(ref->subscriberCount() == 0) {
         refs.removeOne(ref);
         DEBUG << "Ref " << ref->name() << " not subscribed by anyone - removing.";
         ref->deleteLater();

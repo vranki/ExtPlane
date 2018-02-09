@@ -4,9 +4,7 @@
 #include <QString>
 #include <QObject>
 #include <QDebug>
-//#include "XPLMDataAccess.h"
 
-//typedef void* XPLMDataRef;
 typedef int extplaneRefID;
 
 // Ref types. These match X-Plane's ref type values.
@@ -29,22 +27,22 @@ class DataRef : public QObject {
 
 public:
     DataRef(QObject *parent, QString name, void* ref);
-    QString &name();
+    const QString &name() const;
     void* ref();
-    int subscribers();
-    void setSubscribers(int subs);
-    void setWritable(bool cw);
+    int subscriberCount() const;
+    void setSubscriberCount(const int subs);
+    void setWritable(const bool cw);
     bool isWritable();
     virtual QString valueString() = 0;
     virtual void setValue(QString &newValue) = 0;
-    extplaneRefID type(); // NOTE: always only one type, although XPLMDataTypeID can have many.
+    extplaneRefID type() const; // NOTE: always only one type, although XPLMDataTypeID can have many.
     virtual void setType(extplaneRefID newType); // Only set after constructor
-    QString typeString();
+    QString typeString() const;
     virtual void setAccuracy(double val);
     virtual void updateAccuracy(double val);
     double accuracy() { return _accuracy; }
     void setUnsubscribeAfterChange();
-    bool shouldUnsubscribeAfterChange();
+    bool shouldUnsubscribeAfterChange() const;
 signals:
     void changed(DataRef *ref);
 
@@ -56,7 +54,7 @@ protected:
 
 private:
     QString _name;
-    int _subscribers;
+    int _subscriberCount;
     bool _writable;
     bool _unsubscribeAfterChange;
 };

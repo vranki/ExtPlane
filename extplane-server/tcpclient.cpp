@@ -71,7 +71,7 @@ void TcpClient::readClient() {
                 if(!ref) { // Ref not subscribed yet, try to subscribe
                     ref = _refProvider->subscribeRef(refName);
                     if(ref) { // Succesfully subscribed
-                        connect(ref, SIGNAL(changed(DataRef*)), this, SLOT(refChanged(DataRef*)));
+                        connect(ref, &DataRef::changed, this, &TcpClient::refChanged);
                         _subscribedRefs.insert(ref);
                         ref->setAccuracy(accuracy);
 
@@ -279,7 +279,7 @@ QSet<QString> TcpClient::listRefs() {
 
     return refNames;
 }
-DataRef *TcpClient::getSubscribedRef(QString &name) {
+DataRef *TcpClient::getSubscribedRef(const QString &name) {
     for(DataRef* r : _subscribedRefs.values()) {
         if(r->name() == name)
             return r;
@@ -287,7 +287,7 @@ DataRef *TcpClient::getSubscribedRef(QString &name) {
     return nullptr;
 }
 
-void TcpClient::unsubscribeRef(QString &name)
+void TcpClient::unsubscribeRef(const QString &name)
 {
     DataRef *ref = getSubscribedRef(name);
     if(ref) {

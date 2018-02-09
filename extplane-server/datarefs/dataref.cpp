@@ -3,14 +3,14 @@
 DataRef::DataRef(QObject *parent, QString name, void *ref) : QObject(parent)
   , _ref(ref)
   , _name(name)
-  , _subscribers(0)
-  , _writable(false)
+  , _subscriberCount(0)
   , _type(extplaneRefTypeUnknown)
+  , _writable(false)
   , _typeString("?")
   , _unsubscribeAfterChange(false)
 { }
 
-QString &DataRef::name() {
+const QString &DataRef::name() const {
     return _name;
 }
 
@@ -18,16 +18,16 @@ void *DataRef::ref() {
     return _ref;
 }
 
-int DataRef::subscribers() {
-    return _subscribers;
+int DataRef::subscriberCount() const {
+    return _subscriberCount;
 }
 
-void DataRef::setSubscribers(int subs) {
+void DataRef::setSubscriberCount(const int subs) {
     Q_ASSERT(subs >= 0);
-    _subscribers = subs;
+    _subscriberCount = subs;
 }
 
-void DataRef::setWritable(bool cw) {
+void DataRef::setWritable(const bool cw) {
     _writable = cw;
 }
 
@@ -35,7 +35,7 @@ bool DataRef::isWritable() {
     return _writable;
 }
 
-extplaneRefID DataRef::type() {
+extplaneRefID DataRef::type() const {
     return _type;
 }
 
@@ -44,7 +44,7 @@ void DataRef::setType(extplaneRefID newType)
     _type = newType;
 }
 
-QString DataRef::typeString() {
+QString DataRef::typeString() const {
     return _typeString;
 }
 
@@ -61,6 +61,6 @@ void DataRef::setUnsubscribeAfterChange() {
     _unsubscribeAfterChange = true;
 }
 
-bool DataRef::shouldUnsubscribeAfterChange() {
+bool DataRef::shouldUnsubscribeAfterChange() const {
     return _unsubscribeAfterChange;
 }
