@@ -54,7 +54,7 @@ pushd extplane-plugin
 zip -r extplane.zip extplane
 popd
 pushd extplane-transformer
-zip extplane-transformer.zip extplane-transformer_linux 
+zip extplane-transformer.zip extplane-transformer-linux 
 #extplane-transformer.exe
 popd
 
