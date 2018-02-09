@@ -13,6 +13,9 @@ if [ ! -d ../XPlaneSDK ] ; then
   wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
   unzip *.zip
   mv SDK ../XPlaneSDK
+else
+  echo "X-Plane SDK already exists and contains:"
+  ls -lh ../XPlaneSDK
 fi
 
 # For some reason mxe dir stays after cache clean, make sure it's deleted or valid
@@ -22,13 +25,13 @@ fi
 
 # Get mxe if needed..
 # (broken atm, need to recompile mxe in 16.04 container..)
-if [ ! -d ../mxe ] ; then
-  pushd ..
+#if [ ! -d ../mxe ] ; then
+#  pushd ..
 #  wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
 #  tar xvfz mxe.tar.gz
 #  git clone https://github.com/mxe/mxe.git
-  popd
-fi
+#  popd
+#fi
 
 # Build mxe if needed
 #pushd ../mxe
@@ -39,8 +42,6 @@ fi
 #popd
 
 # Build for linux first..
-qmake -r
-make clean distclean
 qmake -r
 make
 
