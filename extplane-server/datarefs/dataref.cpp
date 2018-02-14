@@ -1,12 +1,14 @@
 #include "dataref.h"
 
 DataRef::DataRef(QObject *parent, QString name, void *ref) : QObject(parent)
+  , _typeString("?")
+  , _type(extplaneRefTypeUnknown)
   , _ref(ref)
+  , _accuracy(0)
+  , _valueValid(false)
   , _name(name)
   , _subscriberCount(0)
-  , _type(extplaneRefTypeUnknown)
   , _writable(false)
-  , _typeString("?")
   , _unsubscribeAfterChange(false)
 { }
 
@@ -63,4 +65,16 @@ void DataRef::setUnsubscribeAfterChange() {
 
 bool DataRef::shouldUnsubscribeAfterChange() const {
     return _unsubscribeAfterChange;
+}
+
+bool DataRef::isValid() const
+{
+    return _valueValid;
+}
+
+void DataRef::setValueValid()
+{
+    if(!_valueValid) {
+        _valueValid = true;
+    }
 }

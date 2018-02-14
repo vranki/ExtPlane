@@ -34,7 +34,10 @@ void FloatArrayDataRef::updateValue() {
             notequal = true;
         }
     }
-    if (notequal) emit changed(this);
+    if (notequal) {
+        if(!_valueValid) setValueValid();
+        emit changed(this);
+    }
 }
 
 QString FloatArrayDataRef::valueString() {

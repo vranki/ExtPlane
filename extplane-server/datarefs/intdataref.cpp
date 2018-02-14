@@ -14,6 +14,7 @@ int IntDataRef::value() {
 void IntDataRef::updateValue(int newValue) {
     if(_value != newValue) {
         _value = newValue;
+        if(!_valueValid) setValueValid();
         emit changed(this);
     }
 }

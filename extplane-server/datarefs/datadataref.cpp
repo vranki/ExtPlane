@@ -23,6 +23,7 @@ void DataDataRef::updateValue() {
         // TODO: do we really want to make this comparison for large data datarefs? Probably as it's still cheaper than sending over the wire the new data
         if (_newValue != _value) {
             _value = _newValue;
+            if(!_valueValid) setValueValid();
             emit changed(this);
         }
     }

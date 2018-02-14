@@ -105,7 +105,6 @@ DataRef* XPlanePlugin::subscribeRef(QString &name) {
         if(ref->name() == name) {
             DEBUG << "Already subscribed to " << name;
             ref->setSubscriberCount(ref->subscriberCount() + 1);
-            emit ref->changed(ref); // Force update to all clients
             return ref;
         }
     }
@@ -162,7 +161,7 @@ void XPlanePlugin::updateDataRef(DataRef *ref)
     switch (ref->type()) {
     case extplaneRefTypeFloat:
     {
-        float newValue = XPLMGetDataf(ref);
+        float newValue = XPLMGetDataf(ref->ref());
         qobject_cast<FloatDataRef*>(ref)->updateValue(newValue);
         break;
     };
