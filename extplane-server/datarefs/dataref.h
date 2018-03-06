@@ -24,7 +24,6 @@ enum {
   */
 class DataRef : public QObject {
     Q_OBJECT
-
 public:
     DataRef(QObject *parent, QString name, void* ref);
     const QString &name() const;
@@ -43,14 +42,19 @@ public:
     double accuracy() { return _accuracy; }
     void setUnsubscribeAfterChange();
     bool shouldUnsubscribeAfterChange() const;
+    bool isValid() const; // True if the value has been set initially. False if not.
+
 signals:
-    void changed(DataRef *ref);
+    void changed(DataRef *ref); // Should not be emitted if value is not valid.
 
 protected:
+    void setValueValid(); // Call this to mark the value valid.
+
     QString _typeString;
     extplaneRefID _type;
     void* _ref;
     double _accuracy;
+    bool _valueValid;
 
 private:
     QString _name;
