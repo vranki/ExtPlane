@@ -24,15 +24,19 @@ if [ ! -f ../mxe/.git ] ; then
   rm -rf ../mxe
 fi
 
+
+# mxe deps: 
+# apt install p7zip-full intltool gperf autopoint
+
 # Get mxe if needed..
 # (broken atm, need to recompile mxe in 16.04 container..)
-#if [ ! -d ../mxe ] ; then
-#  pushd ..
-#  wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
-#  tar xvfz mxe.tar.gz
+if [ ! -d ../mxe ] ; then
+  pushd ..
+  wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
+  tar xvfz mxe.tar.gz
 #  git clone https://github.com/mxe/mxe.git
-#  popd
-#fi
+  popd
+fi
 
 # Build mxe if needed
 #pushd ../mxe
@@ -47,14 +51,13 @@ qmake -r
 make
 
 # Build for windows..
-#./scripts/cross-compile-win64-from-lin.sh
+./scripts/cross-compile-win64-from-lin.sh
 
 # Zip the results for release
 pushd extplane-plugin
 zip -r extplane.zip extplane
 popd
 pushd extplane-transformer
-zip extplane-transformer.zip extplane-transformer-linux 
-#extplane-transformer.exe
+zip extplane-transformer.zip extplane-transformer-linux extplane-transformer.exe
 popd
 
