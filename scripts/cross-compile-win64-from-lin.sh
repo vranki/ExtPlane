@@ -33,10 +33,7 @@ if [ ! -d ../mxe ] ; then
 fi
 
 PATH=${PWD}/../mxe/usr/bin:$PATH
-echo
-echo Cleaning up ExtPlane directory..
-echo
-make clean distclean
+
 echo
 echo Starting ExtPlane build
 echo

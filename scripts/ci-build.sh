@@ -13,6 +13,7 @@ if [ ! -d ../XPlaneSDK/CHeaders ] ; then
   rm -rf ../XPlaneSDK
   wget http://developer.x-plane.com/wp-content/plugins/code-sample-generation/sample_templates/XPSDK300.zip
   unzip *.zip
+  rm XPSDK300.zip
   mv SDK ../XPlaneSDK
 else
   echo "X-Plane SDK already exists and contains:"
@@ -29,9 +30,9 @@ fi
 # apt install p7zip-full intltool gperf autopoint
 
 # Get mxe if needed..
-# (broken atm, need to recompile mxe in 16.04 container..)
 if [ ! -d ../mxe ] ; then
   pushd ..
+# use pre-built binary as building with travis is way too slow..
   wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
   tar xvfz mxe.tar.gz
 #  git clone https://github.com/mxe/mxe.git
@@ -49,6 +50,7 @@ fi
 # Build for linux first..
 qmake -r
 make
+make clean distclean
 
 # Build for windows..
 ./scripts/cross-compile-win64-from-lin.sh
