@@ -1,6 +1,7 @@
 #include "dataref.h"
+#include "../util/console.h"
 
-DataRef::DataRef(QObject *parent, QString name, void *ref) : QObject(parent)
+DataRef::DataRef(QObject *parent, const QString &name, void *ref) : QObject(parent)
   , _typeString("?")
   , _type(extplaneRefTypeUnknown)
   , _ref(ref)
@@ -10,13 +11,22 @@ DataRef::DataRef(QObject *parent, QString name, void *ref) : QObject(parent)
   , _subscriberCount(0)
   , _writable(false)
   , _unsubscribeAfterChange(false)
-{ }
+{
+    if(name.contains(":")) {
+        QString modifiersPart = name.right(name.length() - name.indexOf(":") - 1);
+        _modifiers = modifiersPart.split(",");
+    }
+}
 
 const QString &DataRef::name() const {
     return _name;
 }
 
-void *DataRef::ref() {
+QStringList DataRef::modifiers() const {
+    return _modifiers;
+}
+
+void *DataRef::ref() const {
     return _ref;
 }
 
@@ -33,7 +43,7 @@ void DataRef::setWritable(const bool cw) {
     _writable = cw;
 }
 
-bool DataRef::isWritable() {
+bool DataRef::isWritable() const {
     return _writable;
 }
 

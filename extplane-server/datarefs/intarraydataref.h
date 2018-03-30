@@ -19,7 +19,7 @@ public:
 private:
     QVector<int> _values; // Actual values in a vector
     int _length; // Length of dataref, as given by X-Plane
-    int * _valueArray; // Array for reading & writing values. Allocated dynamically.
+    int *_valueArray; // Array for reading & writing values. Allocated dynamically.
 };
 
 #endif // IntArrayDataRef_H

@@ -21,11 +21,12 @@ class TcpClient : public QObject
 public:
     explicit TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider);
     ~TcpClient();
-    QSet<QString> listRefs();
+    QStringList listRefs();
 public slots:
     void readClient();
     void refChanged(DataRef *ref);
     void socketError(QAbstractSocket::SocketError err);
+    void disconnectClient(); // Disconnects this client
 signals:
     void discoed(TcpClient *client);
     void setFlightLoopInterval(float newInterval);

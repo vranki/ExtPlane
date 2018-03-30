@@ -27,7 +27,7 @@ public:
 private:
     QVector<float> _values; // Actual values in a vector
     int _length; // Length of dataref, as given by X-Plane. 0 if not set.
-    float * _valueArray; // Array for reading & writing values. Allocated dynamically.
+    float *_valueArray; // Array for reading & writing values. Allocated dynamically.
 };
 
 #endif // FloatArrayDataRef_H

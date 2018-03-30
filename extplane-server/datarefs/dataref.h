@@ -25,13 +25,14 @@ enum {
 class DataRef : public QObject {
     Q_OBJECT
 public:
-    DataRef(QObject *parent, QString name, void* ref);
+    DataRef(QObject *parent, const QString &name, void* ref);
     const QString &name() const;
-    void* ref();
+    QStringList modifiers() const;
+    void* ref() const;
     int subscriberCount() const;
     void setSubscriberCount(const int subs);
     void setWritable(const bool cw);
-    bool isWritable();
+    bool isWritable() const;
     virtual QString valueString() = 0;
     virtual void setValue(QString &newValue) = 0;
     extplaneRefID type() const; // NOTE: always only one type, although XPLMDataTypeID can have many.
@@ -39,8 +40,8 @@ public:
     QString typeString() const;
     virtual void setAccuracy(double val);
     virtual void updateAccuracy(double val);
-    double accuracy() { return _accuracy; }
-    void setUnsubscribeAfterChange();
+    double accuracy() const { return _accuracy; }
+    void setUnsubscribeAfterChange(); // Call to mark this ref to be unsubscribed after one change
     bool shouldUnsubscribeAfterChange() const;
     bool isValid() const; // True if the value has been set initially. False if not.
 
@@ -58,6 +59,7 @@ protected:
 
 private:
     QString _name;
+    QStringList _modifiers;
     int _subscriberCount;
     bool _writable;
     bool _unsubscribeAfterChange;

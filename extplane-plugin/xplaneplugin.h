@@ -40,6 +40,9 @@ public slots:
     void setFlightLoopInterval(float newInterval);
 
 private:
+    // Returns the ref name without modifier part (after :)
+    QString refNameWithoutModifiers(QString &original);
+
     QList<DataRef*> refs;
     int argc; // Fake argc and argv for QCoreApplication
     char *argv;

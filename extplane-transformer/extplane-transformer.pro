@@ -39,6 +39,9 @@ unix:!macx {
 }
 
 SOURCES += main.cpp \
+    ../extplane-server/datarefs/dataref.cpp \
+    ../extplane-server/datarefs/floatdataref.cpp \
+    ../extplane-server/datarefprovider.cpp \
     extplanetransformer.cpp \
     datasources/flightgeardatasource.cpp \
     ../util/basictcpclient.cpp \

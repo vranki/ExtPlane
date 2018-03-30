@@ -6,8 +6,7 @@ IntArrayDataRef::IntArrayDataRef(QObject *parent, QString name, void *ref) : Dat
     _typeString = "ia";
     _type = extplaneRefTypeIntArray;
     _length = 0;
-    _valueArray = 0;
-    // _length = XPLMGetDatavi(_ref, NULL, 0, 0);
+    _valueArray = nullptr;
 }
 
 IntArrayDataRef::~IntArrayDataRef() {
@@ -19,14 +18,14 @@ QVector<int> & IntArrayDataRef::value() {
 }
 
 void IntArrayDataRef::updateValue() {
-    bool notequal = false;
+    bool valuesChanged = false;
     for(int i=0;i<_length;i++){
-        if(_values[i] != _valueArray[i]) {
-            _values[i] = _valueArray[i];
-            notequal = true;
+        if(_values.at(i) != _valueArray[i]) {
+            _values.replace(i, _valueArray[i]);
+            valuesChanged = true;
         }
     }
-    if (notequal) {
+    if (valuesChanged) {
         if(!_valueValid) setValueValid();
         emit changed(this);
     }
@@ -45,7 +44,7 @@ QString IntArrayDataRef::valueString() {
 void IntArrayDataRef::setValue(QString &newValue) {
     // Check that value starts with [ and ends with ]
     if(!newValue.startsWith('[') || !newValue.endsWith(']')) {
-        INFO << "Invalid array value";
+        INFO << "Invalid array value" << newValue;
         return;
     }
 
@@ -61,7 +60,7 @@ void IntArrayDataRef::setValue(QString &newValue) {
         bool ok = true;
         int value = values[i].toInt(&ok);
         if(!ok) {
-            INFO << "Invalid value " << values[i] << "in array";
+            INFO << "Invalid value " << values.at(i) << "in array";
             return;
         }
         _valueArray[i]=value;
@@ -71,12 +70,15 @@ void IntArrayDataRef::setValue(QString &newValue) {
 
 void IntArrayDataRef::setLength(int newLength)
 {
-    _values.fill(-9999, _length); // Resize and initialize vector
+    Q_ASSERT(newLength > 0);
+    _values.fill(-9999, newLength); // Resize and initialize vector
     if(_valueArray) delete[] _valueArray;
-    _valueArray = new int[_length];
+    _valueArray = new int[newLength];
+    _length = newLength;
 }
 
-int *IntArrayDataRef::valueArray()
+int* IntArrayDataRef::valueArray()
 {
+    Q_ASSERT(_valueArray);
     return _valueArray;
 }

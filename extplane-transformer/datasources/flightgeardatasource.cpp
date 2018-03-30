@@ -39,7 +39,6 @@ void FlightGearDataSource::connectToSource() {
 
 DataRef *FlightGearDataSource::subscribeRef(QString &name)
 {
-    qDebug() << Q_FUNC_INFO << name;
     if(refMap.contains(name)) {
         QString fgRef = refMap.value(name);
         FloatDataRef *newRef = new FloatDataRef(this, name, 0);
@@ -60,28 +59,22 @@ void FlightGearDataSource::unsubscribeRef(DataRef *ref)
 }
 
 void FlightGearDataSource::updateDataRef(DataRef *ref)
-{
-}
+{}
 
 void FlightGearDataSource::changeDataRef(DataRef *ref)
-{
-}
+{}
 
 void FlightGearDataSource::keyStroke(int keyid)
-{
-}
+{}
 
 void FlightGearDataSource::buttonPress(int buttonid)
-{
-}
+{}
 
 void FlightGearDataSource::buttonRelease(int buttonid)
-{
-}
+{}
 
 void FlightGearDataSource::command(QString &name, extplaneCommandType type)
-{
-}
+{}
 
 void FlightGearDataSource::sessionOpened()
 {

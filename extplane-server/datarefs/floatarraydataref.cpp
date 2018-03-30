@@ -14,7 +14,7 @@ FloatArrayDataRef::FloatArrayDataRef(QObject *parent, QString name, void *ref) :
     _typeString = "fa";
     _type = extplaneRefTypeFloatArray;
     _length = 0;
-    _valueArray = 0;
+    _valueArray = nullptr;
 }
 
 FloatArrayDataRef::~FloatArrayDataRef() {
@@ -27,14 +27,15 @@ QVector<float> & FloatArrayDataRef::value() {
 
 // Copies values from valuearray to value list and emits changed as needed
 void FloatArrayDataRef::updateValue() {
-    bool notequal = false;
+    Q_ASSERT(_length > 0);
+    bool valuesChanged = false;
     for(int i=0;i<_length;i++){
-        if(_values[i] != _valueArray[i]) {
-            _values[i] = _valueArray[i];
-            notequal = true;
+        if(_values.at(i) != _valueArray[i]) {
+            _values.replace(i, _valueArray[i]);
+            valuesChanged = true;
         }
     }
-    if (notequal) {
+    if (valuesChanged) {
         if(!_valueValid) setValueValid();
         emit changed(this);
     }
@@ -53,7 +54,7 @@ QString FloatArrayDataRef::valueString() {
 void FloatArrayDataRef::setValue(QString &newValue) {
     // Check that value starts with [ and ends with ]
     if(!newValue.startsWith('[') || !newValue.endsWith(']')) {
-        INFO << "Invalid array value";
+        INFO << "Invalid array value" << newValue;
         return;
     }
 
@@ -69,7 +70,7 @@ void FloatArrayDataRef::setValue(QString &newValue) {
         bool ok = true;
         float value = values[i].toFloat(&ok);
         if(!ok) {
-            INFO << "Invalid value " << values[i] << "in array";
+            INFO << "Invalid value " << values.at(i) << "in array";
             return;
         }
         _valueArray[i]=value;
@@ -79,12 +80,15 @@ void FloatArrayDataRef::setValue(QString &newValue) {
 
 void FloatArrayDataRef::setLength(int newLength)
 {
-    _values.fill(-9999, _length); // Resize and initialize vector
+    Q_ASSERT(newLength > 0);
+    _values.fill(-9999, newLength); // Resize and initialize vector
     if(_valueArray) delete[] _valueArray;
-    _valueArray = new float[_length];
+    _valueArray = new float[newLength];
+    _length = newLength;
 }
 
 float *FloatArrayDataRef::valueArray()
 {
+    Q_ASSERT(_valueArray);
     return _valueArray;
 }

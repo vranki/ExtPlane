@@ -11,12 +11,15 @@
   * The accuracy for binary datarefs represents how often ExtPlane
   * should check for updates in milliseconds. When the accuracy
   * is set to 0, ExtPlane will check for updates as soon as possible.
+  *
+  * Defaults to base64 encoding.
+  * Use modifier "string" to return text as string.
   */
 class DataDataRef : public DataRef {
     Q_OBJECT
 
 public:
-    DataDataRef(QObject *parent, QString name, void* ref);
+    DataDataRef(QObject *parent, QString &name, void* ref);
     QByteArray &value();
     QByteArray &newValue(); // Write to this and call updatevalue to change value
     void setValue(QByteArray &newValue); // @todo implement

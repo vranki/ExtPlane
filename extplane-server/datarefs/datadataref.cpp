@@ -1,7 +1,7 @@
 #include "datadataref.h"
 #include "../util/console.h"
 
-DataDataRef::DataDataRef(QObject *parent, QString name, void *ref) : DataRef(parent, name, ref)
+DataDataRef::DataDataRef(QObject *parent, QString &name, void *ref) : DataRef(parent, name, ref)
 {
     _typeString = "b";
     _type = extplaneRefTypeData;
@@ -51,7 +51,11 @@ void DataDataRef::setValue(QByteArray &newValue) {
 }
 
 QString DataDataRef::valueString() {
-    return QString(_value).toUtf8().toBase64();
+    if(modifiers().contains("string")) {
+        return  QString("\"%1\"").arg(QString(_value));
+    } else {
+        return QString(_value).toUtf8().toBase64();
+    }
 }
 
 void DataDataRef::setValue(QString &newValue) {

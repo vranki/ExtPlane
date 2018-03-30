@@ -6,7 +6,7 @@
 class FloatDataRef : public DataRef {
     Q_OBJECT
 public:
-    FloatDataRef(QObject *parent, QString name, void* ref);
+    FloatDataRef(QObject *parent, QString &name, void* ref);
     float value();
     void updateValue(float newValue);
     virtual QString valueString();

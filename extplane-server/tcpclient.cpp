@@ -30,6 +30,16 @@ TcpClient::TcpClient(QObject *parent,
 
 TcpClient::~TcpClient() {
     DEBUG;
+    disconnectClient();
+}
+
+void TcpClient::socketError(QAbstractSocket::SocketError err) {
+    Q_UNUSED(err);
+    INFO << "Socket error:" << _socket->errorString();
+    deleteLater();
+}
+
+void TcpClient::disconnectClient() {
     while(!_subscribedRefs.isEmpty()) {
         DataRef *ref = _subscribedRefs.values().first();
         _subscribedRefs.remove(ref);
@@ -38,12 +48,8 @@ TcpClient::~TcpClient() {
     }
     for(int but : _heldButtons)
         _refProvider->buttonRelease(but);
+    _socket->disconnectFromHost();
     emit discoed(this);
-}
-
-void TcpClient::socketError(QAbstractSocket::SocketError err) {
-    Q_UNUSED(err);
-    INFO << "Socket error:" << _socket->errorString();
     deleteLater();
 }
 
@@ -58,7 +64,7 @@ void TcpClient::readClient() {
         QString command = subLine.value(0);
         if(command == "disconnect") {
             DEBUG << "killing this client connection";
-            deleteLater();
+            disconnectClient();
         } else if(command == "sub" || command == "get") { // Subscribe or get command
             if(subLine.length() >= 2) {
                 QString refName = subLine[1].trimmed();
@@ -202,64 +208,70 @@ void TcpClient::refChanged(DataRef *ref) {
         FloatDataRef *refF = qobject_cast<FloatDataRef*>(ref);
         if(qAbs(refF->value() - _refValueF[ref]) < ref->accuracy())
             return; // Hasn't changed enough
-        _refValueF[ref] = refF->value();
+        _refValueF.insert(ref, refF->value());
     } else if(ref->type()== extplaneRefTypeFloatArray) {
         FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
-        
         bool bigenough = false;
-
         QVector<float> values = refF->value();
-        long length = values.size();
-        
-        for (int i=0; i<length;i++){
-            if (qAbs(values[i] - _refValueFA[ref][i]) > ref->accuracy()) {
-                bigenough = true;
-                break;
-            }
-        }
-        if (bigenough){ // Values have changed enough
-            for (int i=0; i<length;i++){
-                _refValueFA[ref][i] = values[i];
-            }
+
+        if(_refValueFA.contains(ref) || refF->accuracy() == 0) {
+            // New value or accuracy not set.
+            _refValueFA.insert(ref, values);
         } else {
-            return;
+            long length = values.size();
+
+            for (int i=0; i<length;i++){
+                if (qAbs(values.at(i) - _refValueFA.value(ref).at(i)) > ref->accuracy()) {
+                    bigenough = true;
+                    break;
+                }
+            }
+            if (bigenough){ // Values have changed enough
+                _refValueFA.insert(ref, values);
+            } else {
+                return;
+            }
         }
     } else if(ref->type()== extplaneRefTypeIntArray) {
-        IntArrayDataRef *refF = qobject_cast<IntArrayDataRef*>(ref);
+        IntArrayDataRef *refI = qobject_cast<IntArrayDataRef*>(ref);
 
         bool bigenough = false;
 
-        QVector<int> values = refF->value();
-        long length = values.size();
-
-        for (int i=0; i<length;i++){
-            if (qAbs(values[i] - _refValueIA[ref][i]) > ref->accuracy()) {
-                bigenough = true;
-                break;
-            }
-        }
-        if (bigenough){ // Values have changed enough
-            for (int i=0; i<length;i++){
-                _refValueIA[ref][i] = values[i];
-            }
+        QVector<int> values = refI->value();
+        if(_refValueIA.contains(ref) || refI->accuracy() == 0) {
+            // New value or accuracy not set.
+            _refValueIA.insert(ref, values);
         } else {
-            return;
+
+            long length = values.size();
+
+            for (int i=0; i<length;i++){
+                if (qAbs(values.at(i) - _refValueIA.value(ref).at(i)) > ref->accuracy()) {
+                    bigenough = true;
+                    break;
+                }
+            }
+            if (bigenough){ // Values have changed enough
+                _refValueIA.insert(ref, values);
+            } else {
+                return;
+            }
         }
     } else if(ref->type() == extplaneRefTypeInt) {
         IntDataRef *refI = qobject_cast<IntDataRef*>(ref);
         if(qAbs(refI->value() - _refValueI[ref]) < ref->accuracy())
             return; // Hasn't changed enough
-        _refValueI[ref] = refI->value();
+        _refValueI.insert(ref, refI->value());
     } else if(ref->type() == extplaneRefTypeDouble) {
         DoubleDataRef *refD = qobject_cast<DoubleDataRef*>(ref);
         if(qAbs(refD->value() - _refValueD[ref]) < ref->accuracy())
             return; // Hasn't changed enough
-        _refValueD[ref] = refD->value();
+        _refValueD.insert(ref, refD->value());
     } else if(ref->type() == extplaneRefTypeData) {
         // The accuracy is handled internally for the data dataref, when it emits the update signal
         // it's time to send the update...
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
-        _refValueB[ref] = refB->value();
+        _refValueB.insert(ref, refB->value());
     } else {
         INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
         return;
@@ -277,10 +289,10 @@ void TcpClient::refChanged(DataRef *ref) {
         unsubscribeRef(ref->name());
 }
 
-QSet<QString> TcpClient::listRefs() {
-    QSet<QString> refNames;
+QStringList TcpClient::listRefs() {
+    QStringList refNames;
     for(DataRef *ref : _subscribedRefs)
-        refNames.insert(ref->name());
+        refNames.append(ref->name());
 
     return refNames;
 }
@@ -293,8 +305,7 @@ DataRef *TcpClient::getSubscribedRef(const QString &name) {
     return nullptr;
 }
 
-void TcpClient::unsubscribeRef(const QString &name)
-{
+void TcpClient::unsubscribeRef(const QString &name) {
     DataRef *ref = getSubscribedRef(name);
     if(ref) {
         ref->disconnect(this);

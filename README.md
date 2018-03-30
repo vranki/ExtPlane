@@ -190,14 +190,17 @@ Commands and replies are sent as text strings as defined below.
 
 ### Datarefs ###
 
-* **sub {dataref} [accuracy]**   Subscribe to dataref, with optional accuracy.
-* **unsub {dataref}**            Unsubscribe dataref.
-* **set {dataref} {value}**      Set dataref to value. Dataref must be subscribed first.
+* **sub {dataref}:[modifiers] [accuracy]**   Subscribe to dataref, with optional accuracy.
+* **unsub {dataref}**                      Unsubscribe dataref.
+* **set {dataref} {value}**                Set dataref to value. Dataref must be subscribed first.
 
 With accuracy you can decide how much the dataref's value can
 change before a update is sent. Set it to as large value as possible
 to maximize frame rate and minimize network traffic. For data datarefs,
 the accuracy represents the update interval in milliseconds.
+
+Modifiers is a comma-separated list of strings that can modify behavior of
+dataref. See example on data dataref.
 
 List of datarefs can be found at:
 http://www.xsquawkbox.net/xpsdk/docs/DataRefs.txt
@@ -217,6 +220,12 @@ holds. For example this sets full throttle for engines 1 & 2:
 ```
 set sim/flightmodel/engine/ENGN_thro [1,1]
 ```
+Note: subscribe to array datarefs with full ref name without indices:
+```
+sub sim/flightmodel/engine/ENGN_thro
+WRONG: sub sim/flightmodel/engine/ENGN_thro[1]
+```
+
 
 ### Keys and Buttons ###
 
@@ -276,6 +285,13 @@ Data datarefs output data in base64:
 ```
 ub sim/aircraft/view/acf_descrip RXh0UGxhbmUgU2ltdWxhdGVkIENvbm5lY3Rpb24=
 ```
+Use modifier "string" to output data as text (make sure it's really printable):
+```
+sub sim/aircraft/view/acf_descrip:string
+->
+ub sim/aircraft/view/acf_descrip:string "Boeing 737-800"
+```
+
 
 ### Console Output ###
 
