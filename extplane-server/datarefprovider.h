@@ -36,6 +36,8 @@ public:
     virtual void buttonRelease(int buttonid)=0;
     // Run a named command
     virtual void command(QString &name, extplaneCommandType type)=0;
+    //Load situation file from disk, relatively to XPlane root folder
+    virtual void loadSit(QString sitFileLocation)=0;
 };
 
 #endif // DATAREFPROVIDER_H

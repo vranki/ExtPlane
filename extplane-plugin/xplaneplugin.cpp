@@ -320,6 +320,15 @@ QString XPlanePlugin::refNameWithoutModifiers(QString &original)
     return original;
 }
 
+/**
+ * @brief XPlanePlugin::loadSit
+ * @param name :  situation file location -
+ * relative to XPlane root folder, e.g. Output/situations/XXX.sit
+ */
+void XPlanePlugin::loadSit(QString sitFileLocation){
+    XPLMLoadDataFile(xplm_DataFile_Situation, sitFileLocation.toLatin1().data());
+}
+
 
 void XPlanePlugin::pluginStop() {
     DEBUG;

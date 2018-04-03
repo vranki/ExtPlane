@@ -35,6 +35,7 @@ public:
     void buttonPress(int buttonid);
     void buttonRelease(int buttonid);
     void command(QString &name, extplaneCommandType type);
+    void loadSit(QString sitFileLocation);
 
 private slots:
     void sessionOpened();
