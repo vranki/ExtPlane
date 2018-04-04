@@ -194,6 +194,12 @@ void TcpClient::readClient() {
             } else {
                 INFO << "Invalid cmd command";
             }
+        } else if(command == "sit"){
+            if(subLine.size() == 2) {
+               _refProvider->loadSituation(subLine.value(1));
+            } else {
+                INFO << "Invalid sit command";
+            }
         } else {
             INFO << "Unknown command " << command;
         }
