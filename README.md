@@ -17,6 +17,7 @@ external programs through an easy-to-use TCP protocol.
 * Support for different dataref types: int, float, double, int[], float[], data
 * Simulate key and button presses
 * Execute commands
+* Load situations
 * Free & open source under GPLv3
 * Client libraries available for Qt (c++), Java and C#
 
@@ -246,6 +247,11 @@ provide a way to lookup keys or buttons by name.
 
 Command identifiers are strings that look like datarefs.
 
+
+### Situations ###
+* ** sit {situationFileLocation} ** situation file location relative to XPlane root folder <br />
+ (e.g.,  sit Output/situations/SampleSit.sit )
+
 ### Other ###
 
 * **disconnect**                       Disconnect the TCP socket.
@@ -382,6 +388,7 @@ Original Author:
 Contributors:
 - Dan Krusi <dan.krusi@nerves.ch>
 - Bob Gates
+- Kamil Gołąbek <kamgolabek@gmail.com>
 
 Use GitHub's issue tracker to report bugs or feature requests.
 

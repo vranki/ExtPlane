@@ -76,7 +76,7 @@ void FlightGearDataSource::buttonRelease(int buttonid)
 void FlightGearDataSource::command(QString &name, extplaneCommandType type)
 {}
 
-void FlightGearDataSource::loadSit(QString sitFileLocation)
+bool FlightGearDataSource::loadSituation(QString sitFileLocation)
 {}
 
 void FlightGearDataSource::sessionOpened()

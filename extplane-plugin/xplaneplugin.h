@@ -35,7 +35,7 @@ public: // DataRefProvider implementation
     virtual void buttonRelease(int buttonid);
     virtual void changeDataRef(DataRef *ref);
     virtual void command(QString &name, extplaneCommandType type);
-    virtual void loadSit(QString sitFileLocation);
+    virtual bool loadSituation(QString sitFileLocation);
 
 public slots:
     void setFlightLoopInterval(float newInterval);

@@ -196,7 +196,7 @@ void TcpClient::readClient() {
             }
         } else if(command == "sit"){
             if(subLine.size() == 2) {
-               _refProvider->loadSit(subLine.value(1));
+               _refProvider->loadSituation(subLine.value(1));
             } else {
                 INFO << "Invalid sit command";
             }
