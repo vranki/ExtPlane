@@ -55,45 +55,45 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
 
     // Register the nav custom data accessors
     XPLMRegisterDataAccessor("extplane/navdata/5km",
-                                                 xplmType_Data,                                 // The types we support
-                                                 0,                                             // Writable
-                                                 NULL, NULL,                                    // Integer accessors
-                                                 NULL, NULL,                                    // Float accessors
-                                                 NULL, NULL,                                    // Doubles accessors
-                                                 NULL, NULL,                                    // Int array accessors
-                                                 NULL, NULL,                                    // Float array accessors
-                                                 NavCustomData::DataCallback_5km, NULL,         // Raw data accessors
-                                                 NULL, NULL);                                   // Refcons not used
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             NULL, NULL,                                    // Integer accessors
+                             NULL, NULL,                                    // Float accessors
+                             NULL, NULL,                                    // Doubles accessors
+                             NULL, NULL,                                    // Int array accessors
+                             NULL, NULL,                                    // Float array accessors
+                             NavCustomData::DataCallback_5km, NULL,         // Raw data accessors
+                             NULL, NULL);                                   // Refcons not used
     XPLMRegisterDataAccessor("extplane/navdata/20km",
-                                                 xplmType_Data,                                 // The types we support
-                                                 0,                                             // Writable
-                                                 NULL, NULL,                                    // Integer accessors
-                                                 NULL, NULL,                                    // Float accessors
-                                                 NULL, NULL,                                    // Doubles accessors
-                                                 NULL, NULL,                                    // Int array accessors
-                                                 NULL, NULL,                                    // Float array accessors
-                                                 NavCustomData::DataCallback_20km, NULL,        // Raw data accessors
-                                                 NULL, NULL);                                   // Refcons not used
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             NULL, NULL,                                    // Integer accessors
+                             NULL, NULL,                                    // Float accessors
+                             NULL, NULL,                                    // Doubles accessors
+                             NULL, NULL,                                    // Int array accessors
+                             NULL, NULL,                                    // Float array accessors
+                             NavCustomData::DataCallback_20km, NULL,        // Raw data accessors
+                             NULL, NULL);                                   // Refcons not used
     XPLMRegisterDataAccessor("extplane/navdata/100km",
-                                                 xplmType_Data,                                 // The types we support
-                                                 0,                                             // Writable
-                                                 NULL, NULL,                                    // Integer accessors
-                                                 NULL, NULL,                                    // Float accessors
-                                                 NULL, NULL,                                    // Doubles accessors
-                                                 NULL, NULL,                                    // Int array accessors
-                                                 NULL, NULL,                                    // Float array accessors
-                                                 NavCustomData::DataCallback_100km, NULL,       // Raw data accessors
-                                                 NULL, NULL);                                   // Refcons not used
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             NULL, NULL,                                    // Integer accessors
+                             NULL, NULL,                                    // Float accessors
+                             NULL, NULL,                                    // Doubles accessors
+                             NULL, NULL,                                    // Int array accessors
+                             NULL, NULL,                                    // Float array accessors
+                             NavCustomData::DataCallback_100km, NULL,       // Raw data accessors
+                             NULL, NULL);                                   // Refcons not used
     XPLMRegisterDataAccessor("extplane/atc/124thatc/latest",
-                                                 xplmType_Data,                                 // The types we support
-                                                 0,                                             // Writable
-                                                 NULL, NULL,                                    // Integer accessors
-                                                 NULL, NULL,                                    // Float accessors
-                                                 NULL, NULL,                                    // Doubles accessors
-                                                 NULL, NULL,                                    // Int array accessors
-                                                 NULL, NULL,                                    // Float array accessors
-                                                 ATCCustomData::DataCallback, NULL,             // Raw data accessors
-                                                 NULL, NULL);
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             NULL, NULL,                                    // Integer accessors
+                             NULL, NULL,                                    // Float accessors
+                             NULL, NULL,                                    // Doubles accessors
+                             NULL, NULL,                                    // Int array accessors
+                             NULL, NULL,                                    // Float array accessors
+                             ATCCustomData::DataCallback, NULL,             // Raw data accessors
+                             NULL, NULL);
 
     app->processEvents();
     return 1;
@@ -314,10 +314,7 @@ void XPlanePlugin::setFlightLoopInterval(float newInterval) {
 
 QString XPlanePlugin::refNameWithoutModifiers(QString &original)
 {
-    if(original.contains(":")) {
-        return original.left(original.indexOf(":"));
-    }
-    return original;
+    return original.contains(":") ? original.left(original.indexOf(":")) : original;
 }
 
 /**
@@ -325,15 +322,15 @@ QString XPlanePlugin::refNameWithoutModifiers(QString &original)
  * @param name :  situation file location -
  * relative to XPlane root folder, e.g. Output/situations/XXX.sit
  */
-bool XPlanePlugin::loadSituation(QString sitFileLocation){
-    int ret = XPLMLoadDataFile(xplm_DataFile_Situation, sitFileLocation.toLatin1().data());
-    if(ret == 1){
-        return true;
-    }else {
-        return false;
-    }
-}
+bool XPlanePlugin::loadSituation(QString sitFileLocation) {
 
+    // Remove quotes from filename
+    sitFileLocation = sitFileLocation.replace("\"", "");
+
+    // XPLMLoadDataFile's return value is not documented, assuming it returns
+    // 1 on success and 0 on fail. TODO: Check this.
+    return XPLMLoadDataFile(xplm_DataFile_Situation, sitFileLocation.toUtf8().data());
+}
 
 void XPlanePlugin::pluginStop() {
     DEBUG;

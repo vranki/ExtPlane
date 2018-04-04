@@ -16,6 +16,7 @@ class DataRef;
   */
 class XPlanePlugin : public QObject, public DataRefProvider {
     Q_OBJECT
+
 public:
     explicit XPlanePlugin(QObject *parent = nullptr);
 

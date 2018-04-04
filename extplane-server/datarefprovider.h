@@ -36,7 +36,8 @@ public:
     virtual void buttonRelease(int buttonid)=0;
     // Run a named command
     virtual void command(QString &name, extplaneCommandType type)=0;
-    //Load situation file from disk, relatively to XPlane root folder
+    //Load situation file from disk, relatively to simulator root folder
+    //Returns true on success
     virtual bool loadSituation(QString sitFileLocation)=0;
 };
 

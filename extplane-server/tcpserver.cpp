@@ -8,7 +8,7 @@ TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(pa
     , server(this)
     , _refProvider(nullptr)
     , _clientCount(0) {
-    connect(&server, SIGNAL(newConnection()), this, SLOT(clientConnected()));
+    connect(&server, &QTcpServer::newConnection, this, &TcpServer::clientConnected);
     setDataRefProvider(refProvider);
 }
 

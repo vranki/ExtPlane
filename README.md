@@ -249,8 +249,8 @@ Command identifiers are strings that look like datarefs.
 
 
 ### Situations ###
-* ** sit {situationFileLocation} ** situation file location relative to XPlane root folder <br />
- (e.g.,  sit Output/situations/SampleSit.sit )
+* ** sit "{situationFileLocation}" ** situation file location relative to XPlane root folder <br />
+ (e.g.,  sit "Output/situations/SampleSit.sit" )
 
 ### Other ###
 
