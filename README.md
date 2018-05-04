@@ -1,7 +1,5 @@
 # ExtPlane #
 
-![Screenshot](http://s23.postimg.org/8xhypdei3/extplane_panel_screenshot_v2.png)
-
 A plugin for X-Plane and other simulators that allows commanding the simulation from
 external programs through an easy-to-use TCP protocol.
 
@@ -55,7 +53,16 @@ License:
 
 ## Downloads ##
 
+### Ext-Plane Plugin ###
+
+* Up to date Linux & windows versions
+    * GitHub releases page: https://github.com/vranki/ExtPlane/releases/
+* Older version: Linux, Windows, OS-X (32bit & 64bit), 8MB
+    * [http://dankrusi.com/downloads/ExtPlane-Plugin-v0.1.zip](http://goo.gl/e2aU7b)
+
 ### Ext-Plane Plugin + Panel ###
+
+Older versions
 
 * Linux 32bit, 15MB
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Linux32.zip](http://goo.gl/BNzoeZ)
@@ -67,11 +74,6 @@ License:
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Win64.zip](http://goo.gl/6EHtei)
 * OS-X 64bit, 15MB
     * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-OSX64.zip](http://goo.gl/8kLzJg)
-
-### Ext-Plane Plugin ###
-
-* Linux, Windows, OS-X (32bit & 64bit), 8MB
-    * [http://dankrusi.com/downloads/ExtPlane-Plugin-v0.1.zip](http://goo.gl/e2aU7b)
 
 
 ## Building ##
