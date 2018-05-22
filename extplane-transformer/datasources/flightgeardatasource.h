@@ -27,6 +27,7 @@ public:
 
 public:
     virtual void connectToSource();
+    // From DataSource:
     DataRef *subscribeRef(QString &name);
     void unsubscribeRef(DataRef *ref);
     void updateDataRef(DataRef *ref);
@@ -36,6 +37,7 @@ public:
     void buttonRelease(int buttonid);
     void command(QString &name, extplaneCommandType type);
     bool loadSituation(QString sitFileLocation);
+    //
 
 private slots:
     void sessionOpened();

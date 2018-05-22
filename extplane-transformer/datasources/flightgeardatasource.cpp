@@ -41,7 +41,7 @@ DataRef *FlightGearDataSource::subscribeRef(QString &name)
 {
     if(refMap.contains(name)) {
         QString fgRef = refMap.value(name);
-        FloatDataRef *newRef = new FloatDataRef(this, name, 0);
+        FloatDataRef *newRef = new FloatDataRef(this, name, nullptr);
         floatRefs.append(newRef);
         tcpClient.writeLine("subscribe " + fgRef);
         return newRef;

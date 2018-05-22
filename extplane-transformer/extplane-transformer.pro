@@ -44,11 +44,13 @@ SOURCES += main.cpp \
     ../extplane-server/datarefprovider.cpp \
     extplanetransformer.cpp \
     datasources/flightgeardatasource.cpp \
+    datasources/condordatasource.cpp \
     ../util/basictcpclient.cpp \
-    datasource.cpp
+    datasource.cpp \
 
 HEADERS += \
     extplanetransformer.h \
     datasources/flightgeardatasource.h \
+    datasources/condordatasource.h \
     ../util/basictcpclient.h \
-    datasource.h
+    datasource.h \

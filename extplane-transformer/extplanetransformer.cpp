@@ -1,12 +1,13 @@
 #include "extplanetransformer.h"
 #include "datasources/flightgeardatasource.h"
+#include "datasources/condordatasource.h"
 #include <datarefprovider.h>
 
 ExtplaneTransformer::ExtplaneTransformer() :
     QObject()
   , m_dataSource(nullptr)
 {
-    m_dataSources << "None" << "FlightGear";
+    m_dataSources << "None" << "FlightGear" << "Condor";
     m_dataSourceName = m_dataSources.first(); // None
     emit dataSourcesChanged(m_dataSources);
 }
@@ -50,8 +51,12 @@ void ExtplaneTransformer::setDataSourceName(const QString dataSource)
     m_dataSourceName = dataSource;
     if(m_dataSourceName == m_dataSources.first()) {
         m_dataSource = nullptr;
-    } else {
+    } else if (m_dataSourceName == "FlightGear") {
         m_dataSource = new FlightGearDataSource();
+    } else if (m_dataSourceName == "Condor") {
+        m_dataSource = new CondorDatasource();
+    }
+    if(m_dataSource) {
         connect(m_dataSource, &DataSource::sourceNetworkError,
                 this, &ExtplaneTransformer::sourceNetworkErrorChanged);
     }
@@ -61,8 +66,7 @@ void ExtplaneTransformer::setDataSourceName(const QString dataSource)
     emit dataSourceChanged();
 }
 
-void ExtplaneTransformer::sourceNetworkErrorChanged(QString errorString)
-{
+void ExtplaneTransformer::sourceNetworkErrorChanged(QString errorString) {
     m_networkError = errorString;
     emit networkErrorChanged(errorString);
 }
