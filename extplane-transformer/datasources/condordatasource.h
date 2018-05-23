@@ -40,8 +40,9 @@ private:
     void rxValue(QString &param, QString &value);
     unsigned int m_port;
     QUdpSocket m_udpSocket;
-    QStringList m_supportedRefs;
+    QMap<QString, QString> refMap; // Mapping of X-Plane datarefs to Condor value names
     QList<FloatDataRef*> floatRefs; // All float datarefs used
+    unsigned int m_updatesReceived;
 };
 
 #endif // CONDORDATASOURCE_H

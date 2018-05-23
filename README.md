@@ -6,6 +6,7 @@ external programs through an easy-to-use TCP protocol.
 ## Supported simulators ##
 
 * X-Plane 9, 10 & 11 - native support. X-Plane 11 currently only tested.
+* Condor soaring simulator 1 and 2
 * FlightGear - basic support via Transformer (see later)
 
 ## Features ##
@@ -35,10 +36,8 @@ Known users:
 ## Transformer ##
 
 ExtPlane-Transformer is an application that works as ExtPlane
-server and can transform output from ANY simulator to ExtPlane
-protocol. Work on Transformer is only beginning but expect to see
-support for more simulators in near future.
-
+server and can transform output from other simulators to ExtPlane
+protocol. 
 
 License:
 

@@ -1,18 +1,21 @@
 #include "condordatasource.h"
 #include <QNetworkDatagram>
 #include <QDebug>
+#include <QtMath>
 #include <datarefs/dataref.h>
 
-CondorDatasource::CondorDatasource() : DataSource() {
-    m_port = 55278;
-
-    m_supportedRefs << "sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot"
-                    << "sim/cockpit2/gauges/indicators/airspeed_kts_pilot"
-                    << "sim/cockpit2/gauges/indicators/pitch_vacuum_deg_pilot"
-                    << "sim/cockpit2/gauges/indicators/roll_vacuum_deg_pilot"
-                    << "sim/flightmodel/misc/h_ind"
-                    << "sim/flightmodel/position/vh_ind"
-                    << "sim/cockpit2/gauges/indicators/slip_deg";
+CondorDatasource::CondorDatasource() : DataSource()
+  , m_port(55278)
+  , m_updatesReceived(0)
+{
+    refMap.insert("sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot", "compass");
+    refMap.insert("sim/cockpit2/gauges/indicators/airspeed_kts_pilot", "airspeed");
+    refMap.insert("sim/flightmodel/misc/h_ind", "altitude");
+    refMap.insert("sim/flightmodel/position/vh_ind", "vario");
+    refMap.insert("sim/cockpit2/gauges/indicators/slip_deg", "slipball");
+    refMap.insert("sim/cockpit2/gauges/indicators/pitch_vacuum_deg_pilot", "pitch");
+    refMap.insert("sim/cockpit2/gauges/indicators/roll_vacuum_deg_pilot", "bank");
+    refMap.insert("sim/flightmodel2/misc/gforce_normal", "gforce");
 }
 
 
@@ -31,59 +34,75 @@ void CondorDatasource::readPendingDatagrams() {
     while (m_udpSocket.hasPendingDatagrams()) {
         QNetworkDatagram datagram = m_udpSocket.receiveDatagram();
         QString data = QString::fromUtf8(datagram.data());
-        qDebug() << Q_FUNC_INFO << "RX datagram" << data;
 
-        QStringList lines = data.split("\n");
+        QStringList lines = data.split("\r\n");
         for(QString line : lines) {
             QStringList splitLine = line.split("=");
             if(splitLine.length() == 2) {
-                QString param = splitLine[0];
-                QString value = splitLine[1];
-                rxValue(param, value);
+                rxValue(splitLine[0], splitLine[1]);
             }
+        }
+        if(m_updatesReceived > 0) {
+            setHelpText(QString("Received %1 value updates from Condor").arg(m_updatesReceived));
         }
     }
 }
 
 void CondorDatasource::rxValue(QString &param, QString &value) {
-    qDebug() << Q_FUNC_INFO << param << value;
+    bool ok = false;
+    double val = value.toDouble(&ok);
+    if(ok) {
+        m_updatesReceived++;
+    } else {
+        qDebug() << Q_FUNC_INFO << "Failed to read value for " << param;
+        return;
+    }
+    QString refName = refMap.key(param);
+    if(refName.isEmpty()) return;
+
+    // Magic happens here
+    if(param == "pitch"
+            || param == "bank"
+            || param == "yaw"
+            || param == "slipball")
+        val = qRadiansToDegrees(val);
+    if(param == "bank" || param == "slipball") val = -val;
+    // Other units seem to be ok..
+    //
+    for(FloatDataRef *ref : floatRefs) {
+        if(ref->name() == refName) {
+            qDebug() << Q_FUNC_INFO << "Updating ref " << ref->name() << " to " << val;
+            ref->updateValue(val);
+        }
+    }
 }
 
-DataRef *CondorDatasource::subscribeRef(QString &name)
-{
-    if(m_supportedRefs.contains(name)) {
+DataRef *CondorDatasource::subscribeRef(QString &name) {
+    if(refMap.contains(name)) {
         FloatDataRef *newRef = new FloatDataRef(this, name, nullptr);
         floatRefs.append(newRef);
         return newRef;
     }
+    qDebug() << Q_FUNC_INFO << "Dataref " << name << "not supported!";
     return nullptr;
 }
 
-void CondorDatasource::unsubscribeRef(DataRef *ref)
-{
-    qDebug() << Q_FUNC_INFO << ref->name();
+void CondorDatasource::unsubscribeRef(DataRef *ref) {
     if(ref->type() == extplaneRefTypeFloat)
         floatRefs.removeOne(qobject_cast<FloatDataRef*> (ref));
     ref->deleteLater();
 }
 
-void CondorDatasource::updateDataRef(DataRef *ref)
-{}
+void CondorDatasource::updateDataRef(DataRef *ref) {}
 
-void CondorDatasource::changeDataRef(DataRef *ref)
-{}
+void CondorDatasource::changeDataRef(DataRef *ref) {}
 
-void CondorDatasource::keyStroke(int keyid)
-{}
+void CondorDatasource::keyStroke(int keyid) {}
 
-void CondorDatasource::buttonPress(int buttonid)
-{}
+void CondorDatasource::buttonPress(int buttonid) {}
 
-void CondorDatasource::buttonRelease(int buttonid)
-{}
+void CondorDatasource::buttonRelease(int buttonid) {}
 
-void CondorDatasource::command(QString &name, extplaneCommandType type)
-{}
+void CondorDatasource::command(QString &name, extplaneCommandType type) {}
 
-bool CondorDatasource::loadSituation(QString sitFileLocation)
-{}
+bool CondorDatasource::loadSituation(QString sitFileLocation) {}
