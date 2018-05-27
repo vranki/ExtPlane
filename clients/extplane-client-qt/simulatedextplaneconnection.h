@@ -17,7 +17,7 @@ public:
     virtual ~SimulatedExtPlaneConnection() {}
 public slots:
     virtual void unsubscribeDataRef(ClientDataRef *ref);
-    virtual void connectTo(QString host, unsigned int port);
+    virtual void startConnection(QString host, unsigned int port);
     void tickTime(double dt, int total);
 private:
     virtual void writeLine(QString line);

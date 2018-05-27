@@ -10,7 +10,7 @@ SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) :
     enableSimulatedRefs = true;
 }
 
-void SimulatedExtPlaneConnection::connectTo(QString host, unsigned int port) {
+void SimulatedExtPlaneConnection::startConnection(QString host, unsigned int port) {
     Q_UNUSED(host);
     Q_UNUSED(port);
     server_ok = true;

@@ -14,16 +14,14 @@ BasicTcpClient::BasicTcpClient(QObject *parent) : QTcpSocket(parent)
 }
 
 
-void BasicTcpClient::connectTo(QString host, int port) {
+void BasicTcpClient::startConnection() {
     close();
     reconnectTimer.setInterval(5000);
     reconnectTimer.start();
-    if(host.isEmpty() || !port) {
-        INFO << "host or port not set - can't connect" << host << port;
+    if(m_host.isEmpty() || !m_port) {
+        INFO << "host or port not set - can't connect" << m_host << m_port;
         return;
     }
-    m_host = host;
-    m_port = port;
     emit connectionChanged();
     abort();
     tryReconnect();
@@ -41,6 +39,21 @@ QString BasicTcpClient::lineEnding() const
     return m_lineEnding;
 }
 
+QString BasicTcpClient::hostName() const
+{
+    return m_host;
+}
+
+int BasicTcpClient::port() const
+{
+    return m_port;
+}
+
+bool BasicTcpClient::connected() const
+{
+    return state() == ConnectedState;
+}
+
 void BasicTcpClient::setLineEnding(QString lineEnding)
 {
     if (m_lineEnding == lineEnding)
@@ -48,6 +61,24 @@ void BasicTcpClient::setLineEnding(QString lineEnding)
 
     m_lineEnding = lineEnding;
     emit lineEndingChanged(lineEnding);
+}
+
+void BasicTcpClient::setHostName(QString hostName)
+{
+    if (m_host == hostName)
+        return;
+
+    m_host = hostName;
+    emit connectionChanged();
+}
+
+void BasicTcpClient::setPort(int port)
+{
+    if (m_port == port)
+        return;
+
+    m_port = port;
+    emit connectionChanged();
 }
 
 
@@ -63,15 +94,15 @@ void BasicTcpClient::tryReconnect() {
 
 void BasicTcpClient::socketConnected() {
     reconnectTimer.stop();
-    emit tcpClientConnected();
+    connectedChanged(true);
 }
-
 
 void BasicTcpClient::socketError(QAbstractSocket::SocketError err) {
     Q_UNUSED(err);
     INFO << "Socket error:" << errorString();
     emit networkError(errorString() + " : " + m_host + ":" + QString::number(m_port));
-    emit connectionMessage(errorString() + " : " + peerName() + ":" + QString::number(peerPort()));
+    emit connectionMessage(errorString() + " : " + hostName() + ":" + QString::number(port()));
+    connectedChanged(false);
 }
 
 void BasicTcpClient::readClient() {

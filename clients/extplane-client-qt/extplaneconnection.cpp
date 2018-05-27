@@ -5,13 +5,16 @@
 #include "extplaneclient.h"
 #include "../../util/console.h"
 
-ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent), updateInterval(0.333) {
-    connect(this, SIGNAL(tcpClientConnected()), this, SLOT(tcpClientConnected()));
+ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent)
+  , server_ok(false)
+  , enableSimulatedRefs(false)
+  , updateInterval(0.333)
+{
+    connect(this, SIGNAL(connectedChanged(bool)), this, SLOT(tcpClientConnected()));
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
-    // connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(this, &BasicTcpClient::receivedLine, this, &ExtPlaneConnection::receivedLineSlot);
-    server_ok = false;
-    enableSimulatedRefs = false;
+    setHostName("localhost");
+    setPort(51000);
 }
 
 void ExtPlaneConnection::setUpdateInterval(double newInterval) {
@@ -24,7 +27,11 @@ void ExtPlaneConnection::setUpdateInterval(double newInterval) {
 
 
 void ExtPlaneConnection::tcpClientConnected() {
-    emit connectionMessage("Connected to ExtPlane, waiting for handshake");
+    if(connected()) {
+        emit connectionMessage("Connected to ExtPlane, waiting for handshake");
+    } else {
+        emit connectionMessage("Socket disconnected");
+    }
 }
 
 void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {

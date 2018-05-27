@@ -34,7 +34,7 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
 
 void FlightGearDataSource::connectToSource() {
     setNetworkError(QString());
-    tcpClient.connectTo("localhost" , 5401);
+    tcpClient.startConnection("localhost" , 5401);
 }
 
 DataRef *FlightGearDataSource::subscribeRef(QString &name)
@@ -82,7 +82,7 @@ bool FlightGearDataSource::loadSituation(QString sitFileLocation)
 void FlightGearDataSource::sessionOpened()
 {
     setNetworkError(QString());
-    setHelpText(QString("Connected to FlightGear at %1:%2").arg(tcpClient.peerName()).arg(tcpClient.peerPort()));
+    setHelpText(QString("Connected to FlightGear at %1:%2").arg(tcpClient.hostName()).arg(tcpClient.port()));
     tcpClient.writeLine("data");
 }
 
