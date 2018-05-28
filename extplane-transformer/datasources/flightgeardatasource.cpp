@@ -4,8 +4,8 @@
 #include "../extplane-server/datarefs/floatdataref.h"
 
 FlightGearDataSource::FlightGearDataSource() : DataSource() {
-    connect(&tcpClient, &BasicTcpClient::tcpClientConnected,
-            this, &FlightGearDataSource::sessionOpened);
+    connect(&tcpClient, &BasicTcpClient::connectedChanged,
+            this, &FlightGearDataSource::connectedChanged);
     connect(&tcpClient, &BasicTcpClient::receivedLine,
             this, &FlightGearDataSource::readLine);
     connect(&tcpClient, &BasicTcpClient::networkError,
@@ -34,7 +34,9 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
 
 void FlightGearDataSource::connectToSource() {
     setNetworkError(QString());
-    tcpClient.startConnection("localhost" , 5401);
+    tcpClient.setHostName("localhost");
+    tcpClient.setPort(5401);
+    tcpClient.startConnection();
 }
 
 DataRef *FlightGearDataSource::subscribeRef(QString &name)
@@ -79,11 +81,13 @@ void FlightGearDataSource::command(QString &name, extplaneCommandType type)
 bool FlightGearDataSource::loadSituation(QString sitFileLocation)
 {}
 
-void FlightGearDataSource::sessionOpened()
+void FlightGearDataSource::connectedChanged(bool connected)
 {
-    setNetworkError(QString());
-    setHelpText(QString("Connected to FlightGear at %1:%2").arg(tcpClient.hostName()).arg(tcpClient.port()));
-    tcpClient.writeLine("data");
+    if(connected) {
+        setNetworkError(QString());
+        setHelpText(QString("Connected to FlightGear at %1:%2").arg(tcpClient.hostName()).arg(tcpClient.port()));
+        tcpClient.writeLine("data");
+    }
 }
 
 void FlightGearDataSource::readLine(QString line)

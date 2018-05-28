@@ -40,7 +40,7 @@ public:
     //
 
 private slots:
-    void sessionOpened();
+    void connectedChanged(bool connected);
     void readLine(QString line);
     void gotNetworkError(QString errstring);
 

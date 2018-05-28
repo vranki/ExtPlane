@@ -12,9 +12,9 @@ SimulatedDataRef::SimulatedDataRef(QObject *parent,
     QObject(parent)
   , minValue(minV)
   , maxValue(maxV)
+  , change((maxValue - minValue)/changeDivisor)
   , currentValue(minV)
   , actualCurrentValue(minV)
-  , change((maxValue - minValue)/changeDivisor)
   , round(round)
   , arrayCount(arrayCount)
   , myClientRef(nullptr, refName, 0)
@@ -25,9 +25,7 @@ SimulatedDataRef::SimulatedDataRef(QObject *parent,
     changeTimer.start();
 }
 
-SimulatedDataRef::~SimulatedDataRef() {
-
-}
+SimulatedDataRef::~SimulatedDataRef() { }
 
 void SimulatedDataRef::tickTime(double dt, int total) {
     Q_UNUSED(total);
