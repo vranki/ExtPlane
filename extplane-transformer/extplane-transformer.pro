@@ -1,4 +1,4 @@
-QT += qml quick
+QT += qml quick network
 
 CONFIG += c++11
 CONFIG -= debug_and_release

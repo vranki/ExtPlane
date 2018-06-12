@@ -8,8 +8,8 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
             this, &FlightGearDataSource::connectedChanged);
     connect(&tcpClient, &BasicTcpClient::receivedLine,
             this, &FlightGearDataSource::readLine);
-    connect(&tcpClient, &BasicTcpClient::networkError,
-            this, &FlightGearDataSource::gotNetworkError);
+    connect(&tcpClient, &BasicTcpClient::networkErrorChanged,
+            this, &FlightGearDataSource::networkErrorChanged);
 
     // Fill the mappings of X-Plane <-> FlightGear data refs.
     refMap.insert("sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot", "/instrumentation/magnetic-compass/indicated-heading-deg");
@@ -107,7 +107,7 @@ void FlightGearDataSource::readLine(QString line)
 
 }
 
-void FlightGearDataSource::gotNetworkError(QString errstring)
+void FlightGearDataSource::networkErrorChanged(QString errstring)
 {
     setNetworkError(errstring);
 }

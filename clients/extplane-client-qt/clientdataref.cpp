@@ -1,55 +1,82 @@
 #include "clientdataref.h"
+#include "extplaneclient.h"
 
-ClientDataRef::ClientDataRef(QObject *parent, QString newName, double accuracy) : QObject(parent), _name(newName), _accuracy(accuracy) {
-    _subscribers = 0;
-    _values.reserve(1); // Always at least 1 size
+ClientDataRef::ClientDataRef() : QObject(nullptr)
+  , m_accuracy(0)
+  , m_subscribers(0)
+  ,m_client(nullptr)
+{
+    m_values.reserve(1); // Always at least 1 size
+}
+
+ClientDataRef::ClientDataRef(QObject *parent, QString newName, double accuracy) : QObject(parent)
+  , m_name(newName)
+  , m_accuracy(accuracy)
+  , m_subscribers(0)
+  , m_client(nullptr) {
+    m_values.reserve(1); // Always at least 1 size
 }
 
 QString& ClientDataRef::name() {
-    return _name;
+    return m_name;
 }
 
-QString& ClientDataRef::valueString() {
-    return _values.first();
+void ClientDataRef::setName(QString &name)
+{
+    if (m_name == name)
+        return;
+
+    m_name = name;
+    emit nameChanged(m_name);
 }
 
-QStringList& ClientDataRef::valueStrings() {
-    return _values;
+QString ClientDataRef::value()
+{
+    return m_values.isEmpty() ? "" : m_values.first();
+}
+
+ExtPlaneClient *ClientDataRef::client() const
+{
+    return m_client;
+}
+
+QStringList& ClientDataRef::values() {
+    return m_values;
 }
 
 void ClientDataRef::updateValue(QString newValue) {
-    if(!_values.isEmpty() && newValue == _values.first()) return;
+    if(!m_values.isEmpty() && newValue == m_values.first()) return;
 
-    if(_values.isEmpty()) {
-        _values.push_back(newValue);
+    if(m_values.isEmpty()) {
+        m_values.push_back(newValue);
     } else {
-        _values.replace(0, newValue);
+        m_values.replace(0, newValue);
     }
     emit changed(this);
 }
 
 void ClientDataRef::updateValue(QStringList &newValues) {
-    if(newValues == _values) return;
-    _values = newValues;
+    if(newValues == m_values) return;
+    m_values = newValues;
     emit changed(this);
 }
 
 double ClientDataRef::accuracy() {
-    return _accuracy;
+    return m_accuracy;
 }
 
 int ClientDataRef::subscribers() {
-    return _subscribers;
+    return m_subscribers;
 }
 
 void ClientDataRef::setSubscribers(int sub) {
-    _subscribers = sub;
+    m_subscribers = sub;
 }
 
-void ClientDataRef::setValue(double _newValue, int index) {
-    if(_values.size() < index + 1)
-        _values.reserve(index+1);
-    _values[index] = QString::number(_newValue);
+void ClientDataRef::setValue(QString _newValue, int index) {
+    if(m_values.size() < index + 1)
+        m_values.reserve(index+1);
+    m_values[index] = _newValue;
     emit valueSet(this);
 }
 
@@ -57,6 +84,40 @@ void ClientDataRef::unsubscribe() {
     emit unsubscribed(this);
 }
 
+
+void ClientDataRef::setAccuracy(double accuracy)
+{
+    qWarning("Floating point comparison needs context sanity check");
+    if (qFuzzyCompare(m_accuracy, accuracy))
+        return;
+
+    m_accuracy = accuracy;
+    emit accuracyChanged(m_accuracy);
+}
+
+void ClientDataRef::setValues(QStringList values)
+{
+    if(values == m_values) return;
+    m_values = values;
+    emit changed(this);
+}
+
+void ClientDataRef::setClient(ExtPlaneClient *client)
+{
+    if (m_client == client)
+        return;
+
+    m_client = client;
+    emit clientChanged(m_client);
+}
+
+void ClientDataRef::subscribeIfPossible()
+{
+    if(m_client && !m_name.isEmpty()) {
+        m_client->subscribeDataRef(m_name, m_accuracy);
+    }
+}
+
 bool ClientDataRef::isArray() {
-    return _values.size() > 1;
+    return m_values.size() > 1;
 }

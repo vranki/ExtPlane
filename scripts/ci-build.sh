@@ -20,33 +20,6 @@ else
   ls -lh ../XPlaneSDK
 fi
 
-# For some reason mxe dir stays after cache clean, make sure it's deleted or valid
-if [ ! -f ../mxe/.git ] ; then
-  rm -rf ../mxe
-fi
-
-
-# mxe deps: 
-# apt install p7zip-full intltool gperf autopoint
-
-# Get mxe if needed..
-if [ ! -d ../mxe ] ; then
-  pushd ..
-# use pre-built binary as building with travis is way too slow..
-  wget http://www.modeemi.fi/~cosmo/mxe.tar.gz
-  tar xvfz mxe.tar.gz
-#  git clone https://github.com/mxe/mxe.git
-  popd
-fi
-
-# Build mxe if needed
-#pushd ../mxe
-#  echo mxe dir:
-#  ls
-#  git pull
-#  make MXE_TARGETS=x86_64-w64-mingw32.static -j`nproc` qt5
-#popd
-
 # Build for linux first..
 qmake -r
 make
