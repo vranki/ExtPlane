@@ -5,7 +5,6 @@
 #include "console.h"
 
 TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent)
-    , server(this)
     , _refProvider(nullptr)
     , _clientCount(0) {
     connect(&server, &QTcpServer::newConnection, this, &TcpServer::clientConnected);

@@ -18,6 +18,7 @@ class BasicTcpClient : public QTcpSocket
     Q_PROPERTY(QString hostName READ hostName WRITE setHostName NOTIFY connectionChanged)
     Q_PROPERTY(int port READ port WRITE setPort NOTIFY connectionChanged)
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
+    Q_PROPERTY(QString networkError READ networkError NOTIFY networkErrorChanged)
 
 public:
     explicit BasicTcpClient(QObject *parent = nullptr);
@@ -29,6 +30,8 @@ public:
     int port() const;
     bool connected() const;
 
+    QString networkError() const;
+
 public slots:
     void setLineEnding(QString lineEnding);
     void setHostName(QString hostName);
@@ -37,21 +40,22 @@ public slots:
 signals:
     void receivedLine(QString & line);
     void connectionMessage(QString text);
-    void networkError(QString errorString);
+    void networkErrorChanged(QString errorString);
     void lineEndingChanged(QString lineEnding);
     void connectionChanged();
     void connectedChanged(bool connected);
 
 private slots:
-    void socketConnected();
     void socketError(QAbstractSocket::SocketError err);
     void readClient();
     void tryReconnect();
+    void socketStateChanged(QAbstractSocket::SocketState state);
 
 private:
     QTimer reconnectTimer;
     QString m_lineEnding;
     QString m_host;
+    QString m_networkError;
     int m_port;
 };
 

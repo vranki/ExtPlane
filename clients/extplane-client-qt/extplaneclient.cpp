@@ -1,54 +1,59 @@
 #include "extplaneclient.h"
 #include "../../util/console.h"
 
-ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, ClientDataRefProvider *drp) :
-    QObject(parent), _name(name), _connection(drp)
-{
-}
+ExtPlaneClient::ExtPlaneClient() : QObject()
+  , m_name("ExtPlane Qt client")
+  , m_connection(nullptr)
+{}
+
+ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, ClientDataRefProvider *drp) : QObject(parent)
+  , m_name(name)
+  , m_connection(drp)
+{}
 
 ExtPlaneClient::~ExtPlaneClient() {
-    foreach(ClientDataRef *ref, _dataRefs) {
-        _dataRefs.removeOne(ref);
-        _connection->unsubscribeDataRef(ref);
+    for(ClientDataRef *ref : m_dataRefs) {
+        m_dataRefs.removeOne(ref);
+        m_connection->unsubscribeDataRef(ref);
     }
 }
 
 ClientDataRef* ExtPlaneClient::subscribeDataRef(QString name, double accuracy) {
-    ClientDataRef *ref = _connection->subscribeDataRef(name, accuracy);
+    ClientDataRef *ref = m_connection->subscribeDataRef(name, accuracy);
     connect(ref, SIGNAL(changed(ClientDataRef*)), this, SLOT(cdrChanged(ClientDataRef*)));
     connect(ref, SIGNAL(destroyed(QObject*)), this, SLOT(refDestroyed(QObject*)));
-    _dataRefs.append(ref);
+    m_dataRefs.append(ref);
     return ref;
 }
 
 void ExtPlaneClient::refDestroyed(QObject* refqo) {
-    _dataRefs.removeOne(static_cast<ClientDataRef*>(refqo));
+    m_dataRefs.removeOne(static_cast<ClientDataRef*>(refqo));
 }
 
 void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
     double value;
     bool ok;
     if(ref->isArray()) {
-        emit refChanged(ref->name(), ref->valueStrings());
+        emit refChanged(ref->name(), ref->values());
     } else {
         // Try to convert to double and forward to corresponding slot per default
         // If that fails, we fallback to the string slot
         // TODO: Is this really a nice solution?
-        value = ref->valueString().toDouble(&ok);
+        value = ref->value().toDouble(&ok);
         if (ok){
             emit refChanged(ref->name(), value);
         } else {
-            emit refChanged(ref->name(), ref->valueString());
+            emit refChanged(ref->name(), ref->value());
         }
     }
 }
 
 void ExtPlaneClient::unsubscribeDataRef(QString name) {
     DEBUG << name;
-    foreach(ClientDataRef *ref, _dataRefs) {
+    for(ClientDataRef *ref : m_dataRefs) {
         if(ref->name() == name) {
-            _dataRefs.removeOne(ref);
-            _connection->unsubscribeDataRef(ref);
+            m_dataRefs.removeOne(ref);
+            m_connection->unsubscribeDataRef(ref);
             return;
         }
     }
@@ -56,7 +61,7 @@ void ExtPlaneClient::unsubscribeDataRef(QString name) {
 }
 
 bool ExtPlaneClient::isDataRefSubscribed(QString name) {
-    foreach(ClientDataRef *ref, _dataRefs) {
+    for(ClientDataRef *ref : m_dataRefs) {
         if(ref->name() == name) {
             return true;
         }
@@ -65,41 +70,55 @@ bool ExtPlaneClient::isDataRefSubscribed(QString name) {
 }
 
 void ExtPlaneClient::keyPress(int id) {
-    _connection->keyPress(id);
+    m_connection->keyPress(id);
 }
 
 void ExtPlaneClient::buttonPress(int id) {
-    _heldButtons.insert(id);
-    _connection->buttonPress(id);
+    m_heldButtons.insert(id);
+    m_connection->buttonPress(id);
 }
 
 void ExtPlaneClient::buttonRelease(int id) {
-    if(!_heldButtons.contains(id)) return;
-    _heldButtons.remove(id);
-    _connection->buttonRelease(id);
+    if(!m_heldButtons.contains(id)) return;
+    m_heldButtons.remove(id);
+    m_connection->buttonRelease(id);
 }
 
 void ExtPlaneClient::commandOnce(QString name) {
-    _connection->commandOnce(name);
+    m_connection->commandOnce(name);
 }
 
 void ExtPlaneClient::commandBegin(QString name) {
-    _runningCommands.insert(name);
-    _connection->commandBegin(name);
+    m_runningCommands.insert(name);
+    m_connection->commandBegin(name);
 }
 
 void ExtPlaneClient::commandEnd(QString name) {
-    if(!_runningCommands.contains(name)) return;
-    _runningCommands.remove(name);
-    _connection->commandEnd(name);
+    if(!m_runningCommands.contains(name)) return;
+    m_runningCommands.remove(name);
+    m_connection->commandEnd(name);
+}
+
+ClientDataRefProvider *ExtPlaneClient::datarefProvider() const
+{
+    return m_connection;
 }
 
 void ExtPlaneClient::setUpdateInterval(double newInterval) {
     Q_UNUSED(newInterval);
 }
 
+void ExtPlaneClient::setDatarefProvider(ClientDataRefProvider *datarefProvider)
+{
+    if (m_connection == datarefProvider)
+        return;
+
+    m_connection = datarefProvider;
+    emit datarefProviderChanged(m_connection);
+}
+
 void ExtPlaneClient::valueSet(ClientDataRef *ref) {
-    _connection->setValue(ref->name(), ref->valueString());
+    m_connection->setValue(ref->name(), ref->value());
 }
 
 void ExtPlaneClient::unsubscribed(ClientDataRef *ref) {

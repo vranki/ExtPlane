@@ -4,9 +4,7 @@
 #include "simulateddatarefs/alternatingsimulateddataref.h"
 #include "../../util/console.h"
 
-SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) :
-    ExtPlaneConnection(parent)
-{
+SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
     enableSimulatedRefs = true;
 }
 
@@ -19,7 +17,7 @@ void SimulatedExtPlaneConnection::startConnection(QString host, unsigned int por
 
 ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double accuracy) {
     Q_UNUSED(accuracy);
-    SimulatedDataRef *simRef = 0;
+    SimulatedDataRef *simRef = nullptr;
     if(name=="sim/cockpit2/gauges/indicators/airspeed_kts_pilot") {
         simRef = new SimulatedDataRef(this, 0, 200, 50.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/altitude_ft_pilot") {
@@ -115,7 +113,7 @@ void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
             simulatedRefs.removeOne(simRef);
         }
     }
-    disconnect(ref, 0, this, 0);
+    disconnect(ref, nullptr, this, nullptr);
 }
 
 void SimulatedExtPlaneConnection::writeLine(QString line) {

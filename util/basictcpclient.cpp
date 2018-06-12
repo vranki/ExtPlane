@@ -5,10 +5,11 @@ BasicTcpClient::BasicTcpClient(QObject *parent) : QTcpSocket(parent)
   , m_lineEnding("\n")
   , m_port(0)
 {
-    connect(this, SIGNAL(connected()), this, SLOT(socketConnected()));
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
+    connect(this, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+            this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
     connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(tryReconnect()));
     reconnectTimer.setSingleShot(false);
 }
@@ -54,6 +55,11 @@ bool BasicTcpClient::connected() const
     return state() == ConnectedState;
 }
 
+QString BasicTcpClient::networkError() const
+{
+    return m_networkError;
+}
+
 void BasicTcpClient::setLineEnding(QString lineEnding)
 {
     if (m_lineEnding == lineEnding)
@@ -92,17 +98,22 @@ void BasicTcpClient::tryReconnect() {
     }
 }
 
-void BasicTcpClient::socketConnected() {
-    reconnectTimer.stop();
-    connectedChanged(true);
+void BasicTcpClient::socketStateChanged(QAbstractSocket::SocketState state)
+{
+    if(connected()) {
+        reconnectTimer.stop();
+        m_networkError = "";
+        emit networkErrorChanged(m_networkError);
+    }
+    emit connectedChanged(state == QTcpSocket::ConnectedState);
 }
 
 void BasicTcpClient::socketError(QAbstractSocket::SocketError err) {
     Q_UNUSED(err);
     INFO << "Socket error:" << errorString();
-    emit networkError(errorString() + " : " + m_host + ":" + QString::number(m_port));
+    m_networkError = errorString() + " : " + m_host + ":" + QString::number(m_port);
+    emit networkErrorChanged(m_networkError);
     emit connectionMessage(errorString() + " : " + hostName() + ":" + QString::number(port()));
-    connectedChanged(false);
 }
 
 void BasicTcpClient::readClient() {
