@@ -42,7 +42,7 @@ public:
 private slots:
     void connectedChanged(bool connected);
     void readLine(QString line);
-    void gotNetworkError(QString errstring);
+    void networkErrorChanged(QString errstring);
 
 private:
     BasicTcpClient tcpClient;

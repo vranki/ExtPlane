@@ -201,9 +201,9 @@ void ExtPlaneConnection::setValues(QString name, QStringList values) {
 
 void ExtPlaneConnection::setValue(ClientDataRef *ref) {
     if(!ref->isArray()) {
-        setValue(ref->name(), ref->valueString());
+        setValue(ref->name(), ref->value());
     } else {
-        setValues(ref->name(), ref->valueStrings());
+        setValues(ref->name(), ref->values());
     }
 }
 
