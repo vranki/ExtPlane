@@ -84,6 +84,16 @@ The requirements for ExtPlane are as follows:
 * Qt Framework 5+
 * X-Plane SDK 3.0+
 
+### Docker ###
+
+If you have docker (should work on linux & mac) you can build linux & windows
+binaries.
+
+```bash
+docker build -t extplane .
+docker run -it -v $PWD:/ExtPlane -w /ExtPlane extplane ./scripts/ci-build.sh
+```
+
 ### Debian/Ubuntu Linux ###
 ```bash
 # 1: Install required libraries and tools
