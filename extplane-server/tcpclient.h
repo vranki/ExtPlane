@@ -33,6 +33,8 @@ signals:
 private:
     DataRef *getSubscribedRef(const QString &name);
     void unsubscribeRef(const QString &name);
+    void sendRef(DataRef *ref); // Sends the ref value to the client
+
     QTcpSocket *_socket;
     QSet<DataRef*> _subscribedRefs;
     QMap<DataRef*, double> _refValueD;

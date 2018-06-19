@@ -56,9 +56,9 @@ void TcpClient::disconnectClient() {
 void TcpClient::readClient() {
     while(_socket->canReadLine()) {
         QByteArray lineBA = _socket->readLine();
-
         QString line = QString(lineBA).trimmed();
         DEBUG << "Client says: " << line;
+
         // Split the command in strings
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
         QString command = subLine.value(0);
@@ -96,7 +96,7 @@ void TcpClient::readClient() {
                         }
                         INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
                         if(ref->isValid()) {
-                            emit ref->changed(ref); // Force update to all clients
+                            sendRef(ref); // Force update
                         }
                         if(command == "get") ref->setUnsubscribeAfterChange();
                     } else {
@@ -196,7 +196,7 @@ void TcpClient::readClient() {
             }
         } else if(command == "sit"){
             if(subLine.size() == 2) {
-               _refProvider->loadSituation(subLine.value(1));
+                _refProvider->loadSituation(subLine.value(1));
             } else {
                 INFO << "Invalid sit command";
             }
@@ -210,6 +210,7 @@ void TcpClient::refChanged(DataRef *ref) {
     Q_ASSERT(_subscribedRefs.contains(ref));
     Q_ASSERT(ref->isValid()); // Never send invalid values.
 
+    // Check if the ref has changed enough to be worth sending
     if(ref->type()== extplaneRefTypeFloat) {
         FloatDataRef *refF = qobject_cast<FloatDataRef*>(ref);
         if(qAbs(refF->value() - _refValueF[ref]) < ref->accuracy())
@@ -282,6 +283,18 @@ void TcpClient::refChanged(DataRef *ref) {
         INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
         return;
     }
+
+    // Send the ref value if we got this far..
+    sendRef(ref);
+
+    if(ref->shouldUnsubscribeAfterChange())
+        unsubscribeRef(ref->name());
+}
+
+void TcpClient::sendRef(DataRef *ref) {
+    Q_ASSERT(ref);
+    Q_ASSERT(ref->isValid());
+
     QByteArray block;
     QTextStream out(&block, QIODevice::WriteOnly);
     out << "u" << ref->typeString() << " " << ref->name() << " " << ref->valueString() << "\n";
@@ -291,8 +304,6 @@ void TcpClient::refChanged(DataRef *ref) {
         _socket->write(block);
         //    _socket->flush(); Not really needed and may mess up performance
     }
-    if(ref->shouldUnsubscribeAfterChange())
-        unsubscribeRef(ref->name());
 }
 
 QStringList TcpClient::listRefs() {
