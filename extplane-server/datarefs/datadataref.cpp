@@ -30,6 +30,7 @@ void DataDataRef::updateValue() {
 }
 
 void DataDataRef::setValue(QByteArray &newValue) {
+    Q_UNUSED(newValue);
     //TODO: @dankrusi: finish this implementation and test
     qFatal("Writing of Data DataRefs is not yet supported");
     /*
