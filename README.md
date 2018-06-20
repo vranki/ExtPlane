@@ -32,6 +32,9 @@ Known users:
     * A remote control interface for the Control Display Unit (CDU) for Android.
     * https://play.google.com/store/apps/details?id=net.waynepiekarski.xplanecdu&hl=en
     * https://github.com/waynepiekarski/XPlaneCDU
+* X-Plane Voice Control
+    * Simple to use Voice control made for Zibo's awesome 738X (most likely will work for 739 Ultimate)
+    * https://github.com/Najsr/X-Plane-Voice-Control
 
 ## Transformer ##
 
