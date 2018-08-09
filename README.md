@@ -263,9 +263,13 @@ Command identifiers are strings that look like datarefs.
 
 
 ### Situations ###
-* ** sit "{situationFileLocation}" ** situation file location relative to XPlane root folder <br />
+* **sit "{situationFileLocation}"** situation file location relative to XPlane root folder <br />
  (e.g.,  sit "Output/situations/SampleSit.sit" )
 
+### FMC ###
+* **fms_wpt_entry id,latitude,longitude,altitude** Inserts waypoint to FMC. (e.g., "fms_wpt_entry 1,50.0267,8.51,32000") <br />
+* **clearAllFmsEntries** Clears all entries in FMC. 
+ 
 ### Other ###
 
 * **disconnect**                       Disconnect the TCP socket.

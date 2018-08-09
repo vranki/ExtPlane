@@ -37,6 +37,9 @@ public: // DataRefProvider implementation
     virtual void changeDataRef(DataRef *ref);
     virtual void command(QString &name, extplaneCommandType type);
     virtual bool loadSituation(QString sitFileLocation);
+    virtual void addFMSEntryLatLon(QString fmsEntryLine);
+    virtual void clearAllFmsEntries();
+
 
 public slots:
     void setFlightLoopInterval(float newInterval);
