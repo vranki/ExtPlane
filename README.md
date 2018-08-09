@@ -268,7 +268,7 @@ Command identifiers are strings that look like datarefs.
 
 ### FMC ###
 * **fms_wpt_entry id,latitude,longitude,altitude** Inserts waypoint to FMC. (e.g., "fms_wpt_entry 1,50.0267,8.51,32000") <br />
-* **clearAllFmsEntries** Clears all entries in FMC. 
+* **fms_clear_entries** Clears all entries in FMC. 
  
 ### Other ###
 

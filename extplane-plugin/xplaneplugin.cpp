@@ -339,11 +339,22 @@ bool XPlanePlugin::loadSituation(QString sitFileLocation) {
  * example: "1,50.0267,8.51,198"
  */
 void XPlanePlugin::addFMSEntryLatLon(QString fmsEntryLine){
+     //verify if string is in valid format
+     int commaCount = fmsEntryLine.count(QLatin1Char(','));
+     if(commaCount != 3){
+         return;
+     }
+
      QStringList params = fmsEntryLine.split(",", QString::SkipEmptyParts);
      int id = params.value(0).toInt();
      float lat = params.value(1).toFloat();
      float lon = params.value(2).toFloat();
      int alt = params.value(3).toInt();
+
+     //FMC allows to provide max of 100 waypoints.
+     if(id < 1 || id > 100){
+         return;
+     }
 
      XPLMSetFMSEntryLatLon(id, lat, lon, alt);
 }
