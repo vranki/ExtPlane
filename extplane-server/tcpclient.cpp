@@ -200,7 +200,11 @@ void TcpClient::readClient() {
             } else {
                 INFO << "Invalid sit command";
             }
-        } else {
+        }else if(command == "fms_wpt_entry"){
+            _refProvider->addFMSEntryLatLon(subLine.value(1));
+        }else if(command == "fms_clear_entries"){
+            _refProvider->clearAllFmsEntries();
+        }else {
             INFO << "Unknown command " << command;
         }
     }

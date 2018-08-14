@@ -39,6 +39,8 @@ public:
     //Load situation file from disk, relatively to simulator root folder
     //Returns true on success
     virtual bool loadSituation(QString sitFileLocation)=0;
+    virtual void addFMSEntryLatLon(QString fmsEntryLine)=0;
+    virtual void clearAllFmsEntries()=0;
 };
 
 #endif // DATAREFPROVIDER_H

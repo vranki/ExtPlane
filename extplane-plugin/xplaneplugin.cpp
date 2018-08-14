@@ -329,7 +329,40 @@ bool XPlanePlugin::loadSituation(QString sitFileLocation) {
 
     // XPLMLoadDataFile's return value is not documented, assuming it returns
     // 1 on success and 0 on fail. TODO: Check this.
+
     return XPLMLoadDataFile(xplm_DataFile_Situation, sitFileLocation.toUtf8().data());
+}
+
+/**
+ * @brief XPlanePlugin::addFMSEntryLatLon
+ * @param fmsEntryLine - string in format "id,latitude,longitude,altitude"
+ * example: "1,50.0267,8.51,198"
+ */
+void XPlanePlugin::addFMSEntryLatLon(QString fmsEntryLine){
+     //verify if string is in valid format
+     int commaCount = fmsEntryLine.count(QLatin1Char(','));
+     if(commaCount != 3){
+         return;
+     }
+
+     QStringList params = fmsEntryLine.split(",", QString::SkipEmptyParts);
+     int id = params.value(0).toInt();
+     float lat = params.value(1).toFloat();
+     float lon = params.value(2).toFloat();
+     int alt = params.value(3).toInt();
+
+     XPLMSetFMSEntryLatLon(id, lat, lon, alt);
+}
+
+/**
+ * @brief XPlanePlugin::clearAllFmsEntries
+ * removes all entries inserted to FMS
+ */
+void XPlanePlugin::clearAllFmsEntries(){
+    int count = XPLMCountFMSEntries();
+    for(int i = 0; i < count;i++){
+        XPLMClearFMSEntry(i);
+    }
 }
 
 void XPlanePlugin::pluginStop() {

@@ -37,7 +37,8 @@ public:
     void buttonRelease(int buttonid);
     void command(QString &name, extplaneCommandType type);
     bool loadSituation(QString sitFileLocation);
-    //
+    void addFMSEntryLatLon(QString fmsEntryLine);
+    void clearAllFmsEntries();
 
 private slots:
     void connectedChanged(bool connected);
