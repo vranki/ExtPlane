@@ -351,11 +351,6 @@ void XPlanePlugin::addFMSEntryLatLon(QString fmsEntryLine){
      float lon = params.value(2).toFloat();
      int alt = params.value(3).toInt();
 
-     //FMC allows to provide max of 100 waypoints.
-     if(id < 1 || id > 100){
-         return;
-     }
-
      XPLMSetFMSEntryLatLon(id, lat, lon, alt);
 }
 
