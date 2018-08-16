@@ -112,3 +112,7 @@ void CondorDatasource::addFMSEntryLatLon(QString fmsEntryLine)
 
 void CondorDatasource::clearAllFmsEntries()
 {}
+
+void CondorDatasource::setDestinationFmsEntry(int index)
+{}
+

@@ -39,6 +39,7 @@ public:
     bool loadSituation(QString sitFileLocation);
     void addFMSEntryLatLon(QString fmsEntryLine);
     void clearAllFmsEntries();
+    void setDestinationFmsEntry(int index);
 
 private slots:
     void connectedChanged(bool connected);
