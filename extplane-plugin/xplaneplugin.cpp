@@ -364,6 +364,14 @@ void XPlanePlugin::clearAllFmsEntries(){
         XPLMClearFMSEntry(i);
     }
 }
+/**
+ * @brief XPlanePlugin::setDestinationFmsEntry
+ * @param index entry the FMS is flying the aircraft toward.
+ */
+void XPlanePlugin::setDestinationFmsEntry(int index){
+    XPLMSetDestinationFMSEntry(index);
+}
+
 
 void XPlanePlugin::pluginStop() {
     DEBUG;

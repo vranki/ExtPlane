@@ -41,6 +41,7 @@ public:
     virtual bool loadSituation(QString sitFileLocation)=0;
     virtual void addFMSEntryLatLon(QString fmsEntryLine)=0;
     virtual void clearAllFmsEntries()=0;
+    virtual void setDestinationFmsEntry(int index)=0;
 };
 
 #endif // DATAREFPROVIDER_H

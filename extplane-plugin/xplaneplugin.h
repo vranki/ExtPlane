@@ -39,6 +39,7 @@ public: // DataRefProvider implementation
     virtual bool loadSituation(QString sitFileLocation);
     virtual void addFMSEntryLatLon(QString fmsEntryLine);
     virtual void clearAllFmsEntries();
+    virtual void setDestinationFmsEntry(int index);
 
 
 public slots:

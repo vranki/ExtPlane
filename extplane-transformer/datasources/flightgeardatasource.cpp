@@ -87,6 +87,9 @@ void FlightGearDataSource::addFMSEntryLatLon(QString fmsEntryLine)
 void FlightGearDataSource::clearAllFmsEntries()
 {}
 
+void FlightGearDataSource::setDestinationFmsEntry(int index)
+{}
+
 void FlightGearDataSource::connectedChanged(bool connected)
 {
     if(connected) {
