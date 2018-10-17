@@ -9,11 +9,25 @@ ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent)
   , server_ok(false)
   , updateInterval(0.333)
 {
-    connect(this, SIGNAL(connectedChanged(bool)), this, SLOT(tcpClientConnected()));
+    connect(this, SIGNAL(connectedChanged(bool)), this, SLOT(connectedChanged(bool)));
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, &BasicTcpClient::receivedLine, this, &ExtPlaneConnection::receivedLineSlot);
     setHostName("localhost");
     setPort(51000);
+}
+
+void ExtPlaneConnection::startConnection() {
+    DEBUG << "Starting real connection";
+    emit connectionMessage("Starting real connection");
+    BasicTcpClient::startConnection();
+}
+
+void ExtPlaneConnection::stopConnection() {
+    DEBUG << "Stopping real connection";
+    BasicTcpClient::disconnectFromHost();
+    qDeleteAll(dataRefs.values());
+    dataRefs.clear();
+    emit connectionMessage("Stopped real");
 }
 
 void ExtPlaneConnection::setUpdateInterval(double newInterval) {
@@ -24,9 +38,8 @@ void ExtPlaneConnection::setUpdateInterval(double newInterval) {
     }
 }
 
-
-void ExtPlaneConnection::tcpClientConnected() {
-    if(connected()) {
+void ExtPlaneConnection::connectedChanged(bool connected) {
+    if(connected) {
         emit connectionMessage("Connected to ExtPlane, waiting for handshake");
     } else {
         emit connectionMessage("Socket disconnected");
@@ -46,7 +59,7 @@ void ExtPlaneConnection::registerClient(ExtPlaneClient* client) {
 ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accuracy) {
     ClientDataRef *ref = dataRefs.value(name);
     if(ref) {
-        // DEBUG << "Ref already subscribed";
+        DEBUG << "Ref already subscribed";
         ref->setSubscribers(ref->subscribers()+1);
         if(accuracy < ref->accuracy()) {
             if(server_ok)
@@ -73,7 +86,7 @@ ClientDataRef *ExtPlaneConnection::createDataRef(QString name, double accuracy) 
 }
 
 void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
-    DEBUG << ref << ref->name() << ref->subscribers();
+    // DEBUG << ref << ref->name() << ref->subscribers();
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
     // DEBUG << "Ref not subscribed by anyone anymore";
@@ -86,14 +99,14 @@ void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
 }
 
 void ExtPlaneConnection::receivedLineSlot(QString & line) {
-    DEBUG << "Server says: " << line;
+    //DEBUG << line;
     if(!server_ok) { // Waiting for handshake..
         if(line=="EXTPLANE 1") {
             server_ok = true;
-            emit connectionMessage("");
+            emit connectionMessage(QString("Connected to ExtPlane at %1:%2").arg(hostName()).arg(port()));
             setUpdateInterval(updateInterval);
             // Sub all refs
-            foreach(ClientDataRef *ref, dataRefs)
+            for(ClientDataRef *ref : dataRefs)
                 subRef(ref);
         }
         return;
@@ -126,7 +139,7 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
 }
 
 void ExtPlaneConnection::subRef(ClientDataRef *ref) {
-    // DEBUG;
+    // DEBUG << ref->name();
     Q_ASSERT(server_ok);
     QString subLine = "sub " + ref->name();
     if(ref->accuracy() != 0) {

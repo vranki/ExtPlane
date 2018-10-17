@@ -21,6 +21,8 @@ public:
 public slots:
     virtual void unsubscribeDataRef(ClientDataRef *ref);
     virtual void startConnection();
+    virtual void stopConnection();
+
 private slots:
     void tickTime();
 private:

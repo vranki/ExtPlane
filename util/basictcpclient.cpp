@@ -89,6 +89,7 @@ void BasicTcpClient::setPort(int port)
 
 
 void BasicTcpClient::tryReconnect() {
+    DEBUG << m_host;
     if(m_host.isEmpty() || !m_port) {
         emit connectionMessage("Please set host and port to connect");
         return;
@@ -100,6 +101,7 @@ void BasicTcpClient::tryReconnect() {
 
 void BasicTcpClient::socketStateChanged(QAbstractSocket::SocketState state)
 {
+    // DEBUG << state;
     if(connected()) {
         reconnectTimer.stop();
         m_networkError = "";

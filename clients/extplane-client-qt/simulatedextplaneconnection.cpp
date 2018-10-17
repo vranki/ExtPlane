@@ -11,9 +11,20 @@ SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtP
 }
 
 void SimulatedExtPlaneConnection::startConnection() {
+    DEBUG << "Starting simulated connection";
     server_ok = true;
     emit connectionMessage("Connected to ExtPlane (simulated)");
     tickTimer.start();
+}
+
+void SimulatedExtPlaneConnection::stopConnection() {
+    DEBUG << "Stopping simulated connection";
+    server_ok = false;
+    tickTimer.stop();
+
+    qDeleteAll(simulatedRefs);
+    simulatedRefs.clear();
+    emit connectionMessage("Stopped simulated");
 }
 
 ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double accuracy) {

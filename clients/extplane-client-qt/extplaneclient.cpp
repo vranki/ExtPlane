@@ -32,6 +32,7 @@ void ExtPlaneClient::createClient()
         m_simulatedExtplaneConnection.startConnection();
     } else {
         m_extplaneConnection.registerClient(this);
+        m_extplaneConnection.startConnection();
     }
     m_connection = m_simulated ? &m_simulatedExtplaneConnection : &m_extplaneConnection;
 }
@@ -89,7 +90,7 @@ void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
 }
 
 void ExtPlaneClient::unsubscribeDataRef(QString name) {
-    DEBUG << name;
+    // DEBUG << name;
     for(ClientDataRef *ref : m_dataRefs) {
         if(ref->name() == name) {
             m_dataRefs.removeOne(ref);
@@ -168,18 +169,25 @@ void ExtPlaneClient::setSimulated(bool simulated)
     if (m_simulated == simulated)
         return;
 
+    while(!m_dataRefs.isEmpty())
+        unsubscribeDataRef(m_dataRefs.first()->name());
+
     qDebug() << Q_FUNC_INFO << simulated;
+
     m_simulated = simulated;
+    m_connection = nullptr;
+    emit datarefProviderChanged(m_connection);
     if(m_simulated) {
+        m_extplaneConnection.stopConnection();
         m_connection = &m_simulatedExtplaneConnection;
         m_simulatedExtplaneConnection.startConnection();
     } else {
+        m_simulatedExtplaneConnection.stopConnection();
         m_connection = &m_extplaneConnection;
         m_extplaneConnection.startConnection();
     }
     emit simulatedChanged(m_simulated);
     emit datarefProviderChanged(m_connection);
-
 }
 
 void ExtPlaneClient::valueSet(ClientDataRef *ref) {

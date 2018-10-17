@@ -38,9 +38,11 @@ public slots:
     virtual void setValue(ClientDataRef *ref);
     void setUpdateInterval(double newInterval);
     void receivedLineSlot(QString &line);
+    virtual void startConnection();
+    virtual void stopConnection();
 
 private slots:
-    void tcpClientConnected();
+    void connectedChanged(bool connected);
     void socketError(QAbstractSocket::SocketError err);
 
 protected:

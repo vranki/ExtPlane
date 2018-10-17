@@ -5,7 +5,7 @@
 
 class ClientDataRef;
 class ExtPlaneClient;
-
+class DataRefProvicer;
 
 /**
  * Use this class to create datarefs from QML code and wherever you
@@ -44,6 +44,7 @@ public slots:
     void setValue(QString _newValue, int index=0); // Set value (from client)
     void setValues(QStringList values); // Set full array (from client)
     void setClient(ExtPlaneClient* client);
+    void setDataRefProvider();
 
 private:
     void subscribeIfPossible();

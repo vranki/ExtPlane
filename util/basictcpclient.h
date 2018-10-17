@@ -29,7 +29,6 @@ public:
     QString hostName() const;
     int port() const;
     bool connected() const;
-
     QString networkError() const;
 
 public slots:

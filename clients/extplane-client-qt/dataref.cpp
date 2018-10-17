@@ -7,11 +7,17 @@ DataRef::DataRef(QObject *parent) : QObject(parent)
   , m_clientDataRef(nullptr)
   , m_client(nullptr)
 {
-    m_client = &ExtPlaneClient::instance();
+    setClient(&ExtPlaneClient::instance());
 }
 
 void DataRef::subscribeIfPossible()
 {
+    if(m_clientDataRef)
+        return;
+
+    if(m_name.isEmpty())
+        return;
+
     if(m_client && !m_name.isEmpty()) {
         m_clientDataRef = m_client->subscribeDataRef(m_name, m_accuracy);
         if(!m_clientDataRef) {
@@ -54,9 +60,16 @@ void DataRef::setClient(ExtPlaneClient *client)
     if (m_client == client)
         return;
 
+    disconnect(client, 0, this, 0);
     m_client = client;
     emit clientChanged(m_client);
+    connect(client, &ExtPlaneClient::datarefProviderChanged, this, &DataRef::setDataRefProvider);
     subscribeIfPossible();
+}
+
+void DataRef::setDataRefProvider() {
+    m_clientDataRef = nullptr;
+    if(client()->datarefProvider()) subscribeIfPossible();
 }
 
 QStringList& DataRef::values() {
