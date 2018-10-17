@@ -1,14 +1,6 @@
 #include "clientdataref.h"
 #include "extplaneclient.h"
 
-ClientDataRef::ClientDataRef() : QObject(nullptr)
-  , m_accuracy(0)
-  , m_subscribers(0)
-  ,m_client(nullptr)
-{
-    m_values.reserve(1); // Always at least 1 size
-}
-
 ClientDataRef::ClientDataRef(QObject *parent, QString newName, double accuracy) : QObject(parent)
   , m_name(newName)
   , m_accuracy(accuracy)
@@ -40,6 +32,15 @@ ExtPlaneClient *ClientDataRef::client() const
     return m_client;
 }
 
+void ClientDataRef::setClient(ExtPlaneClient *client)
+{
+    if (m_client == client)
+        return;
+
+    m_client = client;
+    emit clientChanged(m_client);
+}
+
 QStringList& ClientDataRef::values() {
     return m_values;
 }
@@ -61,8 +62,37 @@ void ClientDataRef::updateValue(QStringList &newValues) {
     emit changed(this);
 }
 
+void ClientDataRef::setValue(QString _newValue, int index) {
+    if(m_values.size() < index + 1)
+        m_values.reserve(index+1);
+    m_values[index] = _newValue;
+    emit valueSet(this);
+}
+
+void ClientDataRef::setValues(QStringList values)
+{
+    if(values == m_values) return;
+    m_values = values;
+    emit valueSet(this);
+}
+
 double ClientDataRef::accuracy() {
     return m_accuracy;
+}
+
+void ClientDataRef::setAccuracy(double accuracy)
+{
+    // http://doc.qt.io/qt-5/qtglobal.html#qFuzzyCompare
+    if (qFuzzyIsNull(accuracy)) {
+        if (qFuzzyCompare(1 + m_accuracy, 1 + accuracy))
+            return;
+    } else {
+        if (qFuzzyCompare(m_accuracy, accuracy))
+            return;
+    }
+
+    m_accuracy = accuracy;
+    emit accuracyChanged(m_accuracy);
 }
 
 int ClientDataRef::subscribers() {
@@ -73,49 +103,8 @@ void ClientDataRef::setSubscribers(int sub) {
     m_subscribers = sub;
 }
 
-void ClientDataRef::setValue(QString _newValue, int index) {
-    if(m_values.size() < index + 1)
-        m_values.reserve(index+1);
-    m_values[index] = _newValue;
-    emit valueSet(this);
-}
-
 void ClientDataRef::unsubscribe() {
     emit unsubscribed(this);
-}
-
-
-void ClientDataRef::setAccuracy(double accuracy)
-{
-    qWarning("Floating point comparison needs context sanity check");
-    if (qFuzzyCompare(m_accuracy, accuracy))
-        return;
-
-    m_accuracy = accuracy;
-    emit accuracyChanged(m_accuracy);
-}
-
-void ClientDataRef::setValues(QStringList values)
-{
-    if(values == m_values) return;
-    m_values = values;
-    emit changed(this);
-}
-
-void ClientDataRef::setClient(ExtPlaneClient *client)
-{
-    if (m_client == client)
-        return;
-
-    m_client = client;
-    emit clientChanged(m_client);
-}
-
-void ClientDataRef::subscribeIfPossible()
-{
-    if(m_client && !m_name.isEmpty()) {
-        m_client->subscribeDataRef(m_name, m_accuracy);
-    }
 }
 
 bool ClientDataRef::isArray() {

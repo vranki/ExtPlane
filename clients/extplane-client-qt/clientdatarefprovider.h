@@ -12,6 +12,7 @@
 class ClientDataRefProvider
 {
 public:
+    virtual ~ClientDataRefProvider();
     virtual ClientDataRef *subscribeDataRef(QString name, double accuracy = 0) = 0;
     virtual void unsubscribeDataRef(ClientDataRef *ref) = 0;
     // virtual void getDataRef(QString name)=0; // get command not supported yet
@@ -24,5 +25,9 @@ public:
     virtual void setValue(QString name, QString value) = 0; // For single value
     virtual void setValues(QString name, QStringList values) = 0; // For arrays
 };
+
+#define ClientDataRefProvider_iid "org.vranki.extplane.ClientDataRefProvider"
+
+Q_DECLARE_INTERFACE(ClientDataRefProvider, ClientDataRefProvider_iid)
 
 #endif // CLIENTDATAREFPROVIDER_H

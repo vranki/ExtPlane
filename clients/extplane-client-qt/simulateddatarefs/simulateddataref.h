@@ -16,7 +16,7 @@ class SimulatedDataRef : public QObject
 public:
     /**
      * @brief DataRef that simulates through a range specified in the constructor. The DataRef will return values between minV and maxV in increments of (maxValue-minValue)/changeDivisor. Thus, the larger the changeDivisor the finer the DataRef will iterate through the values.
-     * @param parent: the parent connection (should be a SimulatedExtPlanceConnection)
+     * @param parent: the parent connection (should be a SimulatedExtPlaneConnection)
      * @param minV: the minimum value
      * @param maxV: the maximum value
      * @param changeDivisor: slows down the progression from minV to maxV (when 1, dx is 1)
@@ -28,10 +28,8 @@ public:
     virtual ~SimulatedDataRef();
     ClientDataRef *clientRef();
 
-signals:
-    
 public slots:
-    virtual void tickTime(double dt, int total);
+    virtual void tickTime(double dt);
 private slots:
     virtual void changeTimeout();
 protected:

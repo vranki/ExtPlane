@@ -1,15 +1,40 @@
 #include "extplaneclient.h"
 #include "../../util/console.h"
 
-ExtPlaneClient::ExtPlaneClient() : QObject()
+ExtPlaneClient* ExtPlaneClient::_instance = nullptr;
+
+ExtPlaneClient::ExtPlaneClient(bool simulated) : QObject()
   , m_name("ExtPlane Qt client")
   , m_connection(nullptr)
-{}
+  , m_simulated(simulated)
+{
+    _instance = this;
+}
 
-ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, ClientDataRefProvider *drp) : QObject(parent)
+ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, bool simulated) : QObject(parent)
   , m_name(name)
-  , m_connection(drp)
-{}
+  , m_connection(nullptr)
+  , m_simulated(simulated)
+{
+    _instance = this;
+}
+
+void ExtPlaneClient::createClient()
+{
+    if(m_connection) return; // Already created
+
+    connect(&m_extplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
+    connect(&m_simulatedExtplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
+
+    qDebug() << Q_FUNC_INFO << "simulated:" << m_simulated;
+    if(m_simulated) {
+        m_simulatedExtplaneConnection.registerClient(this);
+        m_simulatedExtplaneConnection.startConnection();
+    } else {
+        m_extplaneConnection.registerClient(this);
+    }
+    m_connection = m_simulated ? &m_simulatedExtplaneConnection : &m_extplaneConnection;
+}
 
 ExtPlaneClient::~ExtPlaneClient() {
     for(ClientDataRef *ref : m_dataRefs) {
@@ -18,10 +43,19 @@ ExtPlaneClient::~ExtPlaneClient() {
     }
 }
 
+ExtPlaneClient &ExtPlaneClient::instance()
+{
+    // qDebug() << Q_FUNC_INFO << "Returning " << (_instance ? "existing" : "new") << "instance";
+    if (!_instance) _instance = new ExtPlaneClient(true);
+    _instance->createClient();
+    return *_instance;
+}
+
 ClientDataRef* ExtPlaneClient::subscribeDataRef(QString name, double accuracy) {
+    Q_ASSERT(m_connection);
     ClientDataRef *ref = m_connection->subscribeDataRef(name, accuracy);
-    connect(ref, SIGNAL(changed(ClientDataRef*)), this, SLOT(cdrChanged(ClientDataRef*)));
-    connect(ref, SIGNAL(destroyed(QObject*)), this, SLOT(refDestroyed(QObject*)));
+    connect(ref, &ClientDataRef::changed, this, &ExtPlaneClient::cdrChanged);
+    connect(ref, &ClientDataRef::destroyed, this, &ExtPlaneClient::refDestroyed);
     m_dataRefs.append(ref);
     return ref;
 }
@@ -30,17 +64,23 @@ void ExtPlaneClient::refDestroyed(QObject* refqo) {
     m_dataRefs.removeOne(static_cast<ClientDataRef*>(refqo));
 }
 
+void ExtPlaneClient::setConnectionMessage(QString msg)
+{
+    m_connectionMessage = msg;
+    emit connectionMessageChanged(m_connectionMessage);
+}
+
+
 void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
-    double value;
-    bool ok;
     if(ref->isArray()) {
         emit refChanged(ref->name(), ref->values());
     } else {
         // Try to convert to double and forward to corresponding slot per default
         // If that fails, we fallback to the string slot
         // TODO: Is this really a nice solution?
-        value = ref->value().toDouble(&ok);
-        if (ok){
+        bool ok;
+        double value = ref->value().toDouble(&ok);
+        if (ok) {
             emit refChanged(ref->name(), value);
         } else {
             emit refChanged(ref->name(), ref->value());
@@ -104,17 +144,42 @@ ClientDataRefProvider *ExtPlaneClient::datarefProvider() const
     return m_connection;
 }
 
+ExtPlaneConnection *ExtPlaneClient::extplaneConnection()
+{
+    return &m_extplaneConnection;
+}
+
+QString ExtPlaneClient::connectionMessage()
+{
+    return m_connectionMessage;
+}
+
+bool ExtPlaneClient::isSimulated() const
+{
+    return m_simulated;
+}
+
 void ExtPlaneClient::setUpdateInterval(double newInterval) {
     Q_UNUSED(newInterval);
 }
 
-void ExtPlaneClient::setDatarefProvider(ClientDataRefProvider *datarefProvider)
+void ExtPlaneClient::setSimulated(bool simulated)
 {
-    if (m_connection == datarefProvider)
+    if (m_simulated == simulated)
         return;
 
-    m_connection = datarefProvider;
+    qDebug() << Q_FUNC_INFO << simulated;
+    m_simulated = simulated;
+    if(m_simulated) {
+        m_connection = &m_simulatedExtplaneConnection;
+        m_simulatedExtplaneConnection.startConnection();
+    } else {
+        m_connection = &m_extplaneConnection;
+        m_extplaneConnection.startConnection();
+    }
+    emit simulatedChanged(m_simulated);
     emit datarefProviderChanged(m_connection);
+
 }
 
 void ExtPlaneClient::valueSet(ClientDataRef *ref) {

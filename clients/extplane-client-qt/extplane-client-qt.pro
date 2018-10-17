@@ -15,7 +15,8 @@ HEADERS += \
     simulateddatarefs/alternatingsimulateddataref.h \
     simulateddatarefs/fixedsimulateddataref.h \
     simulateddatarefs/simulateddataref.h \
-    ../../util/basictcpclient.h
+    ../../util/basictcpclient.h \
+    dataref.h
 
 SOURCES += \
     simulatedextplaneconnection.cpp \
@@ -26,4 +27,5 @@ SOURCES += \
     simulateddatarefs/alternatingsimulateddataref.cpp \
     simulateddatarefs/fixedsimulateddataref.cpp \
     simulateddatarefs/simulateddataref.cpp \
-    ../../util/basictcpclient.cpp
+    ../../util/basictcpclient.cpp \
+    dataref.cpp

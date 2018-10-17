@@ -5,21 +5,25 @@
 #include "../../util/console.h"
 
 SimulatedExtPlaneConnection::SimulatedExtPlaneConnection(QObject *parent) : ExtPlaneConnection(parent) {
-    enableSimulatedRefs = true;
+    tickTimer.setInterval(SIMULATED_TIMER_INTERVAL_MSEC);
+    tickTimer.setSingleShot(false);
+    connect(&tickTimer, &QTimer::timeout, this, &SimulatedExtPlaneConnection::tickTime);
 }
 
-void SimulatedExtPlaneConnection::startConnection(QString host, unsigned int port) {
-    Q_UNUSED(host);
-    Q_UNUSED(port);
+void SimulatedExtPlaneConnection::startConnection() {
     server_ok = true;
     emit connectionMessage("Connected to ExtPlane (simulated)");
+    tickTimer.start();
 }
 
 ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double accuracy) {
     Q_UNUSED(accuracy);
     SimulatedDataRef *simRef = nullptr;
-    if(name=="sim/cockpit2/gauges/indicators/airspeed_kts_pilot") {
+    if(name=="sim/cockpit2/gauges/indicators/airspeed_kts_pilot"
+            || name=="sim/flightmodel/position/indicated_airspeed") {
         simRef = new SimulatedDataRef(this, 0, 200, 50.0, false, 0, name);
+    } else if(name=="sim/aircraft/view/acf_Vne") {
+        simRef = new SimulatedDataRef(this, 300, 300, 500.0, true, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/altitude_ft_pilot") {
         simRef = new SimulatedDataRef(this, 4000, 6000, 50.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/airspeed_acceleration_kts_sec_pilot") {
@@ -97,14 +101,16 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         INFO << "the dataref " << name << "is not supported by simulation";
         simRef = new SimulatedDataRef(this, -100, 100, 1, false, 0, name);
     }
+    // if(simRef) qDebug() << Q_FUNC_INFO << "Subscribed to " << name;
     simulatedRefs.append(simRef);
+
     return simRef->clientRef();
 }
 
 void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
-    DEBUG << "Ref not subscribed by anyone anymore";
+    // DEBUG << "Ref not subscribed by anyone anymore";
     dataRefs.remove(ref->name());
 
     for(SimulatedDataRef *simRef : simulatedRefs) {
@@ -121,7 +127,7 @@ void SimulatedExtPlaneConnection::writeLine(QString line) {
     //qDebug() << Q_FUNC_INFO << line << "(simulated)";
 }
 
-void SimulatedExtPlaneConnection::tickTime(double dt, int total) {
+void SimulatedExtPlaneConnection::tickTime() {
     for(SimulatedDataRef *dr : simulatedRefs)
-        dr->tickTime(dt, total);
+        dr->tickTime(SIMULATED_TIMER_INTERVAL_MSEC * 0.001);
 }

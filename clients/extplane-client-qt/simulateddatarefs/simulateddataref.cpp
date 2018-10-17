@@ -1,5 +1,5 @@
 #include "simulateddataref.h"
-
+#include <QDebug>
 #include <qmath.h>
 
 SimulatedDataRef::SimulatedDataRef(QObject *parent,
@@ -19,16 +19,15 @@ SimulatedDataRef::SimulatedDataRef(QObject *parent,
   , arrayCount(arrayCount)
   , myClientRef(nullptr, refName, 0)
 {
-    connect(&changeTimer, SIGNAL(timeout()), this, SLOT(changeTimeout()));
+    connect(&changeTimer, &QTimer::timeout, this, &SimulatedDataRef::changeTimeout);
     changeTimer.setSingleShot(false);
-    changeTimer.setInterval(5);
+    changeTimer.setInterval(16);
     changeTimer.start();
 }
 
 SimulatedDataRef::~SimulatedDataRef() { }
 
-void SimulatedDataRef::tickTime(double dt, int total) {
-    Q_UNUSED(total);
+void SimulatedDataRef::tickTime(double dt) {
     actualCurrentValue += change*dt;
     if(actualCurrentValue > maxValue)
         change = -qAbs(change);
@@ -36,7 +35,6 @@ void SimulatedDataRef::tickTime(double dt, int total) {
         change = qAbs(change);
     if(round) currentValue = qRound(actualCurrentValue);
     else currentValue = actualCurrentValue;
-
 }
 
 void SimulatedDataRef::changeTimeout() {
@@ -46,7 +44,7 @@ void SimulatedDataRef::changeTimeout() {
             // For every additional array value we use the current value divided by its index,
             // this easily simulates different array values for a dataref that are constrained to
             // the defined range.
-            values.push_back(QString("%1").arg(currentValue/(double)(i+1)));
+            values.push_back(QString("%1").arg(currentValue/static_cast<double>(i+1)));
         }
         myClientRef.updateValue(values);
     }else {

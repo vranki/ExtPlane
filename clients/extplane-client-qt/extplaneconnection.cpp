@@ -7,7 +7,6 @@
 
 ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent)
   , server_ok(false)
-  , enableSimulatedRefs(false)
   , updateInterval(0.333)
 {
     connect(this, SIGNAL(connectedChanged(bool)), this, SLOT(tcpClientConnected()));
@@ -46,8 +45,8 @@ void ExtPlaneConnection::registerClient(ExtPlaneClient* client) {
 
 ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accuracy) {
     ClientDataRef *ref = dataRefs.value(name);
-    if(ref){
-        DEBUG << "Ref already subscribed";
+    if(ref) {
+        // DEBUG << "Ref already subscribed";
         ref->setSubscribers(ref->subscribers()+1);
         if(accuracy < ref->accuracy()) {
             if(server_ok)
@@ -64,7 +63,7 @@ ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accurac
             subRef(ref);
     }
 
-    DEBUG << name << ref->subscribers() << server_ok;
+    // DEBUG << name << ref->subscribers() << server_ok;
     return ref;
 }
 
@@ -77,26 +76,13 @@ void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     DEBUG << ref << ref->name() << ref->subscribers();
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
-    DEBUG << "Ref not subscribed by anyone anymore";
+    // DEBUG << "Ref not subscribed by anyone anymore";
     dataRefs.remove(ref->name());
-    bool isSimulated = false;
-    for(SimulatedDataRef *simRef : simulatedRefs) {
-        if(simRef->clientRef()==ref) {
-            simRef->deleteLater();
-            simulatedRefs.removeOne(simRef);
-            isSimulated = true;
-        }
-    }
-    disconnect(ref, 0, this, 0);
-    if(!isSimulated) {
-        if(server_ok)
-            writeLine("unsub " + ref->name());
-        DEBUG << "Deleting ref " << ref->name() << ref;
-        ref->deleteLater();
-    }
-    for(ClientDataRef *ref : dataRefs) {
-        DEBUG << "refs now:" << ref->name();
-    }
+    disconnect(ref, nullptr, this, nullptr);
+    if(server_ok)
+        writeLine("unsub " + ref->name());
+    // DEBUG << "Deleting ref " << ref->name() << ref;
+    ref->deleteLater();
 }
 
 void ExtPlaneConnection::receivedLineSlot(QString & line) {
@@ -140,7 +126,7 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
 }
 
 void ExtPlaneConnection::subRef(ClientDataRef *ref) {
-    DEBUG;
+    // DEBUG;
     Q_ASSERT(server_ok);
     QString subLine = "sub " + ref->name();
     if(ref->accuracy() != 0) {
@@ -205,9 +191,4 @@ void ExtPlaneConnection::setValue(ClientDataRef *ref) {
     } else {
         setValues(ref->name(), ref->values());
     }
-}
-
-void ExtPlaneConnection::tickTime(double dt, int total) {
-    foreach(SimulatedDataRef *dr, simulatedRefs)
-        dr->tickTime(dt, total);
 }
