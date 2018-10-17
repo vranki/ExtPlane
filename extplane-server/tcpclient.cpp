@@ -204,6 +204,8 @@ void TcpClient::readClient() {
             _refProvider->addFMSEntryLatLon(subLine.value(1));
         }else if(command == "fms_clear_entries"){
             _refProvider->clearAllFmsEntries();
+        }else if(command == "fms_set_dest"){
+            _refProvider->setDestinationFmsEntry(subLine.value(1).toInt());
         }else {
             INFO << "Unknown command " << command;
         }
