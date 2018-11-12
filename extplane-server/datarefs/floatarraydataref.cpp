@@ -66,14 +66,15 @@ void FloatArrayDataRef::setValue(QString &newValue) {
     int numberOfValuesToWrite = qMin(_length, values.size());
 
     // Convert values to float and copy to _valueArray
+
     for(int i=0;i<numberOfValuesToWrite;i++) {
         bool ok = true;
-        float value = values[i].toFloat(&ok);
-        if(!ok) {
+        int value = values[i].toFloat(&ok);
+        if(ok) {
+            _valueArray[i] = value;
+        } else if(!values.at(i).isEmpty()) {
             INFO << "Invalid value " << values.at(i) << "in array";
-            return;
         }
-        _valueArray[i]=value;
     }
     updateValue();
 }
