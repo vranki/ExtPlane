@@ -16,7 +16,6 @@ INCLUDEPATH += $$XPLANE_SDK_PATH/CHeaders/XPLM
 INCLUDEPATH += ../extplane-server
 DEPENDPATH += . ../extplane-server
 INCLUDEPATH += $$PWD/../util/
-LIBS += -L../extplane-server -lextplane-server
 
 # You should not need to touch anything below this for normal build
 
@@ -33,8 +32,10 @@ CONFIG   -= debug_and_release
 TEMPLATE = lib
 
 TARGET = extplane-plugin
-# TODO: compile libextplane-server.so in the plugin!!!
 QMAKE_LFLAGS += -shared
+# Link to static library
+QMAKE_LFLAGS += ../extplane-server/libextplane-server.a ../clients/extplane-client-qt/libextplane-client-qt.a
+
 #  -static-libgcc  <- fails on mac
 
 unix:!macx {

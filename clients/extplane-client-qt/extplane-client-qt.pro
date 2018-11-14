@@ -2,11 +2,11 @@ QT       += network
 QT       -= gui
 
 TEMPLATE = lib
-CONFIG += c++11
-
+CONFIG += staticlib c++11
 INCLUDEPATH += $$PWD/../../util/
 
 HEADERS += \
+    dataref.h \
     simulatedextplaneconnection.h \
     extplaneconnection.h \
     extplaneclient.h \
@@ -16,9 +16,9 @@ HEADERS += \
     simulateddatarefs/fixedsimulateddataref.h \
     simulateddatarefs/simulateddataref.h \
     ../../util/basictcpclient.h \
-    dataref.h
 
 SOURCES += \
+    dataref.cpp \
     simulatedextplaneconnection.cpp \
     extplaneconnection.cpp \
     extplaneclient.cpp \
@@ -27,5 +27,4 @@ SOURCES += \
     simulateddatarefs/alternatingsimulateddataref.cpp \
     simulateddatarefs/fixedsimulateddataref.cpp \
     simulateddatarefs/simulateddataref.cpp \
-    ../../util/basictcpclient.cpp \
-    dataref.cpp
+    ../../util/basictcpclient.cpp
