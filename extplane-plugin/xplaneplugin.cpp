@@ -44,7 +44,7 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     INFO << "Plugin started";
     strcpy(outName, "ExtPlane");
     strcpy(outSig, "org.vranki.extplaneplugin");
-    strcpy(outDesc, "Read and write X-Plane datarefs from external programs using TCP sockets.");
+    strcpy(outDesc, "Read and write X-Plane datarefs from external programs on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR);
 
     // Init application and server
     app = new QCoreApplication(argc, &argv);
@@ -52,6 +52,9 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
 
     server = new TcpServer(this, this);
     connect(server, SIGNAL(setFlightLoopInterval(float)), this, SLOT(setFlightLoopInterval(float)));
+
+    // Log that we have started
+    XPLMDebugString ("ExtPlane listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR "\n");
 
     // Register the nav custom data accessors
     XPLMRegisterDataAccessor("extplane/navdata/5km",

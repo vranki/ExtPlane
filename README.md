@@ -182,7 +182,7 @@ scripts/cross-compile-win64-from-lin.sh for instructions.
 Launch X-Plane in console and observe the output. You should see something like:
 `ExtPlane-Plugin: Listening on port 51000`. All console output from Ext-Plane
 will start with `ExtPlane-Plugin`. Open another console and run `telnet localhost 51000`.
-Wait until you see line `EXTPLANE 1`. Then try typing the following commands:
+Wait until you see line `EXTPLANE 1` and `EXTPLANE-VERSION NNNNN`. Then try typing the following commands:
 
 ```
 sub sim/cockpit/electrical/night_vision_on
@@ -283,9 +283,14 @@ Supported settings are:
 
 ## Protocol Output ##
 
-* **EXTPLANE {version}**               Sent when connected. Version number is currently 1.
+* **EXTPLANE {protocol}**              Sent when connected. Protocol is currently 1.
+* **EXTPLANE-VERSION {version}**       Sent when connected. Feature version integer, which is incremented with each new bug fix or feature.
 * **u{type} {dataref} {value}**        Dataref has changed in value based on accuracy.
     * Types may be `i` (int), `f` (float), `d` (double), `ia` (int array), `fa` (float array), or `b` (data).
+
+The value for EXTPLANE-VERSION is defined in extplane-server/tcpserver.h. It is an integer and should be incremented
+each time new features are added or bugs are fixed. The client is then able to check if the version is new enough, and can
+warn the user if the plugin is out of date.
 
 ### Int/Float/Double Datarefs ###
 
