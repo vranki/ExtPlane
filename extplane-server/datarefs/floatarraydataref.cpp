@@ -69,11 +69,11 @@ void FloatArrayDataRef::setValue(QString &newValue) {
     for(int i=0;i<numberOfValuesToWrite;i++) {
         bool ok = true;
         float value = values[i].toFloat(&ok);
-        if(!ok) {
+        if(ok) {
+            _valueArray[i] = value;
+        } else if(!values.at(i).isEmpty()) {
             INFO << "Invalid value " << values.at(i) << "in array";
-            return;
         }
-        _valueArray[i]=value;
     }
     updateValue();
 }

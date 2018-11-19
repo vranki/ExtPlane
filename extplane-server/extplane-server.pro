@@ -32,5 +32,3 @@ HEADERS += \
     datarefs/intarraydataref.h \
     datarefs/datadataref.h \
     ../util/console.h
-
-QMAKE_CLEAN += extplane.xpl

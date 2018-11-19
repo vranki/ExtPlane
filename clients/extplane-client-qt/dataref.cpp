@@ -1,7 +1,6 @@
 #include "dataref.h"
 #include <clientdataref.h>
 #include <extplaneclient.h>
-#include <QQmlApplicationEngine>
 
 DataRef::DataRef(QObject *parent) : QObject(parent)
   , m_clientDataRef(nullptr)
@@ -60,7 +59,7 @@ void DataRef::setClient(ExtPlaneClient *client)
     if (m_client == client)
         return;
 
-    disconnect(client, 0, this, 0);
+    disconnect(client, nullptr, this, nullptr);
     m_client = client;
     emit clientChanged(m_client);
     connect(client, &ExtPlaneClient::datarefProviderChanged, this, &DataRef::setDataRefProvider);

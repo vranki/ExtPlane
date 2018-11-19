@@ -16,7 +16,6 @@ INCLUDEPATH += $$XPLANE_SDK_PATH/CHeaders/XPLM
 INCLUDEPATH += ../extplane-server
 DEPENDPATH += . ../extplane-server
 INCLUDEPATH += $$PWD/../util/
-LIBS += -L../extplane-server -lextplane-server
 
 # You should not need to touch anything below this for normal build
 
@@ -33,14 +32,16 @@ CONFIG   -= debug_and_release
 TEMPLATE = lib
 
 TARGET = extplane-plugin
+QMAKE_LFLAGS += -shared
+# Link to static library
+QMAKE_LFLAGS += ../extplane-server/libextplane-server.a ../clients/extplane-client-qt/libextplane-client-qt.a
 
-QMAKE_LFLAGS += -shared -fPIC
 #  -static-libgcc  <- fails on mac
 
 unix:!macx {
     message("Linux Platform")
     DEFINES += APL=0 IBM=0 LIN=1
-    QMAKE_CXXFLAGS += -fPIC
+    QMAKE_CXXFLAGS += -rdynamic -nodefaultlibs -undefined_warning
     XPLDIR = extplane/64
     XPLFILE = lin.xpl
 }
@@ -48,7 +49,7 @@ unix:!macx {
 macx {
      message("Mac Platform")
      DEFINES += APL=1 IBM=0 LIN=0
-     QMAKE_LFLAGS += -dynamiclib
+     QMAKE_LFLAGS += -dynamiclib -fPIC
      # -flat_namespace -undefined warning <- not needed or recommended anymore.
 
      # Build for multiple architectures.
@@ -66,6 +67,7 @@ macx {
 win32 {
     DEFINES += APL=0 IBM=1 LIN=0
     DEFINES += NOMINMAX #Qt5 bug
+    QMAKE_LFLAGS += -fPIC
     LIBS += -L$$XPLANE_SDK_PATH/Libraries/Win
 # We should test for target arch, not host arch, but this doesn't work. Fix.
 #    !contains(QMAKE_TARGET.arch, x86_64) {
@@ -106,4 +108,3 @@ HEADERS += \
     xplaneplugin.h \
     customdata/navcustomdata.h \
     customdata/atccustomdata.h \
-

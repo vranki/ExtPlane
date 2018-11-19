@@ -231,9 +231,13 @@ set sim/flightmodel/misc/h_ind 267.32
 ```
 
 Array datarefs can be set the same way. You can give less values than the dataref
-holds. For example this sets full throttle for engines 1 & 2:
+holds or skip some values. For example this sets full throttle for engines 1 & 2:
 ```
 set sim/flightmodel/engine/ENGN_thro [1,1]
+```
+This sets full throttle to engine 2:
+```
+set sim/flightmodel/engine/ENGN_thro [,1]
 ```
 Note: subscribe to array datarefs with full ref name without indices:
 ```
