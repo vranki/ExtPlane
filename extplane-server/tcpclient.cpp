@@ -1,4 +1,5 @@
 #include "tcpclient.h"
+#include "tcpserver.h"
 #include "datarefs/dataref.h"
 #include "datarefs/floatdataref.h"
 #include "datarefs/floatarraydataref.h"
@@ -23,7 +24,8 @@ TcpClient::TcpClient(QObject *parent,
 
     QByteArray block;
     QTextStream out(&block, QIODevice::WriteOnly);
-    out << "EXTPLANE 1\n";
+    out << "EXTPLANE " << EXTPLANE_PROTOCOL << "\n";
+    out << "EXTPLANE-VERSION " << EXTPLANE_VERSION << "\n";
     out.flush();
     _socket->write(block);
 }

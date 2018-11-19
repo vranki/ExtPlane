@@ -9,7 +9,20 @@
 /**
   * Creates the TCP socket and manages client connections
   */
+// TCP port used to listen for connections
 #define EXTPLANE_PORT 51000
+// Network protocol, currently always 1
+#define EXTPLANE_PROTOCOL 1
+// Feature revision, every time we add a new feature or bug fix, this should be incremented so that clients can know how old the plugin is
+#define EXTPLANE_VERSION 1000
+
+#define EXTPLANE_STRINGIFY(s) __EXTPLANE_STRINGIFY(s)
+#define __EXTPLANE_STRINGIFY(s) #s
+
+#define EXTPLANE_PORT_STR EXTPLANE_STRINGIFY(EXTPLANE_PORT)
+#define EXTPLANE_PROTOCOL_STR EXTPLANE_STRINGIFY(EXTPLANE_PROTOCOL)
+#define EXTPLANE_VERSION_STR EXTPLANE_STRINGIFY(EXTPLANE_VERSION)
+
 
 class TcpClient;
 class DataRefProvider;
