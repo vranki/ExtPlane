@@ -31,6 +31,7 @@ private:
     QByteArray _value; // Value of dataref is stored here once retrieved from XPLM
     QByteArray _newValue; // Temp variable used while checking changes. Here to avoid resizing.
     QTime _lastUpdate; // Timer used for tracking the last update time
+    bool _isString; // True, if string modifier is used.
 };
 
 #endif // DATADATAREF_H

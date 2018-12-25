@@ -278,6 +278,12 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
         XPLMSetDatad(ref->ref(), qobject_cast<DoubleDataRef*>(ref)->value());
         break;
     }
+    case extplaneRefTypeData:
+    {
+        DataDataRef *bRef = qobject_cast<DataDataRef*>(ref);
+        XPLMSetDatab(bRef->ref(), bRef->value().data(), 0, bRef->value().length());
+        break;
+    }
     default:
         break;
     }

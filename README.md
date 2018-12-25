@@ -315,7 +315,7 @@ uia sim/cockpit2/engine/indicators/N1_percent [99,97]
 
 ### Data Datarefs ###
 
-Data datarefs output data in base64:
+Data datarefs input and output data in base64:
 ```
 ub sim/aircraft/view/acf_descrip RXh0UGxhbmUgU2ltdWxhdGVkIENvbm5lY3Rpb24=
 ```
@@ -324,6 +324,12 @@ Use modifier "string" to output data as text (make sure it's really printable):
 sub sim/aircraft/view/acf_descrip:string
 ->
 ub sim/aircraft/view/acf_descrip:string "Boeing 737-800"
+```
+Setting can be done as base64 or string:
+```
+set sim/aircraft/view/acf_descrip:string "Boeing 737-800"
+or
+set sim/aircraft/view/acf_descrip RXh0UGxhbmUgU2ltdWxhdGVkIENvbm5lY3Rpb24=
 ```
 
 
