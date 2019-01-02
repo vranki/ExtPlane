@@ -102,11 +102,9 @@ QMAKE_POST_LINK += $(MKDIR) $$XPLDIR ; $(COPY_FILE) $(TARGET) $$XPLDIR/$$XPLFILE
 
 SOURCES += main.cpp \
     xplaneplugin.cpp \
-    ../extplane-server/datarefprovider.cpp \
     customdata/navcustomdata.cpp \
     customdata/atccustomdata.cpp
 HEADERS += \
     xplaneplugin.h \
-    ../extplane-server/datarefprovider.h \
     customdata/navcustomdata.h \
     customdata/atccustomdata.h \
