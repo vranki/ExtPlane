@@ -33,6 +33,8 @@ TEMPLATE = lib
 
 TARGET = extplane-plugin
 QMAKE_LFLAGS += -shared
+# Use these LFLAGS to check for missing symbols:  -Wl,-z,defs
+
 # Link to static library
 QMAKE_LFLAGS += ../extplane-server/libextplane-server.a ../clients/extplane-client-qt/libextplane-client-qt.a
 
@@ -102,9 +104,11 @@ QMAKE_POST_LINK += $(MKDIR) $$XPLDIR ; $(COPY_FILE) $(TARGET) $$XPLDIR/$$XPLFILE
 
 SOURCES += main.cpp \
     xplaneplugin.cpp \
+    $$PWD/../extplane-server/tcpserver.cpp \
     customdata/navcustomdata.cpp \
     customdata/atccustomdata.cpp
 HEADERS += \
     xplaneplugin.h \
+    $$PWD/../extplane-server/tcpserver.h \
     customdata/navcustomdata.h \
     customdata/atccustomdata.h \
