@@ -100,7 +100,7 @@ docker run -it -v $PWD:/ExtPlane -w /ExtPlane extplane ./scripts/ci-build.sh
 ### Debian/Ubuntu Linux ###
 ```bash
 # 1: Install required libraries and tools
-sudo apt install git build-essential qt5-qmake qt5-default qtbase5-dev
+sudo apt install git build-essential qt5-qmake qt5-default qtbase5-dev qtdeclarative5-dev
 
 # 2: Download X-Plane SDK and ExtPlane source code from GitHub
 git clone https://github.com/dankrusi/XPlaneSDK.git
