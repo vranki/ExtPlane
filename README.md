@@ -60,22 +60,22 @@ License:
 * Up to date Linux & windows versions
     * GitHub releases page: https://github.com/vranki/ExtPlane/releases/
 * Older version: Linux, Windows, OS-X (32bit & 64bit), 8MB
-    * [http://dankrusi.com/downloads/ExtPlane-Plugin-v0.1.zip](http://goo.gl/e2aU7b)
+    * [https://github.com/dankrusi/ExtPlane-Panel/releases/tag/v0.1](https://github.com/dankrusi/ExtPlane-Panel/releases/tag/v0.1)
 
 ### Ext-Plane Plugin + Panel ###
 
 Older versions
 
 * Linux 32bit, 15MB
-    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Linux32.zip](http://goo.gl/BNzoeZ)
+    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux32.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux32.zip)
 * Linux 64bit, 15MB
-    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Linux64.zip](http://goo.gl/akBtl4)
+    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux64.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux64.zip)
 * Windows 32bit, 12MB
-    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Win32.zip](http://goo.gl/Nupczn)
+    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win32.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win32.zip)
 * Windows 64bit, 13MB
-    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-Win64.zip](http://goo.gl/6EHtei)
+    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win64.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win64.zip)
 * OS-X 64bit, 15MB
-    * [http://dankrusi.com/downloads/ExtPlane-Panel-v0.1-OSX64.zip](http://goo.gl/8kLzJg)
+    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-OSX64.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-OSX64.zip)
 
 
 ## Building ##
