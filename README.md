@@ -9,6 +9,10 @@ external programs through an easy-to-use TCP protocol.
 * Condor soaring simulator 1 and 2
 * FlightGear - basic support via Transformer (see later)
 
+NOTE: ExtPlane-transformer (support for other sims except X-Plane) is not available in
+github releases, as building it requires Qt 5.8 and the ci container has older one..
+This will eventually be fixed.
+
 ## Features ##
 
 * Multiple concurrent connections

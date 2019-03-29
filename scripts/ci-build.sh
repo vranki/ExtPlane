@@ -22,16 +22,12 @@ fi
 # Build for linux first..
 qmake -r
 make
+zip -r extplane-plugin.zip extplane-plugin/extplane/64/*.xpl
+zip extplane-transformer.zip extplane-transformer/extplane-transformer-linux extplane-transformer.exe
 make clean distclean
 
 # Build for windows..
 ./scripts/cross-compile-win64-from-lin.sh
-
-# Zip the results for release
-pushd extplane-plugin
-zip -r extplane.zip extplane
-popd
-pushd extplane-transformer
-zip extplane-transformer.zip extplane-transformer-linux extplane-transformer.exe
-popd
+zip -r extplane-plugin.zip extplane-plugin/extplane/64/*.xpl
+zip extplane-transformer.zip extplane-transformer/extplane-transformer.exe
 
