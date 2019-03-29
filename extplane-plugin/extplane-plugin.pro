@@ -46,7 +46,7 @@ QMAKE_LFLAGS += -shared
 
 
 # Link to static library
-QMAKE_LFLAGS += ../extplane-server/libextplane-server.a ../clients/extplane-client-qt/libextplane-client-qt.a
+QMAKE_LFLAGS += ../extplane-server/libextplane-server.a
 
 #  -static-libgcc  <- fails on mac
 

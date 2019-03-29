@@ -16,8 +16,7 @@ if [ ! -d ../XPlaneSDK/CHeaders ] ; then
   rm XPSDK300.zip
   mv SDK ../XPlaneSDK
 else
-  echo "X-Plane SDK already exists and contains:"
-  ls -lh ../XPlaneSDK
+  echo "X-Plane SDK already exists"
 fi
 
 # Build for linux first..
