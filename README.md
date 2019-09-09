@@ -94,6 +94,7 @@ binaries.
 docker build -t extplane .
 docker run -it -v $PWD:/ExtPlane -w /ExtPlane extplane ./scripts/ci-build.sh
 ```
+You should end up with extplane-transformer.zip and extplane-plugin.zip with both linux & windows versions inside.
 
 ### Debian/Ubuntu Linux ###
 ```bash

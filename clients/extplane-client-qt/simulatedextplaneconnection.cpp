@@ -27,6 +27,9 @@ void SimulatedExtPlaneConnection::stopConnection() {
     emit connectionMessage("Stopped simulated");
 }
 
+void SimulatedExtPlaneConnection::connectionChangedSlot() { // Host or port changed -reconnect
+}
+
 void SimulatedExtPlaneConnection::keyPress(int id) {
     emit connectionMessage(QString("Simulated key press id %1").arg(id));
 }

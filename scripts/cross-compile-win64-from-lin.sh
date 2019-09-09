@@ -21,8 +21,8 @@
 # Good luck!
 #
 
-if [ ! -d ../ExtPlane-Panel ] ; then
-   echo "Run this from ExtPlane-Panel subdirectory is. Read the comments in script."
+if [ ! -d ../ExtPlane ] ; then
+   echo "Run this from ExtPlane subdirectory is. Read the comments in script."
    exit -1
 fi
 echo "Cleaning up build dir"
@@ -33,7 +33,7 @@ if [ -d ../mxe ] ; then
   MXEDIR=`pwd`/../mxe
 else
   if [ -d /usr/lib/mxe ] ; then
-     MXEDIR = /usr/lib/mxe
+     MXEDIR=/usr/lib/mxe
   fi
 fi
 
@@ -54,8 +54,7 @@ popd
 PATH=$MXEDIR/usr/bin/:$PATH
 
 echo
-echo Starting ExtPlane-Panel build
+echo Starting ExtPlane build
 echo $PATH
 $MXEDIR/usr/$TARGET/qt5/bin/qmake  "CONFIG+=release" -recursive
 make
-

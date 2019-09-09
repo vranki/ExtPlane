@@ -29,6 +29,8 @@ public slots:
 
 private slots:
     void tickTime();
+    virtual void connectionChangedSlot();
+
 private:
     virtual void writeLine(QString line);
     virtual ClientDataRef *createDataRef(QString name, double accuracy=0);

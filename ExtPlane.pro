@@ -18,4 +18,4 @@ versionAtLeast(QT_VERSION, 5.8.0) {
     warning(Qt 5.8.0 needed to build extplane-transformer - skipping $$QT_VERSION)
 }
 
-OTHER_FILES += README.md clients/extplane-client-qt/README
+OTHER_FILES += README.md clients/extplane-client-qt/README Dockerfile scripts/*
