@@ -17,6 +17,13 @@ class ExtPlaneClient;
  * Never call delete or deleteLater() on this - memory is managed by ExtPlaneConnection.
  *
  * This is supposed to be used from C++. See DataRef class for QML friendly version.
+ *
+ * dataFormat variable contains hints how to interpret data in ambigous situations.
+ *
+ * Current values:
+ * (empty) - default behavior
+ * (binary) - Returns binary data dataref in an array of bytes, that you get with values()
+ *
  */
 class ClientDataRef : public QObject {
     Q_OBJECT
@@ -24,9 +31,11 @@ class ClientDataRef : public QObject {
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY changed)
     Q_PROPERTY(QStringList values READ values WRITE setValues NOTIFY changed)
     Q_PROPERTY(double accuracy READ accuracy WRITE setAccuracy NOTIFY accuracyChanged)
+    Q_PROPERTY(QString dataFormat READ dataFormat WRITE setDataFormat NOTIFY dataFormatChanged)
 
 public:
     explicit ClientDataRef(QObject *parent, QString newName, double accuracy=0);
+    virtual ~ClientDataRef();
     QString& name();
     QStringList& values(); // Returns all values
     double accuracy();
@@ -38,6 +47,7 @@ public:
     void setSubscribers(int sub);
     bool isArray();
     void unsubscribe(); // Call to unsubscribe ref.
+    QString dataFormat() const;
 
 public slots:
     void setName(QString &name);
@@ -45,6 +55,7 @@ public slots:
     void setValue(QString _newValue, int index=0); // Set value (from client)
     void setValues(QStringList values); // Set full array (from client)
     void setClient(ExtPlaneClient* client);
+    void setDataFormat(QString dataFormat);
 
 signals:
     void changed(ClientDataRef *ref); // Emitted when simulator updates value
@@ -53,6 +64,10 @@ signals:
     void nameChanged(QString name);
     void accuracyChanged(double accuracy);
     void clientChanged(ExtPlaneClient* client);
+    void dataFormatChanged(QString dataFormat);
+
+private slots:
+    void clientDestroyed();
 
 private:
     QString m_name;
@@ -60,6 +75,8 @@ private:
     double m_accuracy;
     int m_subscribers;
     ExtPlaneClient* m_client;
+    QString m_dataFormat;
+    bool m_changedOnce; // False until first update sent.
 };
 
 #endif // CLIENTDATAREF_H

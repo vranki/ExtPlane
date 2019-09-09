@@ -5,8 +5,7 @@
 #include "console.h"
 
 TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent)
-    , _refProvider(nullptr)
-    , _clientCount(0) {
+                                                                      , m_refProvider(nullptr) {
     connect(&server, &QTcpServer::newConnection, this, &TcpServer::clientConnected);
     setDataRefProvider(refProvider);
 }
@@ -17,17 +16,17 @@ TcpServer::~TcpServer() {
 }
 
 int TcpServer::clientCount() const {
-    return _clientCount;
+    return m_clientConnections.length();
 }
 
 void TcpServer::setDataRefProvider(DataRefProvider *refProvider)
 {
-    if(_refProvider) {
+    if(m_refProvider) {
         disconnectClients();
     }
-    _refProvider = refProvider;
+    m_refProvider = refProvider;
 
-    if(_refProvider) {
+    if(m_refProvider) {
         if(!server.listen(QHostAddress::Any, EXTPLANE_PORT)) {
             INFO << "Unable to listen on port " << EXTPLANE_PORT;
             return;
@@ -40,26 +39,24 @@ void TcpServer::setDataRefProvider(DataRefProvider *refProvider)
 }
 
 void TcpServer::clientConnected() {
-    TcpClient *client = new TcpClient(this, server.nextPendingConnection(), _refProvider);
-    connect(client, SIGNAL(discoed(TcpClient *)), this, SLOT(clientDiscoed(TcpClient *)));
-    connect(client, SIGNAL(setFlightLoopInterval(float)), this, SIGNAL(setFlightLoopInterval(float)));
-    clientConnections.append(client);
-    _clientCount++;
-    emit clientCountChanged(_clientCount);
+    TcpClient *client = new TcpClient(this, server.nextPendingConnection(), m_refProvider);
+    connect(client, &TcpClient::discoed, this, &TcpServer::clientDiscoed);
+    connect(client, &TcpClient::setFlightLoopInterval, this, &TcpServer::setFlightLoopInterval);
+    m_clientConnections.append(client);
+    emit clientCountChanged(clientCount());
 }
 
 void TcpServer::clientDiscoed(TcpClient *client) {
     DEBUG << client;
-    clientConnections.removeOne(client);
-    _clientCount--;
-    emit clientCountChanged(_clientCount);
+    m_clientConnections.removeOne(client);
+    emit clientCountChanged(clientCount());
 }
 
-void TcpServer::disconnectClients()
-{
-    while (!clientConnections.isEmpty()) {
-        TcpClient *client = clientConnections.takeLast();
-        client->disconnect(this);
-        client->deleteLater();
+void TcpServer::disconnectClients() {
+    INFO << Q_FUNC_INFO << m_clientConnections.length();
+    while (!m_clientConnections.isEmpty()) {
+        TcpClient *client = m_clientConnections.first();
+        INFO << Q_FUNC_INFO << "Discoing" << client << "length" << m_clientConnections.length();
+        client->disconnectClient(); // Will cause clientDiscoed() signal and deletelater this client
     }
 }

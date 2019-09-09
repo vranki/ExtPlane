@@ -8,6 +8,7 @@
 #include "../extplane-server/tcpserver.h"
 #include "../extplane-server/datarefprovider.h"
 #include <XPLMDataAccess.h>
+#include <XPLMMenus.h>
 
 class DataRef;
 
@@ -55,6 +56,8 @@ private:
     QCoreApplication *app; // For Qt main loop
     TcpServer *server;
     float flightLoopInterval; // Delay between loop calls (in seconds)
+    int g_menu_container_idx;
+    XPLMMenuID g_menu_id; // ExtPlane menus
 };
 
 #endif // XPLANEPLUGIN_H

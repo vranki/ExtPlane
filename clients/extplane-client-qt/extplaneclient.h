@@ -42,7 +42,7 @@ public:
     void commandEnd(QString name);
     bool isSimulated() const;
     ClientDataRefProvider* datarefProvider() const;
-    ExtPlaneConnection *extplaneConnection(); // Note: used only if not simulated
+    ExtPlaneConnection *extplaneConnection();
     QString connectionMessage();
 
 public slots:

@@ -1,30 +1,31 @@
 #include "datadataref.h"
 #include "../util/console.h"
 
-DataDataRef::DataDataRef(QObject *parent, QString &name, void *ref) : DataRef(parent, name, ref)
+DataDataRef::DataDataRef(QObject *parent, QString &name, void *ref)
+    : DataRef(parent, name, ref)
 {
     _typeString = "b";
     _type = extplaneRefTypeData;
-    _lastUpdate.restart();
+    m_lastUpdate.restart();
 }
 
 QByteArray &DataDataRef::value() {
-    return _value;
+    return m_value;
 }
 
-QByteArray &DataDataRef::newValue()
-{
-    return _newValue;
+QByteArray &DataDataRef::newValue() {
+    return m_newValue;
 }
 
 void DataDataRef::updateValue() {
     // Make sure it's time to update again based on the accuracy
-    if(this->accuracy() == 0 || _lastUpdate.elapsed() > this->accuracy()) {
+    if(this->accuracy() == 0 || (m_lastUpdate.elapsed() > this->accuracy() ) ) {
         // TODO: do we really want to make this comparison for large data datarefs? Probably as it's still cheaper than sending over the wire the new data
-        if (_newValue != _value) {
-            _value = _newValue;
+        if (m_newValue != m_value || !isValid()) {
+            m_value = m_newValue;
             if(!_valueValid) setValueValid();
             emit changed(this);
+            m_lastUpdate.restart();
         }
     }
 }
@@ -53,9 +54,9 @@ void DataDataRef::setValue(QByteArray &newValue) {
 
 QString DataDataRef::valueString() {
     if(modifiers().contains("string")) {
-        return  QString("\"%1\"").arg(QString(_value));
+        return  QString("\"%1\"").arg(QString(m_value));
     } else {
-        return QString(_value).toUtf8().toBase64();
+        return m_value.toBase64();
     }
 }
 
@@ -64,11 +65,10 @@ void DataDataRef::setValue(QString &newValue) {
     setValue(valueBA);
 }
 
-void DataDataRef::setLength(int newLength)
-{
-    Q_ASSERT(newLength > 0);
-    if(_value.length() != newLength) {
-        _value = QByteArray(newLength, 0);
-        _newValue = QByteArray(newLength, 0); // Init already here for perf reasons.
+void DataDataRef::setLength(int newLength) {
+    Q_ASSERT(newLength >= 0);
+    if(m_value.length() != newLength) {
+        m_value = QByteArray(newLength, 0);
+        m_newValue = QByteArray(newLength, 0); // Init already here for perf reasons.
     }
 }

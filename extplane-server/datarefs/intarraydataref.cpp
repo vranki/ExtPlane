@@ -25,7 +25,7 @@ void IntArrayDataRef::updateValue() {
             valuesChanged = true;
         }
     }
-    if (valuesChanged) {
+    if (valuesChanged || !isValid()) {
         if(!_valueValid) setValueValid();
         emit changed(this);
     }

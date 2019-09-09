@@ -11,19 +11,20 @@ BasicTcpClient::BasicTcpClient(QObject *parent) : QTcpSocket(parent)
     connect(this, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
     connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(tryReconnect()));
+    reconnectTimer.setInterval(5000);
     reconnectTimer.setSingleShot(false);
 }
 
-
 void BasicTcpClient::startConnection() {
     close();
-    reconnectTimer.setInterval(5000);
+
     reconnectTimer.start();
     if(m_host.isEmpty() || !m_port) {
+        m_networkError = QString("Host or port not set - can't connect to %1:%2").arg(m_host).arg(m_port);
+        emit networkErrorChanged(m_networkError);
         INFO << "host or port not set - can't connect" << m_host << m_port;
         return;
     }
-    emit connectionChanged();
     abort();
     tryReconnect();
 }
@@ -87,21 +88,22 @@ void BasicTcpClient::setPort(int port)
     emit connectionChanged();
 }
 
-
 void BasicTcpClient::tryReconnect() {
-    DEBUG << m_host;
     if(m_host.isEmpty() || !m_port) {
-        emit connectionMessage("Please set host and port to connect");
+        m_networkError = "Please set host and port to connect";
+        emit networkErrorChanged(m_networkError);
         return;
     } else {
-        emit connectionMessage(QString("Connecting to %1:%2..").arg(m_host).arg(m_port));
+        if(state() != QAbstractSocket::UnconnectedState) {
+            disconnectFromHost();
+            waitForDisconnected(500);
+        }
         connectToHost(m_host, static_cast<quint16>(m_port));
     }
 }
 
 void BasicTcpClient::socketStateChanged(QAbstractSocket::SocketState state)
 {
-    // DEBUG << state;
     if(connected()) {
         reconnectTimer.stop();
         m_networkError = "";
@@ -111,11 +113,11 @@ void BasicTcpClient::socketStateChanged(QAbstractSocket::SocketState state)
 }
 
 void BasicTcpClient::socketError(QAbstractSocket::SocketError err) {
-    Q_UNUSED(err);
+    Q_UNUSED(err)
     INFO << "Socket error:" << errorString();
     m_networkError = errorString() + " : " + m_host + ":" + QString::number(m_port);
     emit networkErrorChanged(m_networkError);
-    emit connectionMessage(errorString() + " : " + hostName() + ":" + QString::number(port()));
+    reconnectTimer.start();
 }
 
 void BasicTcpClient::readClient() {

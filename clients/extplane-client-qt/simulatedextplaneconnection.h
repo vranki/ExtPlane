@@ -18,10 +18,14 @@ class SimulatedExtPlaneConnection : public ExtPlaneConnection {
 public:
     explicit SimulatedExtPlaneConnection(QObject *parent = nullptr);
     virtual ~SimulatedExtPlaneConnection() {}
+
 public slots:
     virtual void unsubscribeDataRef(ClientDataRef *ref);
     virtual void startConnection();
     virtual void stopConnection();
+    virtual void keyPress(int id);
+    virtual void buttonPress(int id);
+    virtual void buttonRelease(int id);
 
 private slots:
     void tickTime();

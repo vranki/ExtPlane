@@ -27,9 +27,11 @@ public slots:
     void refChanged(DataRef *ref);
     void socketError(QAbstractSocket::SocketError err);
     void disconnectClient(); // Disconnects this client
+
 signals:
     void discoed(TcpClient *client);
     void setFlightLoopInterval(float newInterval);
+
 private:
     DataRef *getSubscribedRef(const QString &name);
     void unsubscribeRef(const QString &name);

@@ -10,14 +10,16 @@
 #include "customdata/navcustomdata.h"
 #include "customdata/atccustomdata.h"
 #include <clocale>
+#include <cstring>
 #include <XPLMUtilities.h>
 
 XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent)
-  , argc(0)
-  , argv(nullptr)
-  , app(nullptr)
-  , server(nullptr)
-  , flightLoopInterval(1.0f / 30.f) // Default to 30hz
+                                              , argc(0)
+                                              , argv(nullptr)
+                                              , app(nullptr)
+                                              , server(nullptr)
+                                              , flightLoopInterval(1.0f / 30.f) // Default to 30hz
+                                              , g_menu_container_idx(0)
 { }
 
 XPlanePlugin::~XPlanePlugin() {
@@ -28,10 +30,10 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall,
                                float inElapsedTimeSinceLastFlightLoop,
                                int inCounter,
                                void *inRefcon) {
-    Q_UNUSED(inElapsedSinceLastCall);
-    Q_UNUSED(inElapsedTimeSinceLastFlightLoop);
-    Q_UNUSED(inCounter);
-    Q_UNUSED(inRefcon);
+    Q_UNUSED(inElapsedSinceLastCall)
+    Q_UNUSED(inElapsedTimeSinceLastFlightLoop)
+    Q_UNUSED(inCounter)
+    Q_UNUSED(inRefcon)
     // Tell each dataref to update its value through the XPLM api
     for(DataRef *ref : refs) updateDataRef(ref);
     // Tell Qt to process it's own runloop
@@ -42,9 +44,13 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall,
 int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     // Set plugin info
     INFO << "Plugin started";
-    strcpy(outName, "ExtPlane");
-    strcpy(outSig, "org.vranki.extplaneplugin");
-    strcpy(outDesc, "Read and write X-Plane datarefs from external programs on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR);
+    std::strcpy(outName, "ExtPlane");
+    std::strcpy(outSig, "org.vranki.extplaneplugin");
+    std::strcpy(outDesc, "Read and write X-Plane datarefs from external programs on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR);
+
+    g_menu_container_idx = XPLMAppendMenuItem(XPLMFindPluginsMenu(), "ExtPlane", nullptr, 0);
+    g_menu_id = XPLMCreateMenu("ExtPlane", XPLMFindPluginsMenu(), g_menu_container_idx, nullptr, nullptr);
+    XPLMAppendMenuItem(g_menu_id, "Listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR ". No GUI yet.", nullptr, 1);
 
     // Init application and server
     app = new QCoreApplication(argc, &argv);
@@ -60,43 +66,43 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     XPLMRegisterDataAccessor("extplane/navdata/5km",
                              xplmType_Data,                                 // The types we support
                              0,                                             // Writable
-                             NULL, NULL,                                    // Integer accessors
-                             NULL, NULL,                                    // Float accessors
-                             NULL, NULL,                                    // Doubles accessors
-                             NULL, NULL,                                    // Int array accessors
-                             NULL, NULL,                                    // Float array accessors
-                             NavCustomData::DataCallback_5km, NULL,         // Raw data accessors
-                             NULL, NULL);                                   // Refcons not used
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             NavCustomData::DataCallback_5km, nullptr,         // Raw data accessors
+                             nullptr, nullptr);                                   // Refcons not used
     XPLMRegisterDataAccessor("extplane/navdata/20km",
                              xplmType_Data,                                 // The types we support
                              0,                                             // Writable
-                             NULL, NULL,                                    // Integer accessors
-                             NULL, NULL,                                    // Float accessors
-                             NULL, NULL,                                    // Doubles accessors
-                             NULL, NULL,                                    // Int array accessors
-                             NULL, NULL,                                    // Float array accessors
-                             NavCustomData::DataCallback_20km, NULL,        // Raw data accessors
-                             NULL, NULL);                                   // Refcons not used
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             NavCustomData::DataCallback_20km, nullptr,        // Raw data accessors
+                             nullptr, nullptr);                                   // Refcons not used
     XPLMRegisterDataAccessor("extplane/navdata/100km",
                              xplmType_Data,                                 // The types we support
                              0,                                             // Writable
-                             NULL, NULL,                                    // Integer accessors
-                             NULL, NULL,                                    // Float accessors
-                             NULL, NULL,                                    // Doubles accessors
-                             NULL, NULL,                                    // Int array accessors
-                             NULL, NULL,                                    // Float array accessors
-                             NavCustomData::DataCallback_100km, NULL,       // Raw data accessors
-                             NULL, NULL);                                   // Refcons not used
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             NavCustomData::DataCallback_100km, nullptr,       // Raw data accessors
+                             nullptr, nullptr);                                   // Refcons not used
     XPLMRegisterDataAccessor("extplane/atc/124thatc/latest",
                              xplmType_Data,                                 // The types we support
                              0,                                             // Writable
-                             NULL, NULL,                                    // Integer accessors
-                             NULL, NULL,                                    // Float accessors
-                             NULL, NULL,                                    // Doubles accessors
-                             NULL, NULL,                                    // Int array accessors
-                             NULL, NULL,                                    // Float array accessors
-                             ATCCustomData::DataCallback, NULL,             // Raw data accessors
-                             NULL, NULL);
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             ATCCustomData::DataCallback, nullptr,             // Raw data accessors
+                             nullptr, nullptr);
 
     app->processEvents();
     return 1;
@@ -152,7 +158,6 @@ DataRef* XPlanePlugin::subscribeRef(QString &name) {
 
 void XPlanePlugin::unsubscribeRef(DataRef *ref) {
     Q_ASSERT(refs.contains(ref));
-    DEBUG << ref->name() << ref->subscriberCount();
 
     ref->setSubscriberCount(ref->subscriberCount() - 1);
     if(ref->subscriberCount() == 0) {
@@ -173,56 +178,56 @@ void XPlanePlugin::updateDataRef(DataRef *ref)
         float newValue = XPLMGetDataf(ref->ref());
         qobject_cast<FloatDataRef*>(ref)->updateValue(newValue);
         break;
-    };
+    }
     case extplaneRefTypeFloatArray:
     {
         FloatArrayDataRef *faRef = qobject_cast<FloatArrayDataRef*>(ref);
         int arrayLength = faRef->value().length();
         if(arrayLength == 0) {
-            arrayLength = XPLMGetDatavf(faRef->ref(), NULL, 0, 0);
+            arrayLength = XPLMGetDatavf(faRef->ref(), nullptr, 0, 0);
             faRef->setLength(arrayLength);
         }
         int valuesCopied = XPLMGetDatavf(faRef->ref(), faRef->valueArray(), 0, arrayLength);
         Q_ASSERT(valuesCopied == arrayLength);
         faRef->updateValue();
         break;
-    };
+    }
     case extplaneRefTypeIntArray:
     {
         IntArrayDataRef *iaRef = qobject_cast<IntArrayDataRef*>(ref);
         int arrayLength = iaRef->value().length();
         if(arrayLength <= 0) {
-            arrayLength = XPLMGetDatavi(iaRef->ref(), NULL, 0, 0);
+            arrayLength = XPLMGetDatavi(iaRef->ref(), nullptr, 0, 0);
             iaRef->setLength(arrayLength);
         }
         int valuesCopied = XPLMGetDatavi(iaRef->ref(), iaRef->valueArray(), 0, arrayLength);
         Q_ASSERT(valuesCopied == arrayLength);
         iaRef->updateValue();
         break;
-    };
+    }
     case extplaneRefTypeInt:
     {
         int newValue = XPLMGetDatai(ref->ref());
         qobject_cast<IntDataRef*>(ref)->updateValue(newValue);
         break;
-    };
+    }
     case extplaneRefTypeDouble:
     {
         double newValue = XPLMGetDatad(ref->ref());
         qobject_cast<DoubleDataRef*>(ref)->updateValue(newValue);
         break;
-    };
+    }
     case extplaneRefTypeData:
     {
         DataDataRef *bRef = qobject_cast<DataDataRef*>(ref);
         Q_ASSERT(bRef);
-        int arrayLength = XPLMGetDatab(ref->ref(), NULL, 0, 0);
+        int arrayLength = XPLMGetDatab(ref->ref(), nullptr, 0, 0);
         bRef->setLength(arrayLength);
         int valuesCopied = XPLMGetDatab(ref->ref(), bRef->newValue().data(), 0, arrayLength);
         Q_ASSERT(valuesCopied == arrayLength);
         bRef->updateValue();
         break;
-    };
+    }
     default:
         break;
     }
@@ -342,19 +347,19 @@ bool XPlanePlugin::loadSituation(QString sitFileLocation) {
  * example: "1,50.0267,8.51,198"
  */
 void XPlanePlugin::addFMSEntryLatLon(QString fmsEntryLine){
-     //verify if string is in valid format
-     int commaCount = fmsEntryLine.count(QLatin1Char(','));
-     if(commaCount != 3){
-         return;
-     }
+    //verify if string is in valid format
+    int commaCount = fmsEntryLine.count(QLatin1Char(','));
+    if(commaCount != 3){
+        return;
+    }
 
-     QStringList params = fmsEntryLine.split(",", QString::SkipEmptyParts);
-     int id = params.value(0).toInt();
-     float lat = params.value(1).toFloat();
-     float lon = params.value(2).toFloat();
-     int alt = params.value(3).toInt();
+    QStringList params = fmsEntryLine.split(",", QString::SkipEmptyParts);
+    int id = params.value(0).toInt();
+    float lat = params.value(1).toFloat();
+    float lon = params.value(2).toFloat();
+    int alt = params.value(3).toInt();
 
-     XPLMSetFMSEntryLatLon(id, lat, lon, alt);
+    XPLMSetFMSEntryLatLon(id, lat, lon, alt);
 }
 
 /**
@@ -371,14 +376,16 @@ void XPlanePlugin::clearAllFmsEntries(){
  * @brief XPlanePlugin::setDestinationFmsEntry
  * @param index entry the FMS is flying the aircraft toward.
  */
-void XPlanePlugin::setDestinationFmsEntry(int index){
+void XPlanePlugin::setDestinationFmsEntry(int index) {
     XPLMSetDestinationFMSEntry(index);
 }
 
 
 void XPlanePlugin::pluginStop() {
     DEBUG;
+    XPLMDestroyMenu(g_menu_id);
     app->processEvents();
+    server->disconnectClients();
     delete server;
     server = nullptr;
     app->quit();
@@ -390,7 +397,7 @@ void XPlanePlugin::pluginStop() {
 }
 
 void XPlanePlugin::receiveMessage(XPLMPluginID inFromWho, long inMessage, void *inParam) {
-    Q_UNUSED(inParam);
-
-    DEBUG << inFromWho << inMessage;
+    Q_UNUSED(inFromWho)
+    Q_UNUSED(inMessage)
+    Q_UNUSED(inParam)
 }

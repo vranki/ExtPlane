@@ -11,7 +11,7 @@ double DoubleDataRef::value() {
 }
 
 void DoubleDataRef::updateValue(double newValue) {
-    if(_value != newValue) {
+    if(_value != newValue || !isValid()) {
         _value = newValue;
         if(!_valueValid) setValueValid();
         emit changed(this);

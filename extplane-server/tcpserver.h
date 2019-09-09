@@ -14,7 +14,7 @@
 // Network protocol, currently always 1
 #define EXTPLANE_PROTOCOL 1
 // Feature revision, every time we add a new feature or bug fix, this should be incremented so that clients can know how old the plugin is
-#define EXTPLANE_VERSION 1000
+#define EXTPLANE_VERSION 1001
 
 #define EXTPLANE_STRINGIFY(s) __EXTPLANE_STRINGIFY(s)
 #define __EXTPLANE_STRINGIFY(s) #s
@@ -22,7 +22,6 @@
 #define EXTPLANE_PORT_STR EXTPLANE_STRINGIFY(EXTPLANE_PORT)
 #define EXTPLANE_PROTOCOL_STR EXTPLANE_STRINGIFY(EXTPLANE_PROTOCOL)
 #define EXTPLANE_VERSION_STR EXTPLANE_STRINGIFY(EXTPLANE_VERSION)
-
 
 class TcpClient;
 class DataRefProvider;
@@ -44,12 +43,12 @@ signals:
 public slots:
     void clientConnected();
     void clientDiscoed(TcpClient *client);
+    void disconnectClients(); // Call before destroying
+
 private:
-    void disconnectClients();
     QTcpServer server;
-    QList<TcpClient *> clientConnections;
-    DataRefProvider *_refProvider;
-    int _clientCount;
+    QList<TcpClient *> m_clientConnections;
+    DataRefProvider *m_refProvider;
 };
 
 #endif // TCPSERVER_H

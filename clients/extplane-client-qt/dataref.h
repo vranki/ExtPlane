@@ -17,26 +17,31 @@ class DataRef : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString value READ value WRITE setValue NOTIFY changed)
-    Q_PROPERTY(QStringList values READ values WRITE setValues NOTIFY changed)
+    Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(QStringList values READ values WRITE setValues NOTIFY valueChanged)
     Q_PROPERTY(double accuracy READ accuracy WRITE setAccuracy NOTIFY accuracyChanged)
     Q_PROPERTY(ExtPlaneClient* client READ client WRITE setClient NOTIFY clientChanged)
+    Q_PROPERTY(QString dataFormat READ dataFormat WRITE setDataFormat NOTIFY dataFormatChanged)
 
 public:
     explicit DataRef(QObject *parent = nullptr);
+    virtual ~DataRef();
     QString& name();
     QStringList& values(); // Returns all values
     double accuracy();
     QString value(); // Returns first value
     ExtPlaneClient* client() const;
+    QString dataFormat() const;
 
 signals:
     void changed(ClientDataRef *ref); // Emitted when simulator updates value
     void valueSet(ClientDataRef *ref); // Emitted when client sets value
+    void valueChanged(ClientDataRef *ref); // Emitted if either simulator or client changes value
     void unsubscribed(ClientDataRef *ref);
     void nameChanged(QString name);
     void accuracyChanged(double accuracy);
     void clientChanged(ExtPlaneClient* client);
+    void dataFormatChanged(QString dataFormat);
 
 public slots:
     void setName(QString &name);
@@ -45,12 +50,16 @@ public slots:
     void setValues(QStringList values); // Set full array (from client)
     void setClient(ExtPlaneClient* client);
     void setDataRefProvider();
+    void setDataFormat(QString dataFormat);
+
+private slots:
+    void clientDatarefDestroyed();
 
 private:
     void subscribeIfPossible();
     ClientDataRef *m_clientDataRef;
     ExtPlaneClient *m_client;
-    QString m_name;
+    QString m_name, m_dataFormat;
     QStringList m_emptyStringList; // Return if no client dataref available yet
     double m_accuracy;
 };

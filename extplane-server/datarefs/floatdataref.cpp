@@ -13,7 +13,7 @@ float FloatDataRef::value() {
 }
 
 void FloatDataRef::updateValue(float newValue) {
-    if(_value != newValue) {
+    if(_value != newValue || !isValid()) {
         _value = newValue;
         if(!_valueValid) setValueValid();
         emit changed(this);

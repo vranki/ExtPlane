@@ -24,6 +24,9 @@ public:
     virtual ~ExtPlaneConnection() {}
     void registerClient(ExtPlaneClient* client);
 
+signals:
+    void connectionMessage(QString connectionMessage);
+
 public slots:
     virtual ClientDataRef *subscribeDataRef(QString name, double accuracy = 0);
     virtual void unsubscribeDataRef(ClientDataRef *ref);
@@ -35,13 +38,14 @@ public slots:
     virtual void commandEnd(QString name);
     virtual void setValue(QString name, QString value);
     virtual void setValues(QString name, QStringList values);
-    virtual void setValue(ClientDataRef *ref);
+    virtual void setValueFromRef(ClientDataRef *ref); // Convenience, calls above function with ref's values.
     void setUpdateInterval(double newInterval);
     void receivedLineSlot(QString &line);
     virtual void startConnection();
     virtual void stopConnection();
 
 private slots:
+    void connectionChangedSlot();
     void connectedChanged(bool connected);
     void socketError(QAbstractSocket::SocketError err);
 
@@ -54,7 +58,8 @@ protected:
     bool server_ok;
 
 private:
-    double updateInterval;
+    double m_updateInterval;
+    int m_extplaneVersion; // Version of the remote ExtPlane plugin. -1 if yet unknown.
 };
 
 #endif // EXTPLANECONNECTION_H

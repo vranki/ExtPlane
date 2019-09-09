@@ -22,10 +22,8 @@ ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, bool simulated) : 
 void ExtPlaneClient::createClient()
 {
     if(m_connection) return; // Already created
-
-    connect(&m_extplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
     connect(&m_simulatedExtplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
-
+    connect(&m_extplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
     qDebug() << Q_FUNC_INFO << "simulated:" << m_simulated;
     if(m_simulated) {
         m_simulatedExtplaneConnection.registerClient(this);
@@ -41,12 +39,12 @@ ExtPlaneClient::~ExtPlaneClient() {
     for(ClientDataRef *ref : m_dataRefs) {
         m_dataRefs.removeOne(ref);
         m_connection->unsubscribeDataRef(ref);
+        ref->setClient(nullptr);
     }
 }
 
 ExtPlaneClient &ExtPlaneClient::instance()
 {
-    // qDebug() << Q_FUNC_INFO << "Returning " << (_instance ? "existing" : "new") << "instance";
     if (!_instance) _instance = new ExtPlaneClient(true);
     _instance->createClient();
     return *_instance;
@@ -71,7 +69,6 @@ void ExtPlaneClient::setConnectionMessage(QString msg)
     emit connectionMessageChanged(m_connectionMessage);
 }
 
-
 void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
     if(ref->isArray()) {
         emit refChanged(ref->name(), ref->values());
@@ -90,7 +87,6 @@ void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
 }
 
 void ExtPlaneClient::unsubscribeDataRef(QString name) {
-    // DEBUG << name;
     for(ClientDataRef *ref : m_dataRefs) {
         if(ref->name() == name) {
             m_dataRefs.removeOne(ref);
@@ -140,32 +136,27 @@ void ExtPlaneClient::commandEnd(QString name) {
     m_connection->commandEnd(name);
 }
 
-ClientDataRefProvider *ExtPlaneClient::datarefProvider() const
-{
+ClientDataRefProvider *ExtPlaneClient::datarefProvider() const {
     return m_connection;
 }
 
-ExtPlaneConnection *ExtPlaneClient::extplaneConnection()
-{
-    return &m_extplaneConnection;
+ExtPlaneConnection *ExtPlaneClient::extplaneConnection() {
+    return (isSimulated() ? &m_simulatedExtplaneConnection : &m_extplaneConnection);
 }
 
-QString ExtPlaneClient::connectionMessage()
-{
+QString ExtPlaneClient::connectionMessage() {
     return m_connectionMessage;
 }
 
-bool ExtPlaneClient::isSimulated() const
-{
+bool ExtPlaneClient::isSimulated() const {
     return m_simulated;
 }
 
 void ExtPlaneClient::setUpdateInterval(double newInterval) {
-    Q_UNUSED(newInterval);
+    Q_UNUSED(newInterval)
 }
 
-void ExtPlaneClient::setSimulated(bool simulated)
-{
+void ExtPlaneClient::setSimulated(bool simulated) {
     if (m_simulated == simulated)
         return;
 
@@ -177,6 +168,8 @@ void ExtPlaneClient::setSimulated(bool simulated)
     m_simulated = simulated;
     m_connection = nullptr;
     emit datarefProviderChanged(m_connection);
+    setConnectionMessage("");
+
     if(m_simulated) {
         m_extplaneConnection.stopConnection();
         m_connection = &m_simulatedExtplaneConnection;

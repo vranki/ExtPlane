@@ -35,7 +35,7 @@ void FloatArrayDataRef::updateValue() {
             valuesChanged = true;
         }
     }
-    if (valuesChanged) {
+    if (valuesChanged || !isValid()) {
         if(!_valueValid) setValueValid();
         emit changed(this);
     }
@@ -80,7 +80,7 @@ void FloatArrayDataRef::setValue(QString &newValue) {
 
 void FloatArrayDataRef::setLength(int newLength)
 {
-    Q_ASSERT(newLength > 0);
+    Q_ASSERT(newLength >= 0);
     _values.fill(-9999, newLength); // Resize and initialize vector
     if(_valueArray) delete[] _valueArray;
     _valueArray = new float[newLength];

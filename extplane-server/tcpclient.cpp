@@ -19,7 +19,7 @@ TcpClient::TcpClient(QObject *parent,
 {
     INFO << "Client connected from " << socket->peerAddress().toString();
     connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(_socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    connect(_socket, SIGNAL(disconnected()), this, SLOT(disconnectClient()));
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
 
     QByteArray block;
@@ -32,16 +32,18 @@ TcpClient::TcpClient(QObject *parent,
 
 TcpClient::~TcpClient() {
     DEBUG;
-    disconnectClient();
+    // disconnectClient(); nope, in destructor this crashes
 }
 
 void TcpClient::socketError(QAbstractSocket::SocketError err) {
-    Q_UNUSED(err);
+    Q_UNUSED(err)
     INFO << "Socket error:" << _socket->errorString();
-    deleteLater();
+
+    // deleteLater(); // WTF? No?
 }
 
 void TcpClient::disconnectClient() {
+    INFO << Q_FUNC_INFO << this << _subscribedRefs.size();
     while(!_subscribedRefs.isEmpty()) {
         DataRef *ref = _subscribedRefs.values().first();
         _subscribedRefs.remove(ref);
@@ -59,7 +61,6 @@ void TcpClient::readClient() {
     while(_socket->canReadLine()) {
         QByteArray lineBA = _socket->readLine();
         QString line = QString(lineBA).trimmed();
-        DEBUG << "Client says: " << line;
 
         // Split the command in strings
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
@@ -72,8 +73,13 @@ void TcpClient::readClient() {
                 QString refName = subLine[1].trimmed();
 
                 double accuracy = 0;
-                if(subLine.length() >=3)
-                    accuracy = subLine[2].toDouble();
+                bool accuracy_ok = false;
+                if(subLine.length() >= 3) {
+                    accuracy = subLine[2].toDouble(&accuracy_ok);
+                    if(!accuracy_ok) {
+                        INFO << "WARNING: Unable to parse accuracy value: " << subLine[2] << " - accuracy set to 0";
+                    }
+                }
 
                 DataRef *ref = getSubscribedRef(refName);
                 if(!ref) { // Ref not subscribed yet, try to subscribe
@@ -96,7 +102,7 @@ void TcpClient::readClient() {
                         } else if(ref->type() == extplaneRefTypeData) {
                             _refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
                         }
-                        INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString();
+                        INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString() << ", valid " << ref->isValid();
                         if(ref->isValid()) {
                             sendRef(ref); // Force update
                         }

@@ -38,10 +38,9 @@ public slots:
 
 signals:
     void receivedLine(QString & line);
-    void connectionMessage(QString text);
     void networkErrorChanged(QString errorString);
     void lineEndingChanged(QString lineEnding);
-    void connectionChanged();
+    void connectionChanged(); // Emitted when hostname or port has changed
     void connectedChanged(bool connected);
 
 private slots:

@@ -27,6 +27,18 @@ void SimulatedExtPlaneConnection::stopConnection() {
     emit connectionMessage("Stopped simulated");
 }
 
+void SimulatedExtPlaneConnection::keyPress(int id) {
+    emit connectionMessage(QString("Simulated key press id %1").arg(id));
+}
+
+void SimulatedExtPlaneConnection::buttonPress(int id) {
+    emit connectionMessage(QString("Simulated button press id %1").arg(id));
+}
+
+void SimulatedExtPlaneConnection::buttonRelease(int id) {
+    emit connectionMessage(QString("Simulated button release id %1").arg(id));
+}
+
 ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double accuracy) {
     Q_UNUSED(accuracy);
     SimulatedDataRef *simRef = nullptr;
@@ -105,8 +117,10 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new SimulatedDataRef(this, 1.0, 2.2, 10.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
     } else if(name=="sim/cockpit2/engine/indicators/EGT_deg_C") {
         simRef = new SimulatedDataRef(this, 0.0, 800, 100.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
-    }  else if(name=="sim/cockpit2/EFIS/map_range") {
+    } else if(name=="sim/cockpit2/EFIS/map_range") {
         simRef = new SimulatedDataRef(this, 1*2, 6*2, 1*2, true, 0, name);
+    } else if(name=="sim/cockpit/warnings/annunciators/master_caution") {
+        simRef = new SimulatedDataRef(this, 0, 1, 5.0, true, 0, name);
     } else {
         // Fallback
         INFO << "the dataref " << name << "is not supported by simulation";

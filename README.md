@@ -3,6 +3,8 @@
 A plugin for X-Plane and other simulators that allows commanding the simulation from
 external programs through an easy-to-use TCP protocol.
 
+Current version 1001
+
 ## Supported simulators ##
 
 * X-Plane 9, 10 & 11 - native support. X-Plane 11 currently only tested.
@@ -59,32 +61,24 @@ License:
 
 ## Downloads ##
 
-### Ext-Plane Plugin ###
+### ExtPlane Plugin ###
 
 * Up to date Linux & windows versions
     * GitHub releases page: https://github.com/vranki/ExtPlane/releases/
 * Older version: Linux, Windows, OS-X (32bit & 64bit), 8MB
     * [https://github.com/dankrusi/ExtPlane-Panel/releases/tag/v0.1](https://github.com/dankrusi/ExtPlane-Panel/releases/tag/v0.1)
 
-### Ext-Plane Plugin + Panel ###
+## Installing ##
 
-Older versions
+This is a fat plugin - just copy "extplane" directory under X-Plane/Resources/plugins.
 
-* Linux 32bit, 15MB
-    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux32.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux32.zip)
-* Linux 64bit, 15MB
-    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux64.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Linux64.zip)
-* Windows 32bit, 12MB
-    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win32.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win32.zip)
-* Windows 64bit, 13MB
-    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win64.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-Win64.zip)
-* OS-X 64bit, 15MB
-    * [https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-OSX64.zip](https://github.com/dankrusi/ExtPlane-Panel/releases/download/v0.1/ExtPlane-Panel-v0.1-OSX64.zip)
-
+Start X-Plane. You should see ExtPlane menu entry in plugins menu.
 
 ## Building ##
 
-ExtPlane uses the Qt Framework for cross-platform compatibility. Before building you'll need to setup Qt 5 or greater to compile. You'll also need to check out the X-Plane SDK (http://www.xsquawkbox.net/xpsdk/mediawiki/Download) to the directory next to the ExtPlane directory. The X-Plane SDK can be either at ~/SDK or ../SDK or ../XPlaneSDK relative to the ExtPlane directory.
+ExtPlane uses the Qt Framework for cross-platform compatibility. Before building you'll need to setup Qt 5 or greater to compile. You'll
+also need to check out the X-Plane SDK (http://www.xsquawkbox.net/xpsdk/mediawiki/Download) to the directory next to the ExtPlane directory.
+The X-Plane SDK can be either at ~/SDK or ../SDK or ../XPlaneSDK relative to the ExtPlane directory.
 
 The requirements for ExtPlane are as follows:
 * C++ Toolchain

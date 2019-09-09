@@ -5,6 +5,7 @@
 
 #include <QByteArray>
 #include <QTime>
+#include <QString>
 
 /**
   * Represents a Binary DataRef (type b).
@@ -28,9 +29,9 @@ public:
     virtual void setValue(QString &newValue);
     void setLength(int newLength);
 private:
-    QByteArray _value; // Value of dataref is stored here once retrieved from XPLM
-    QByteArray _newValue; // Temp variable used while checking changes. Here to avoid resizing.
-    QTime _lastUpdate; // Timer used for tracking the last update time
+    QByteArray m_value; // Value of dataref is stored here once retrieved from XPLM
+    QByteArray m_newValue; // Temp variable used while checking changes. Here to avoid resizing.
+    QTime m_lastUpdate; // Timer used for tracking the last update time
 };
 
 #endif // DATADATAREF_H
