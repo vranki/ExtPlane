@@ -26,6 +26,7 @@ public:
 
 signals:
     void connectionMessage(QString connectionMessage);
+    void extplaneWarning(QString message);
 
 public slots:
     virtual ClientDataRef *subscribeDataRef(QString name, double accuracy = 0);

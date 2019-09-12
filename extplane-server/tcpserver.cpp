@@ -4,8 +4,9 @@
 #include "datarefprovider.h"
 #include "console.h"
 
-TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider) : QObject(parent)
-                                                                      , m_refProvider(nullptr) {
+TcpServer::TcpServer(QObject *parent, DataRefProvider *refProvider)
+    : QObject(parent)
+      , m_refProvider(nullptr) {
     connect(&server, &QTcpServer::newConnection, this, &TcpServer::clientConnected);
     setDataRefProvider(refProvider);
 }
@@ -19,8 +20,7 @@ int TcpServer::clientCount() const {
     return m_clientConnections.length();
 }
 
-void TcpServer::setDataRefProvider(DataRefProvider *refProvider)
-{
+void TcpServer::setDataRefProvider(DataRefProvider *refProvider) {
     if(m_refProvider) {
         disconnectClients();
     }
@@ -53,10 +53,15 @@ void TcpServer::clientDiscoed(TcpClient *client) {
 }
 
 void TcpServer::disconnectClients() {
-    INFO << Q_FUNC_INFO << m_clientConnections.length();
     while (!m_clientConnections.isEmpty()) {
         TcpClient *client = m_clientConnections.first();
-        INFO << Q_FUNC_INFO << "Discoing" << client << "length" << m_clientConnections.length();
         client->disconnectClient(); // Will cause clientDiscoed() signal and deletelater this client
+    }
+}
+
+void TcpServer::extplaneWarning(QString message) {
+    INFO << "Sending extplane warning " << message << "to" << m_clientConnections.length() << "clients";
+    for(auto cc : m_clientConnections) {
+        cc->extplaneWarning(message);
     }
 }

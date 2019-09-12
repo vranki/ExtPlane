@@ -42,6 +42,8 @@ public: // DataRefProvider implementation
     virtual void clearAllFmsEntries();
     virtual void setDestinationFmsEntry(int index);
 
+signals:
+    void extplaneWarning(QString message); // Send warning message to client
 
 public slots:
     void setFlightLoopInterval(float newInterval);

@@ -57,6 +57,12 @@ void TcpClient::disconnectClient() {
     deleteLater();
 }
 
+void TcpClient::extplaneWarning(QString message) {
+    if(_socket->isOpen()) {
+        _socket->write(QString("EXTPLANE-WARNING %1\n").arg(message).toUtf8());
+    }
+}
+
 void TcpClient::readClient() {
     while(_socket->canReadLine()) {
         QByteArray lineBA = _socket->readLine();
@@ -77,7 +83,7 @@ void TcpClient::readClient() {
                 if(subLine.length() >= 3) {
                     accuracy = subLine[2].toDouble(&accuracy_ok);
                     if(!accuracy_ok) {
-                        INFO << "WARNING: Unable to parse accuracy value: " << subLine[2] << " - accuracy set to 0";
+                        extplaneWarning(QString("WARNING: Unable to parse accuracy value: %1 - accuracy set to 0").arg(subLine[2]));
                     }
                 }
 
@@ -108,14 +114,14 @@ void TcpClient::readClient() {
                         }
                         if(command == "get") ref->setUnsubscribeAfterChange();
                     } else {
-                        INFO << "Ref not found" << refName;
+                        extplaneWarning(QString("Ref not found: %1").arg(refName));
                     }
                 } else { // Ref already subscribed - update accuracy
                     INFO << "Updating " << refName << " accuracy to " << accuracy;
                     ref->setAccuracy(accuracy);
                 }
             } else {
-                INFO << "Invalid sub command";
+                extplaneWarning(QString("Invalid sub command"));
             }
         } else if(command == "unsub") {
             QString refName = subLine.value(1);
@@ -130,11 +136,11 @@ void TcpClient::readClient() {
                         ref->setValue(refValue);
                         _refProvider->changeDataRef(ref);
                     } else {
-                        INFO << "Ref " << ref->name() << " is not writable!";
+                        extplaneWarning(QString("Ref %1 is not writable!").arg(ref->name()));
                     }
                 }
             } else {
-                INFO << "Invalid set command";
+                extplaneWarning(QString("Invalid set command"));
             }
         } else if(command == "key") {
             if(subLine.size() == 2) {
@@ -143,7 +149,7 @@ void TcpClient::readClient() {
                 if(ok)
                     _refProvider->keyStroke(keyId);
             } else {
-                INFO << "Invalid key command";
+                extplaneWarning(QString("Invalid key command"));
             }
         } else if(command == "but") {
             if(subLine.size() == 2) {
@@ -154,7 +160,7 @@ void TcpClient::readClient() {
                     _heldButtons.insert(keyId);
                 }
             } else {
-                INFO << "Invalid but command";
+                extplaneWarning("Invalid but command");
             }
         } else if(command == "rel") {
             if(subLine.size() == 2) {
@@ -163,7 +169,7 @@ void TcpClient::readClient() {
                 if(ok && _heldButtons.contains(keyId)) {
                     _refProvider->buttonRelease(keyId);
                 } else {
-                    INFO << "Invalid rel command, button not held";
+                    extplaneWarning("Invalid rel command, button not held");
                 }
             } else {
                 INFO << "Invalid rel command";
@@ -176,13 +182,13 @@ void TcpClient::readClient() {
                     if(ok) {
                         emit(setFlightLoopInterval(newInterval));
                     } else {
-                        INFO << "Invalid interval";
+                        extplaneWarning(QString("Invalid flight loop interval %1").arg(subLine.value(2)));
                     }
                 } else {
-                    INFO << "Invalid update_interval command";
+                    extplaneWarning(QString("Invalid update_interval command"));
                 }
             } else {
-                INFO << "Invalid extplane-set command";
+                extplaneWarning(QString("Invalid extplane-set command"));
             }
         } else if (command == "cmd") {
             if (subLine.size()==3) {
@@ -195,27 +201,27 @@ void TcpClient::readClient() {
                 } else if (subCmd == "end") {
                     type = extplaneCommandTypeEnd;
                 } else {
-                    INFO << "Invalid cmd command";
+                    extplaneWarning(QString("Invalid cmd command"));
                 }
                 QString commandName = subLine.value(2);
                 _refProvider->command(commandName, type);
             } else {
-                INFO << "Invalid cmd command";
+                extplaneWarning(QString("Invalid cmd command"));
             }
         } else if(command == "sit"){
             if(subLine.size() == 2) {
                 _refProvider->loadSituation(subLine.value(1));
             } else {
-                INFO << "Invalid sit command";
+                extplaneWarning(QString("Invalid sit command"));
             }
-        }else if(command == "fms_wpt_entry"){
+        } else if(command == "fms_wpt_entry"){
             _refProvider->addFMSEntryLatLon(subLine.value(1));
-        }else if(command == "fms_clear_entries"){
+        } else if(command == "fms_clear_entries"){
             _refProvider->clearAllFmsEntries();
-        }else if(command == "fms_set_dest"){
+        } else if(command == "fms_set_dest"){
             _refProvider->setDestinationFmsEntry(subLine.value(1).toInt());
-        }else {
-            INFO << "Unknown command " << command;
+        } else {
+            extplaneWarning(QString("Unknown command %1").arg(command));
         }
     }
 }
@@ -294,7 +300,7 @@ void TcpClient::refChanged(DataRef *ref) {
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
         _refValueB.insert(ref, refB->value());
     } else {
-        INFO << "Ref type " << ref->type() << " not supported (this should not happen!)";
+        extplaneWarning(QString("Ref type %1 not supported (this should not happen!)").arg(ref->type()));
         return;
     }
 
@@ -314,6 +320,7 @@ void TcpClient::sendRef(DataRef *ref) {
     out << "u" << ref->typeString() << " " << ref->name() << " " << ref->valueString() << "\n";
     out.flush(); // Is this optimal for performance? Should be studied.
 
+    // INFO << QString::fromUtf8(block);
     if(_socket->isOpen()) {
         _socket->write(block);
         //    _socket->flush(); Not really needed and may mess up performance

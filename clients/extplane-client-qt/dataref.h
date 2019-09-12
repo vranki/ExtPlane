@@ -12,6 +12,10 @@ class DataRefProvicer;
  * want. About the same API as with ClientDataRef.
  *
  * Will automatically connect when name is set.
+ *
+ * Scalefactor can be set if a numeric dataref needs to be scaled with
+ * a number (for unit conversion etc). If scaleFactor is 2, value()
+ * returns 2*(real value).
  */
 class DataRef : public QObject
 {
@@ -22,6 +26,7 @@ class DataRef : public QObject
     Q_PROPERTY(double accuracy READ accuracy WRITE setAccuracy NOTIFY accuracyChanged)
     Q_PROPERTY(ExtPlaneClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(QString dataFormat READ dataFormat WRITE setDataFormat NOTIFY dataFormatChanged)
+    Q_PROPERTY(double scaleFactor READ scaleFactor WRITE scaleFactor NOTIFY scaleFactorChanged)
 
 public:
     explicit DataRef(QObject *parent = nullptr);
@@ -32,6 +37,7 @@ public:
     QString value(); // Returns first value
     ExtPlaneClient* client() const;
     QString dataFormat() const;
+    double scaleFactor() const;
 
 signals:
     void changed(ClientDataRef *ref); // Emitted when simulator updates value
@@ -42,6 +48,7 @@ signals:
     void accuracyChanged(double accuracy);
     void clientChanged(ExtPlaneClient* client);
     void dataFormatChanged(QString dataFormat);
+    void scaleFactorChanged(double scaleFactor);
 
 public slots:
     void setName(QString &name);
@@ -51,6 +58,7 @@ public slots:
     void setClient(ExtPlaneClient* client);
     void setDataRefProvider();
     void setDataFormat(QString dataFormat);
+    void scaleFactor(double scaleFactor);
 
 private slots:
     void clientDatarefDestroyed();
@@ -62,6 +70,7 @@ private:
     QString m_name, m_dataFormat;
     QStringList m_emptyStringList; // Return if no client dataref available yet
     double m_accuracy;
+    double m_scaleFactor;
 };
 
 #endif // DATAREF_H

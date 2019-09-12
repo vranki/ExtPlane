@@ -3,7 +3,7 @@
 A plugin for X-Plane and other simulators that allows commanding the simulation from
 external programs through an easy-to-use TCP protocol.
 
-Current version 1001
+Current version 1002
 
 ## Supported simulators ##
 
@@ -288,6 +288,7 @@ Supported settings are:
 
 * **EXTPLANE {protocol}**              Sent when connected. Protocol is currently 1.
 * **EXTPLANE-VERSION {version}**       Sent when connected. Feature version integer, which is incremented with each new bug fix or feature.
+* **EXTPLANE-WARNING {message}**       Show warning message for developer and/or user
 * **u{type} {dataref} {value}**        Dataref has changed in value based on accuracy.
     * Types may be `i` (int), `f` (float), `d` (double), `ia` (int array), `fa` (float array), or `b` (data).
 

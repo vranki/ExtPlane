@@ -8,9 +8,8 @@
 
 ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent)
                                                           , server_ok(false)
-                                                          , m_updateInterval(0.333)
-                                                          , m_extplaneVersion(-1)
-{
+                                                          , m_updateInterval(1.0 / 60.0)
+                                                          , m_extplaneVersion(-1) {
     connect(this, SIGNAL(connectedChanged(bool)), this, SLOT(connectedChanged(bool)));
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, &BasicTcpClient::receivedLine, this, &ExtPlaneConnection::receivedLineSlot);
@@ -21,7 +20,7 @@ ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent)
 void ExtPlaneConnection::startConnection() {
     if(hostName().length()) {
         DEBUG << "Starting real connection to " << hostName() << "port" << port();
-        emit connectionMessage("Starting real connection");
+        emit connectionMessage(QString("Connecting to %1:%2..").arg(hostName().arg(port())));
         BasicTcpClient::startConnection();
     } else {
         DEBUG << "Hostname not set yet - not connecting yet.";
@@ -30,18 +29,15 @@ void ExtPlaneConnection::startConnection() {
 }
 
 void ExtPlaneConnection::stopConnection() {
-    DEBUG << "Stopping real connection";
+    DEBUG << "Stopping connection";
     BasicTcpClient::disconnectFromHost();
     qDeleteAll(dataRefs.values());
     dataRefs.clear();
-    emit connectionMessage("Stopped real");
+    emit connectionMessage("Stopped connection");
 }
 
 void ExtPlaneConnection::connectionChangedSlot() { // Host or port changed -reconnect
-    if(connected()) {
-        stopConnection();
-    }
-    startConnection();
+    connected() ? stopConnection() : startConnection();
 }
 
 void ExtPlaneConnection::setUpdateInterval(double newInterval) {
@@ -75,13 +71,14 @@ void ExtPlaneConnection::registerClient(ExtPlaneClient* client) {
 ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accuracy) {
     ClientDataRef *ref = dataRefs.value(name);
     if(ref) {
-        DEBUG << QString("Ref %1 already subscribed!").arg(name);
+        DEBUG << QString("Ref %1 already subscribed %2 times").arg(name).arg(ref->subscribers());
         ref->setSubscribers(ref->subscribers()+1);
         if(accuracy < ref->accuracy()) {
             if(server_ok)
                 subRef(ref); // Re-subscribe with higher accuracy
         }
     } else {
+        DEBUG << QString("Subscribing to new ref %1").arg(name);
         ref = createDataRef(name, accuracy);
 
         dataRefs[ref->name()] = ref;
@@ -101,6 +98,7 @@ ClientDataRef *ExtPlaneConnection::createDataRef(QString name, double accuracy) 
 }
 
 void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
+    qDebug() << Q_FUNC_INFO << ref->name();
 
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
@@ -125,6 +123,9 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
         }
         return;
     } else { // Handle updates
+        if(line.startsWith("EXTPLANE-WARNING")) {
+            emit extplaneWarning(line.mid(17));
+        }
         QStringList cmd = line.split(" ", QString::SkipEmptyParts);
         if(cmd.size()>=2) { // Normally 3, but can be 2 if a data dataref updates to be empty
             if(cmd.value(0)=="EXTPLANE-VERSION" && cmd.length() == 2) {

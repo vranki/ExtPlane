@@ -124,6 +124,7 @@ void BasicTcpClient::readClient() {
     while(canReadLine()) {
         QByteArray lineBA = readLine();
         QString line = QString(lineBA).trimmed();
+        // qDebug() << line;
         emit receivedLine(line);
     }
 }

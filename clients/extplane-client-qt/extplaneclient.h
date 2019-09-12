@@ -32,7 +32,7 @@ public:
     static ExtPlaneClient &instance();
     Q_INVOKABLE void createClient(); // MUST be called before use
     ClientDataRef* subscribeDataRef(QString name, double accuracy=0);
-    void unsubscribeDataRef(QString name);
+    void unsubscribeDataRefByName(QString name); // TODO: Shouldn't be used - REMOVE
     bool isDataRefSubscribed(QString name);
     void keyPress(int id);
     void buttonPress(int id);
@@ -46,6 +46,7 @@ public:
     QString connectionMessage();
 
 public slots:
+    void unsubscribeDataRef(ClientDataRef *refToUnsubscribe);
     void setUpdateInterval(double newInterval);
     void setSimulated(bool simulated);
 
@@ -56,11 +57,11 @@ signals:
     void datarefProviderChanged(ClientDataRefProvider* datarefProvider);
     void simulatedChanged(bool simulated);
     void connectionMessageChanged(QString connectionMessage);
+    void extplaneWarning(QString message);
 
 private slots:
     void cdrChanged(ClientDataRef *ref);
     void valueSet(ClientDataRef *ref);
-    void unsubscribed(ClientDataRef *ref);
     void refDestroyed(QObject* refqo);
     void setConnectionMessage(QString msg);
 

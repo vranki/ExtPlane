@@ -18,13 +18,11 @@ XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent)
                                               , argv(nullptr)
                                               , app(nullptr)
                                               , server(nullptr)
-                                              , flightLoopInterval(1.0f / 30.f) // Default to 30hz
+                                              , flightLoopInterval(1.0f / 60.f) // Default to 60hz
                                               , g_menu_container_idx(0)
 { }
 
-XPlanePlugin::~XPlanePlugin() {
-    DEBUG << Q_FUNC_INFO;
-}
+XPlanePlugin::~XPlanePlugin() { }
 
 float XPlanePlugin::flightLoop(float inElapsedSinceLastCall,
                                float inElapsedTimeSinceLastFlightLoop,
@@ -57,7 +55,7 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     setlocale(LC_NUMERIC, "C"); // See http://stackoverflow.com/questions/25661295/why-does-qcoreapplication-call-setlocalelc-all-by-default-on-unix-linux
 
     server = new TcpServer(this, this);
-    connect(server, SIGNAL(setFlightLoopInterval(float)), this, SLOT(setFlightLoopInterval(float)));
+    connect(server, &TcpServer::setFlightLoopInterval, this, &XPlanePlugin::setFlightLoopInterval);
 
     // Log that we have started
     XPLMDebugString ("ExtPlane listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR "\n");
@@ -109,8 +107,6 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
 }
 
 DataRef* XPlanePlugin::subscribeRef(QString &name) {
-    DEBUG << name;
-
     // Search in list of already subscribed datarefs - if found return that
     for(DataRef *ref : refs) {
         if(ref->name() == name) {
@@ -148,10 +144,10 @@ DataRef* XPlanePlugin::subscribeRef(QString &name) {
             refs.append(dr);
             return dr;
         } else {
-            INFO << "Dataref type " << refType << "not supported";
+            server->extplaneWarning(QString("Dataref type %1 not supported").arg(refType));
         }
     } else {
-        INFO << "Can't find dataref " << name;
+        server->extplaneWarning(QString("Can't find dataref %1").arg(name));
     }
     return nullptr;
 }
@@ -168,8 +164,7 @@ void XPlanePlugin::unsubscribeRef(DataRef *ref) {
 }
 
 // Called for each ref on every flight loop
-void XPlanePlugin::updateDataRef(DataRef *ref)
-{
+void XPlanePlugin::updateDataRef(DataRef *ref) {
     Q_ASSERT(ref);
 
     switch (ref->type()) {
@@ -251,7 +246,7 @@ void XPlanePlugin::buttonRelease(int buttonid) {
 void XPlanePlugin::changeDataRef(DataRef *ref)
 {
     if(!ref->isWritable()) {
-        INFO << "Tried to write read-only dataref" << ref->name();
+        server->extplaneWarning(QString("Tried to write read-only dataref %1").arg(ref->name()));
         return;
     }
 
@@ -306,7 +301,7 @@ void XPlanePlugin::command(QString &name, extplaneCommandType type)
             break;
         }
     } else {
-        INFO << "Command" << name << "not found";
+        server->extplaneWarning(QString("Command %1 not found").arg(name));
     }
 
 }
@@ -316,12 +311,11 @@ void XPlanePlugin::setFlightLoopInterval(float newInterval) {
         flightLoopInterval = newInterval;
         DEBUG << "New interval" << flightLoopInterval;
     } else {
-        DEBUG << "Invalid interval " << newInterval;
+        server->extplaneWarning(QString("Invalid interval %1").arg(newInterval));
     }
 }
 
-QString XPlanePlugin::refNameWithoutModifiers(QString &original)
-{
+QString XPlanePlugin::refNameWithoutModifiers(QString &original) {
     return original.contains(":") ? original.left(original.indexOf(":")) : original;
 }
 

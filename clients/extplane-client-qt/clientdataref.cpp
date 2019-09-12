@@ -7,10 +7,14 @@ ClientDataRef::ClientDataRef(QObject *parent, QString newName, double accuracy) 
                                                                                   , m_subscribers(0)
                                                                                   , m_client(nullptr)
                                                                                   , m_changedOnce(false)
-{ }
+{
+    qDebug() << Q_FUNC_INFO << m_name;
+}
 
 ClientDataRef::~ClientDataRef() {
-    unsubscribe();
+    if(m_subscribers > 0) {
+        qDebug() << Q_FUNC_INFO << "Warning: ref " << m_name << " destroyed but still subscribed by " << m_subscribers;
+    }
 }
 
 QString& ClientDataRef::name() {
@@ -36,7 +40,7 @@ ExtPlaneClient *ClientDataRef::client() const {
 void ClientDataRef::setClient(ExtPlaneClient *client) {
     if (m_client == client)
         return;
-
+    qDebug() << Q_FUNC_INFO << name() << client;
     m_client = client;
     if(m_client) {
         connect(m_client, &ExtPlaneClient::destroyed, this, &ClientDataRef::clientDestroyed);
@@ -45,6 +49,7 @@ void ClientDataRef::setClient(ExtPlaneClient *client) {
 }
 
 void ClientDataRef::clientDestroyed() {
+    qDebug() << Q_FUNC_INFO << name();
     setClient(nullptr);
 }
 
@@ -116,11 +121,14 @@ int ClientDataRef::subscribers() {
 }
 
 void ClientDataRef::setSubscribers(int sub) {
+    qDebug() << Q_FUNC_INFO << name() << sub;
+    Q_ASSERT(sub >= 0);
     m_subscribers = sub;
 }
 
 void ClientDataRef::unsubscribe() {
-    if(m_client) emit unsubscribed(this);
+    qDebug() << Q_FUNC_INFO << m_client << m_subscribers;
+    emit unsubscribed(this);
 }
 
 QString ClientDataRef::dataFormat() const {

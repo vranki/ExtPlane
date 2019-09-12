@@ -6,6 +6,7 @@ DataRef::DataRef(QObject *parent) : QObject(parent)
                                     , m_clientDataRef(nullptr)
                                     , m_client(nullptr)
                                     , m_accuracy(0)
+                                    , m_scaleFactor(1)
 {
     // Connect both valueset and changed to valuechanged
     connect(this, &DataRef::valueSet, this, &DataRef::valueChanged);
@@ -15,7 +16,11 @@ DataRef::DataRef(QObject *parent) : QObject(parent)
 }
 
 DataRef::~DataRef() {
-    if(m_clientDataRef) m_clientDataRef->unsubscribe();
+    qDebug() << Q_FUNC_INFO << m_name << m_clientDataRef;
+    if(m_clientDataRef) {
+        m_clientDataRef->unsubscribe();
+        m_clientDataRef = nullptr;
+    }
 }
 
 void DataRef::subscribeIfPossible() {
@@ -50,18 +55,40 @@ void DataRef::setName(QString &name) {
     if (m_name == name)
         return;
 
+    if(!m_name.isEmpty()) {
+        if(m_clientDataRef) { // Unsub old dataref..
+            qDebug() << Q_FUNC_INFO << "Unsubbing" << m_clientDataRef->name();
+            m_clientDataRef->unsubscribe();
+            m_clientDataRef = nullptr;
+        } else {
+            qDebug() << Q_FUNC_INFO << "No cdr - can't unsub " << m_name << " after subscribing" << name;
+        }
+    }
     m_name = name;
     emit nameChanged(m_name);
 
-    if(m_clientDataRef) { // Unsub old dataref..
-        m_clientDataRef->unsubscribe();
-        m_clientDataRef = nullptr;
-    }
     subscribeIfPossible();
 }
 
 QString DataRef::value() {
-    return m_clientDataRef ? m_clientDataRef->value() : "";
+    if(m_clientDataRef) {
+        if(qFuzzyCompare(m_scaleFactor, 1)) {
+            return m_clientDataRef->value();
+        } else {
+            bool ok;
+            double refValue = m_clientDataRef->value().toDouble(&ok);
+            refValue = refValue * m_scaleFactor;
+            if(!ok) {
+                if(m_clientDataRef->value().isEmpty()) return "";
+
+                qDebug() << Q_FUNC_INFO << "Warning: Ref " << name() << "scale factor is set, but can't convert value to double: " << m_clientDataRef->value();
+                return m_clientDataRef->value();
+            }
+            return QString::number(refValue);
+        }
+    } else {
+        return "";
+    }
 }
 
 ExtPlaneClient *DataRef::client() const {
@@ -70,6 +97,10 @@ ExtPlaneClient *DataRef::client() const {
 
 QString DataRef::dataFormat() const {
     return m_clientDataRef ?  m_clientDataRef->dataFormat() : "";
+}
+
+double DataRef::scaleFactor() const {
+    return m_scaleFactor;
 }
 
 void DataRef::setClient(ExtPlaneClient *client) {
@@ -91,6 +122,15 @@ void DataRef::setDataRefProvider() {
 void DataRef::setDataFormat(QString dataFormat) {
     m_dataFormat = dataFormat;
     if(m_clientDataRef) m_clientDataRef->setDataFormat(m_dataFormat);
+}
+
+void DataRef::scaleFactor(double scaleFactor) {
+    if (qFuzzyCompare(m_scaleFactor, scaleFactor))
+        return;
+
+    m_scaleFactor = scaleFactor;
+    emit scaleFactorChanged(m_scaleFactor);
+    emit valueChanged(m_clientDataRef);
 }
 
 void DataRef::clientDatarefDestroyed() {

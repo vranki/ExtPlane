@@ -46,7 +46,7 @@ public:
     int subscribers();
     void setSubscribers(int sub);
     bool isArray();
-    void unsubscribe(); // Call to unsubscribe ref.
+    void unsubscribe(); // Call to unsubscribe ref. Subscriber count will be reduced by one.
     QString dataFormat() const;
 
 public slots:
@@ -60,7 +60,7 @@ public slots:
 signals:
     void changed(ClientDataRef *ref); // Emitted when simulator updates value
     void valueSet(ClientDataRef *ref); // Emitted when client sets value
-    void unsubscribed(ClientDataRef *ref);
+    void unsubscribed(ClientDataRef *ref); // Emitted when one subscriber unsubscribes (not necessarily all)
     void nameChanged(QString name);
     void accuracyChanged(double accuracy);
     void clientChanged(ExtPlaneClient* client);

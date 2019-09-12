@@ -22,11 +22,13 @@ public:
     explicit TcpClient(QObject *parent, QTcpSocket *socket, DataRefProvider *refProvider);
     ~TcpClient();
     QStringList listRefs();
+
 public slots:
     void readClient();
     void refChanged(DataRef *ref);
     void socketError(QAbstractSocket::SocketError err);
     void disconnectClient(); // Disconnects this client
+    void extplaneWarning(QString message);
 
 signals:
     void discoed(TcpClient *client);
