@@ -113,8 +113,6 @@ void TcpClient::readClient() {
                             sendRef(ref); // Force update
                         }
                         if(command == "get") ref->setUnsubscribeAfterChange();
-                    } else {
-                        extplaneWarning(QString("Ref not found: %1").arg(refName));
                     }
                 } else { // Ref already subscribed - update accuracy
                     INFO << "Updating " << refName << " accuracy to " << accuracy;

@@ -99,7 +99,12 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new SimulatedDataRef(this, -90, 90, 10.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/roll_electric_deg_pilot") {
         simRef = new SimulatedDataRef(this, -30, 30, 10.0, false, 0, name);
+    } else if(name=="sim/flightmodel/forces/g_nrml") {
+        simRef = new SimulatedDataRef(this, -2, 4, 50.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/slip_deg") {
+        simRef = new SimulatedDataRef(this, -10, 10, 10.0, false, 0, name);
+    } else if(name=="sim/cockpit2/gauges/indicators/turn_rate_heading_deg_pilot"
+               || name=="sim/flightmodel/misc/turnrate_noroll") {
         simRef = new SimulatedDataRef(this, -10, 10, 10.0, false, 0, name);
     } else if(name=="sim/cockpit2/gauges/indicators/heading_AHARS_deg_mag_pilot") {
         simRef = new SimulatedDataRef(this, 0, 360, 20.0, false, 0, name);
@@ -112,7 +117,7 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
     } else if(name=="sim/cockpit2/autopilot/heading_dial_deg_mag_pilot") {
         simRef = new SimulatedDataRef(this, -360, 360, 30.0, false, 0, name);
     } else if(name=="sim/cockpit2/engine/indicators/engine_speed_rpm") {
-        simRef = new SimulatedDataRef(this, 0, 10000, 5.0, false, 4, name);
+        simRef = new SimulatedDataRef(this, 0, 2000, 15.0, false, 4, name);
     } else if(name=="sim/aircraft/view/acf_tailnum") {
         simRef = new AlternatingSimulatedDataRef(this, "EXTPL1,EXTPL2",5.0, name);
     } else if(name=="sim/aircraft/view/acf_descrip") {
@@ -127,10 +132,16 @@ ClientDataRef *SimulatedExtPlaneConnection::createDataRef(QString name, double a
         simRef = new SimulatedDataRef(this, 1, 4, 20.0, true, 0, name);
     } else if(name=="sim/cockpit2/engine/indicators/N1_percent") {
         simRef = new SimulatedDataRef(this, 0, 100, 10.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
+    } else if(name=="sim/cockpit2/engine/indicators/N2_percent") {
+        simRef = new SimulatedDataRef(this, 0, 100, 20.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
     } else if(name=="sim/cockpit2/engine/indicators/EPR_ratio") {
         simRef = new SimulatedDataRef(this, 1.0, 2.2, 10.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
     } else if(name=="sim/cockpit2/engine/indicators/EGT_deg_C") {
         simRef = new SimulatedDataRef(this, 0.0, 800, 100.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
+    } else if(name=="sim/cockpit2/engine/indicators/fuel_flow_kg_sec") {
+        simRef = new SimulatedDataRef(this, 0.0, 5, 500.0, false, 8, name); // X-Plane seems to return 8 engines no matter what
+    } else if(name=="sim/aircraft/engine/acf_RSC_redline_eng") {
+        simRef = new SimulatedDataRef(this, 280, 280, 1.0, false, 8, name);
     } else if(name=="sim/cockpit2/EFIS/map_range") {
         simRef = new SimulatedDataRef(this, 1*2, 6*2, 1*2, true, 0, name);
     } else if(name=="sim/cockpit/warnings/annunciators/master_caution") {
@@ -162,7 +173,7 @@ void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
 }
 
 void SimulatedExtPlaneConnection::writeLine(QString line) {
-    Q_UNUSED(line);
+    Q_UNUSED(line)
     //qDebug() << Q_FUNC_INFO << line << "(simulated)";
 }
 

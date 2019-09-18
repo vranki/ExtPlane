@@ -125,44 +125,45 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
     } else { // Handle updates
         if(line.startsWith("EXTPLANE-WARNING")) {
             emit extplaneWarning(line.mid(17));
-        }
-        QStringList cmd = line.split(" ", QString::SkipEmptyParts);
-        if(cmd.size()>=2) { // Normally 3, but can be 2 if a data dataref updates to be empty
-            if(cmd.value(0)=="EXTPLANE-VERSION" && cmd.length() == 2) {
-                INFO << "Connected to ExtPlane version" << cmd.value(1);
-                m_extplaneVersion = cmd.value(1).toInt(); // Nothing done with this currently.
-            } else {
-                ClientDataRef *ref = dataRefs.value(cmd.value(1));
-                if(ref) {
-                    if ((cmd.value(0)=="ufa" || cmd.value(0)=="uia") && cmd.size() == 3) {
-                        // Array dataref
-                        QString arrayString = cmd.value(2);
-                        Q_ASSERT(arrayString[0]=='[' && arrayString[arrayString.length()-1]==']');
-                        arrayString = arrayString.mid(1, arrayString.length()-2);
-                        QStringList arrayValues = arrayString.split(',');
-                        ref->updateValue(arrayValues);
-                    } else if (((cmd.value(0)=="uf") || (cmd.value(0)=="ui") || (cmd.value(0)=="ud") ) && cmd.size() == 3) {
-                        // Single value dataref
-                        ref->updateValue(cmd.value(2));
-                    } else if (cmd.value(0)=="ub") { // cmd size can be 2 or 3
-                        // Data dataref
-                        if(ref->dataFormat().contains("binary")) {
-                            QByteArray rawArray = QByteArray::fromBase64(cmd.value(2).toUtf8());
-                            QStringList values;
-                            for(int i=0;i<rawArray.size();i++) {
-                                char value = rawArray[i];
-                                values.append(QChar(value));
+        } else {
+            QStringList cmd = line.split(" ", QString::SkipEmptyParts);
+            if(cmd.size()>=2) { // Normally 3, but can be 2 if a data dataref updates to be empty
+                if(cmd.value(0)=="EXTPLANE-VERSION" && cmd.length() == 2) {
+                    INFO << "Connected to ExtPlane version" << cmd.value(1);
+                    m_extplaneVersion = cmd.value(1).toInt(); // Nothing done with this currently.
+                } else {
+                    ClientDataRef *ref = dataRefs.value(cmd.value(1));
+                    if(ref) {
+                        if ((cmd.value(0)=="ufa" || cmd.value(0)=="uia") && cmd.size() == 3) {
+                            // Array dataref
+                            QString arrayString = cmd.value(2);
+                            Q_ASSERT(arrayString[0]=='[' && arrayString[arrayString.length()-1]==']');
+                            arrayString = arrayString.mid(1, arrayString.length()-2);
+                            QStringList arrayValues = arrayString.split(',');
+                            ref->updateValue(arrayValues);
+                        } else if (((cmd.value(0)=="uf") || (cmd.value(0)=="ui") || (cmd.value(0)=="ud") ) && cmd.size() == 3) {
+                            // Single value dataref
+                            ref->updateValue(cmd.value(2));
+                        } else if (cmd.value(0)=="ub") { // cmd size can be 2 or 3
+                            // Data dataref
+                            if(ref->dataFormat().contains("binary")) {
+                                QByteArray rawArray = QByteArray::fromBase64(cmd.value(2).toUtf8());
+                                QStringList values;
+                                for(int i=0;i<rawArray.size();i++) {
+                                    char value = rawArray[i];
+                                    values.append(QChar(value));
+                                }
+                                ref->updateValue(values);
+                            } else {
+                                // Base64 decoded value, if value defined - empty string otherwise
+                                ref->updateValue((cmd.size() == 3) ? QByteArray::fromBase64(cmd.value(2).toUtf8()) : QString());
                             }
-                            ref->updateValue(values);
                         } else {
-                            // Base64 decoded value, if value defined - empty string otherwise
-                            ref->updateValue((cmd.size() == 3) ? QByteArray::fromBase64(cmd.value(2).toUtf8()) : QString());
+                            INFO << "Unsupported ref type " << cmd.value(0);
                         }
                     } else {
-                        INFO << "Unsupported ref type " << cmd.value(0);
+                        INFO << "Ref not subscribed " << cmd.value(2);
                     }
-                } else {
-                    INFO << "Ref not subscribed " << cmd.value(2);
                 }
             }
         }
