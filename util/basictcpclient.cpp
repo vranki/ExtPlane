@@ -10,15 +10,15 @@ BasicTcpClient::BasicTcpClient(QObject *parent) : QTcpSocket(parent)
     connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(this, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-    connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(tryReconnect()));
-    reconnectTimer.setInterval(5000);
-    reconnectTimer.setSingleShot(false);
+    connect(&m_reconnectTimer, SIGNAL(timeout()), this, SLOT(tryReconnect()));
+    m_reconnectTimer.setInterval(5000);
+    m_reconnectTimer.setSingleShot(false);
 }
 
 void BasicTcpClient::startConnection() {
     close();
 
-    reconnectTimer.start();
+    m_reconnectTimer.start();
     if(m_host.isEmpty() || !m_port) {
         m_networkError = QString("Host or port not set - can't connect to %1:%2").arg(m_host).arg(m_port);
         emit networkErrorChanged(m_networkError);
@@ -105,7 +105,7 @@ void BasicTcpClient::tryReconnect() {
 void BasicTcpClient::socketStateChanged(QAbstractSocket::SocketState state)
 {
     if(connected()) {
-        reconnectTimer.stop();
+        m_reconnectTimer.stop();
         m_networkError = "";
         emit networkErrorChanged(m_networkError);
     }
@@ -117,7 +117,7 @@ void BasicTcpClient::socketError(QAbstractSocket::SocketError err) {
     INFO << "Socket error:" << errorString();
     m_networkError = errorString() + " : " + m_host + ":" + QString::number(m_port);
     emit networkErrorChanged(m_networkError);
-    reconnectTimer.start();
+    m_reconnectTimer.start();
 }
 
 void BasicTcpClient::readClient() {

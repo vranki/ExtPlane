@@ -31,8 +31,8 @@ void ExtPlaneConnection::startConnection() {
 void ExtPlaneConnection::stopConnection() {
     DEBUG << "Stopping connection";
     BasicTcpClient::disconnectFromHost();
-    qDeleteAll(dataRefs.values());
-    dataRefs.clear();
+    // qDeleteAll(dataRefs.values());
+    // dataRefs.clear();
     emit connectionMessage("Stopped connection");
 }
 
@@ -116,10 +116,14 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
         if(line=="EXTPLANE 1") {
             server_ok = true;
             emit connectionMessage(QString("Connected to ExtPlane at %1:%2").arg(hostName()).arg(port()));
+            DEBUG << "Setting update interval to " << m_updateInterval;
             setUpdateInterval(m_updateInterval);
             // Sub all refs
-            for(ClientDataRef *ref : dataRefs)
+            DEBUG << "REFS" << dataRefs.count();
+            for(ClientDataRef *ref : dataRefs) {
+                DEBUG << "Subscribing to ref" << ref->name();
                 subRef(ref);
+            }
         }
         return;
     } else { // Handle updates

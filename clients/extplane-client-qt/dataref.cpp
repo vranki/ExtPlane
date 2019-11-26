@@ -16,7 +16,6 @@ DataRef::DataRef(QObject *parent) : QObject(parent)
 }
 
 DataRef::~DataRef() {
-    qDebug() << Q_FUNC_INFO << m_name << m_clientDataRef;
     if(m_clientDataRef) {
         m_clientDataRef->unsubscribe();
         m_clientDataRef = nullptr;

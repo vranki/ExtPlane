@@ -50,7 +50,7 @@ private slots:
     void socketStateChanged(QAbstractSocket::SocketState state);
 
 private:
-    QTimer reconnectTimer;
+    QTimer m_reconnectTimer;
     QString m_lineEnding;
     QString m_host;
     QString m_networkError;

@@ -42,6 +42,10 @@ Known users:
     * Simple to use Voice control made for Zibo's awesome 738X (most likely will work for 739 Ultimate)
     * https://github.com/Najsr/X-Plane-Voice-Control
 
+Note: X-Plane has UDP interface that can be used to do lot of things ExtPlane normally
+would do. See https://github.com/dotsha747/libXPlane-UDP-Client for a c++ client
+for the UDP interface.
+
 ## Transformer ##
 
 ExtPlane-Transformer is an application that works as ExtPlane
