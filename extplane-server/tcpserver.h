@@ -14,7 +14,7 @@
 // Network protocol, currently always 1
 #define EXTPLANE_PROTOCOL 1
 // Feature revision, every time we add a new feature or bug fix, this should be incremented so that clients can know how old the plugin is
-#define EXTPLANE_VERSION 1002
+#define EXTPLANE_VERSION 1003
 
 #define EXTPLANE_STRINGIFY(s) __EXTPLANE_STRINGIFY(s)
 #define __EXTPLANE_STRINGIFY(s) #s

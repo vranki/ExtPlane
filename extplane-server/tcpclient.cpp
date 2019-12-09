@@ -109,15 +109,15 @@ void TcpClient::readClient() {
                             _refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
                         }
                         INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString() << ", valid " << ref->isValid();
-                        if(ref->isValid()) {
-                            sendRef(ref); // Force update
-                        }
-                        if(command == "get") ref->setUnsubscribeAfterChange();
                     }
                 } else { // Ref already subscribed - update accuracy
                     INFO << "Updating " << refName << " accuracy to " << accuracy;
                     ref->setAccuracy(accuracy);
                 }
+                if(ref->isValid()) {
+                    sendRef(ref); // Force update
+                }
+                if(command == "get") ref->setUnsubscribeAfterChange();
             } else {
                 extplaneWarning(QString("Invalid sub command"));
             }

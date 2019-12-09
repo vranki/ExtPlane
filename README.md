@@ -3,7 +3,7 @@
 A plugin for X-Plane and other simulators that allows commanding the simulation from
 external programs through an easy-to-use TCP protocol.
 
-Current version 1002
+Current version 1003 (set in tcpserver.h, if you make changes!)
 
 ## Supported simulators ##
 
@@ -211,6 +211,7 @@ Commands and replies are sent as text strings as defined below.
 * **sub {dataref}:[modifiers] [accuracy]**   Subscribe to dataref, with optional accuracy.
 * **unsub {dataref}**                      Unsubscribe dataref.
 * **set {dataref} {value}**                Set dataref to value. Dataref must be subscribed first.
+* **get {dataref}**                        Get dataref value once, then unsubscribe.
 
 With accuracy you can decide how much the dataref's value can
 change before a update is sent. Set it to as large value as possible
