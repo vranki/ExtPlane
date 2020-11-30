@@ -239,7 +239,7 @@ void TcpClient::refChanged(DataRef *ref) {
         bool bigenough = false;
         QVector<float> values = refF->value();
 
-        if(_refValueFA.contains(ref) || refF->accuracy() == 0) {
+        if(!_refValueFA.contains(ref) || refF->accuracy() == 0) {
             // New value or accuracy not set.
             _refValueFA.insert(ref, values);
         } else {
@@ -263,7 +263,7 @@ void TcpClient::refChanged(DataRef *ref) {
         bool bigenough = false;
 
         QVector<int> values = refI->value();
-        if(_refValueIA.contains(ref) || refI->accuracy() == 0) {
+        if(!_refValueIA.contains(ref) || refI->accuracy() == 0) {
             // New value or accuracy not set.
             _refValueIA.insert(ref, values);
         } else {
