@@ -15,4 +15,4 @@ defined(XPLANE_SDK_PATH, var) {
     warning("No X-Plane SDK found in ../XPlaneSDK or ~/SDK - not building X-Plane plugin")
 }
 
-OTHER_FILES += README.md clients/extplane-client-qt/README Dockerfile scripts/*
+OTHER_FILES += README.md UDP.md clients/extplane-client-qt/README Dockerfile scripts/*

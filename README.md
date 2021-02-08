@@ -23,6 +23,7 @@ This will eventually be fixed.
 * Simulate key and button presses
 * Execute commands
 * Load situations
+* High-performance UDP option
 * Free & open source under GPLv3
 * Client libraries available for Qt (c++), Java and C#
 
@@ -249,6 +250,13 @@ sub sim/flightmodel/engine/ENGN_thro
 WRONG: sub sim/flightmodel/engine/ENGN_thro[1]
 ```
 
+### High-performance UDP output ###
+
+ExtPlane supports tight UDP protocol for basic dataref types (int, float, double)
+from simulator to client. Add modifier udp to ref name to request it in UDP.
+UDP datarefs are sent every flight loop using lightweight protocol.
+
+See [this file](UDP.md) for details.
 
 ### Keys and Buttons ###
 
@@ -286,12 +294,11 @@ Command identifiers are strings that look like datarefs.
 Supported settings are:
 * **update_interval {value}**          How often ExtPlane should update its data from X-Plane, in seconds. Use as high value as possible here for best performance. For example 0.16 would mean 60Hz, 0.33 = 30Hz, 0.1 = 10Hz etc.. Must be a positive float. Default is 0.33.
 
-
-
 ## Protocol Output ##
 
 * **EXTPLANE {protocol}**              Sent when connected. Protocol is currently 1.
 * **EXTPLANE-VERSION {version}**       Sent when connected. Feature version integer, which is incremented with each new bug fix or feature.
+* **CLIENT-ID {clientid}**             Client ID used with UDP protocol
 * **EXTPLANE-WARNING {message}**       Show warning message for developer and/or user
 * **u{type} {dataref} {value}**        Dataref has changed in value based on accuracy.
     * Types may be `i` (int), `f` (float), `d` (double), `ia` (int array), `fa` (float array), or `b` (data).
