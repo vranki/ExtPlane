@@ -24,7 +24,9 @@ rm extplane-plugin.zip
 # Build for linux first..
 qmake -r
 make
-zip -r extplane-plugin.zip extplane-plugin/extplane/64/*.xpl
+pushd extplane-plugin
+zip -r ../extplane-plugin.zip extplane/64/*.xpl
+popd
 zip -r extplane-transformer.zip extplane-transformer/extplane-transformer-linux extplane-transformer.exe
 make clean distclean
 
@@ -32,8 +34,10 @@ make clean distclean
 if [ -d /usr/lib/mxe ] ; then
   ./scripts/cross-compile-win64-from-lin.sh
   zip -r extplane-transformer.zip extplane-transformer/extplane-transformer.exe
+  pushd extplane-plugin
+    zip -r ../extplane-plugin.zip extplane/64/*.xpl
+  popd
 else
   echo "mxe not found in /usr/lib/mxe - not building windows versions"
 fi
-  zip -r extplane-plugin.zip extplane-plugin/extplane/64/*.xpl
 
