@@ -27,7 +27,7 @@ class DataRef : public QObject {
 public:
     DataRef(QObject *parent, const QString &name, void* ref);
     const QString &name() const;
-    QStringList modifiers() const;
+    const QStringList &modifiers() const;
     void* ref() const;
     int subscriberCount() const;
     void setSubscriberCount(const int subs);
@@ -37,14 +37,15 @@ public:
     virtual void setValue(QString &newValue) = 0;
     extplaneRefID type() const; // NOTE: always only one type, although XPLMDataTypeID can have many.
     virtual void setType(extplaneRefID newType); // Only set after constructor
-    QString typeString() const;
+    const QString &typeString() const;
     virtual void setAccuracy(double val);
     virtual void updateAccuracy(double val);
     double accuracy() const { return _accuracy; }
     void setUnsubscribeAfterChange(); // Call to mark this ref to be unsubscribed after one change
     bool shouldUnsubscribeAfterChange() const;
     bool isValid() const; // True if the value has been set initially. False if not.
-
+    void setUdpId(quint16 id);
+    quint16 udpId();
 signals:
     void changed(DataRef *ref); // Should not be emitted if value is not valid.
 
@@ -63,6 +64,7 @@ private:
     int _subscriberCount;
     bool _writable;
     bool _unsubscribeAfterChange;
+    quint16 _udpId = 0; // UDP id, global for all clients
 };
 
 #endif // DATAREF_H

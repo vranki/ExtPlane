@@ -1,5 +1,5 @@
 #include "datadataref.h"
-#include "../util/console.h"
+#include "../../util/console.h"
 
 DataDataRef::DataDataRef(QObject *parent, QString &name, void *ref)
     : DataRef(parent, name, ref)
@@ -32,28 +32,11 @@ void DataDataRef::updateValue() {
 
 void DataDataRef::setValue(QByteArray &newValue) {
     Q_UNUSED(newValue);
-    //TODO: @dankrusi: finish this implementation and test
-    qFatal("Writing of Data DataRefs is not yet supported");
-    /*
-    // Limit number of values to write to ref length or number of given values
-    int numberOfValuesToWrite = qMin(_length, values.size());
-
-    // Convert values to float and copy to _valueArray
-    for(int i=0;i<numberOfValuesToWrite;i++) {
-        bool ok = true;
-        float value = values[i].toFloat(&ok);
-        if(!ok) {
-            qDebug() << Q_FUNC_INFO << "Invalid value " << values[i] << "in array";
-            return;
-        }
-        _valueArray[i]=value;
-    }
-    XPLMSetDatavf(_ref, _valueArray, 0, numberOfValuesToWrite);
-    */
+    // qDebug() << Q_FUNC_INFO << "Set ref" <<  << "to string" << s << "length" << length;
 }
 
 QString DataDataRef::valueString() {
-    if(modifiers().contains("string")) {
+    if(modifiers().contains("string")) { // Add quotes to strings
         return  QString("\"%1\"").arg(QString(m_value));
     } else {
         return m_value.toBase64();
@@ -61,8 +44,10 @@ QString DataDataRef::valueString() {
 }
 
 void DataDataRef::setValue(QString &newValue) {
-    QByteArray valueBA = newValue.toUtf8();
-    setValue(valueBA);
+    m_value = newValue.toUtf8();
+    setValueValid();
+    emit changed(this);
+    // setValue(valueBA);
 }
 
 void DataDataRef::setLength(int newLength) {

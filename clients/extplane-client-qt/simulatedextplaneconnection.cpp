@@ -161,7 +161,7 @@ void SimulatedExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
     // DEBUG << "Ref not subscribed by anyone anymore";
-    dataRefs.remove(ref->name());
+    dataRefs.erase(ref->name());
 
     for(SimulatedDataRef *simRef : simulatedRefs) {
         if(simRef->clientRef()==ref) {

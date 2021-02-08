@@ -5,8 +5,6 @@
 DataRef::DataRef(QObject *parent) : QObject(parent)
                                     , m_clientDataRef(nullptr)
                                     , m_client(nullptr)
-                                    , m_accuracy(0)
-                                    , m_scaleFactor(1)
 {
     // Connect both valueset and changed to valuechanged
     connect(this, &DataRef::valueSet, this, &DataRef::valueChanged);
@@ -50,7 +48,7 @@ QString& DataRef::name() {
     return m_name;
 }
 
-void DataRef::setName(QString &name) {
+void DataRef::setName(const QString name) {
     if (m_name == name)
         return;
 
@@ -80,7 +78,7 @@ QString DataRef::value() {
             if(!ok) {
                 if(m_clientDataRef->value().isEmpty()) return "";
 
-                qDebug() << Q_FUNC_INFO << "Warning: Ref " << name() << "scale factor is set, but can't convert value to double: " << m_clientDataRef->value();
+                qWarning() << Q_FUNC_INFO << "Warning: Ref " << name() << "scale factor is set, but can't convert value to double: " << m_clientDataRef->value();
                 return m_clientDataRef->value();
             }
             return QString::number(refValue);
@@ -94,12 +92,32 @@ ExtPlaneClient *DataRef::client() const {
     return m_client;
 }
 
+ClientDataRef *DataRef::clientDataRef() const
+{
+    return m_clientDataRef;
+}
+
 QString DataRef::dataFormat() const {
     return m_clientDataRef ?  m_clientDataRef->dataFormat() : "";
 }
 
 double DataRef::scaleFactor() const {
     return m_scaleFactor;
+}
+
+float DataRef::valueFloat() const
+{
+    return m_clientDataRef ? m_clientDataRef->valueFloat() : 0;
+}
+
+double DataRef::valueDouble() const
+{
+    return m_clientDataRef ? m_clientDataRef->valueDouble() : 0;
+}
+
+int DataRef::valueInt() const
+{
+    return m_clientDataRef ? m_clientDataRef->valueInt() : 0;
 }
 
 void DataRef::setClient(ExtPlaneClient *client) {
@@ -118,7 +136,7 @@ void DataRef::setDataRefProvider() {
     if(client()->datarefProvider()) subscribeIfPossible();
 }
 
-void DataRef::setDataFormat(QString dataFormat) {
+void DataRef::setDataFormat(const QString dataFormat) {
     m_dataFormat = dataFormat;
     if(m_clientDataRef) m_clientDataRef->setDataFormat(m_dataFormat);
 }
@@ -140,11 +158,11 @@ QStringList& DataRef::values() {
     return m_clientDataRef ? m_clientDataRef->values() : m_emptyStringList;
 }
 
-void DataRef::setValue(QString _newValue, int index) {
+void DataRef::setValue(const QString _newValue, int index) {
     if(m_clientDataRef) m_clientDataRef->setValue(_newValue, index);
 }
 
-void DataRef::setValues(QStringList values) {
+void DataRef::setValues(const QStringList values) {
     if(m_clientDataRef) m_clientDataRef->setValues(values);
 }
 

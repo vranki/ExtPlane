@@ -22,8 +22,10 @@ ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, bool simulated) : 
 void ExtPlaneClient::createClient() {
     if(m_connection) return; // Already created
     connect(&m_simulatedExtplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
+    connect(&m_simulatedExtplaneConnection, &ExtPlaneConnection::connectedChanged, this, &ExtPlaneClient::connectedChanged);
     connect(&m_extplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
     connect(&m_extplaneConnection, &ExtPlaneConnection::extplaneWarning, this, &ExtPlaneClient::extplaneWarning);
+    connect(&m_extplaneConnection, &ExtPlaneConnection::connectedChanged, this, &ExtPlaneClient::connectedChanged);
     qDebug() << Q_FUNC_INFO << "simulated:" << m_simulated;
     if(m_simulated) {
         m_simulatedExtplaneConnection.registerClient(this);
@@ -36,10 +38,13 @@ void ExtPlaneClient::createClient() {
 }
 
 ExtPlaneClient::~ExtPlaneClient() {
-    for(ClientDataRef *ref : m_dataRefs) {
-        m_dataRefs.removeOne(ref);
-        m_connection->unsubscribeDataRef(ref);
-        ref->setClient(nullptr);
+    while (!m_dataRefs.empty()) {
+        auto *ref = *m_dataRefs.begin();
+        m_dataRefs.erase(ref);
+        if(ref->client()) {
+            m_connection->unsubscribeDataRef(ref);
+            ref->setClient(nullptr);
+        }
     }
 }
 
@@ -56,7 +61,7 @@ ClientDataRef* ExtPlaneClient::subscribeDataRef(QString name, double accuracy) {
     connect(ref, &ClientDataRef::changed, this, &ExtPlaneClient::cdrChanged);
     connect(ref, &ClientDataRef::destroyed, this, &ExtPlaneClient::refDestroyed);
     ref->setClient(this);
-    m_dataRefs.append(ref);
+    m_dataRefs.insert(ref);
     return ref;
 }
 
@@ -65,7 +70,7 @@ void ExtPlaneClient::unsubscribeDataRefByName(QString name) {
     qDebug() << Q_FUNC_INFO << "Warning: this functions is deprecated and will be removed. Used with ref" << name;
     for(ClientDataRef *ref : m_dataRefs) {
         if(ref->name() == name) {
-            m_dataRefs.removeOne(ref);
+            m_dataRefs.erase(ref);
             m_connection->unsubscribeDataRef(ref);
             return;
         }
@@ -73,7 +78,7 @@ void ExtPlaneClient::unsubscribeDataRefByName(QString name) {
 }
 
 void ExtPlaneClient::refDestroyed(QObject* refqo) {
-    m_dataRefs.removeOne(static_cast<ClientDataRef*>(refqo));
+    m_dataRefs.erase(static_cast<ClientDataRef*>(refqo));
 }
 
 void ExtPlaneClient::setConnectionMessage(QString msg) {
@@ -101,7 +106,7 @@ void ExtPlaneClient::cdrChanged(ClientDataRef *ref) {
 void ExtPlaneClient::unsubscribeDataRef(ClientDataRef *refToUnsubscribe) {
     for(ClientDataRef *ref : m_dataRefs) {
         if(ref->name() == refToUnsubscribe->name()) {
-            m_dataRefs.removeOne(ref);
+            m_dataRefs.erase(ref);
             m_connection->unsubscribeDataRef(ref);
             return;
         }
@@ -128,8 +133,8 @@ void ExtPlaneClient::buttonPress(int id) {
 }
 
 void ExtPlaneClient::buttonRelease(int id) {
-    if(!m_heldButtons.contains(id)) return;
-    m_heldButtons.remove(id);
+    if(m_heldButtons.find(id) == m_heldButtons.end()) return;
+    m_heldButtons.erase(id);
     m_connection->buttonRelease(id);
 }
 
@@ -143,8 +148,8 @@ void ExtPlaneClient::commandBegin(QString name) {
 }
 
 void ExtPlaneClient::commandEnd(QString name) {
-    if(!m_runningCommands.contains(name)) return;
-    m_runningCommands.remove(name);
+    if(m_runningCommands.find(name) == m_runningCommands.end()) return;
+    m_runningCommands.erase(name);
     m_connection->commandEnd(name);
 }
 
@@ -160,6 +165,11 @@ QString ExtPlaneClient::connectionMessage() {
     return m_connectionMessage;
 }
 
+bool ExtPlaneClient::isConnected() const
+{
+    return m_extplaneConnection.isConnected();
+}
+
 bool ExtPlaneClient::isSimulated() const {
     return m_simulated;
 }
@@ -172,8 +182,8 @@ void ExtPlaneClient::setSimulated(bool simulated) {
     if (m_simulated == simulated)
         return;
 
-    while(!m_dataRefs.isEmpty())
-        unsubscribeDataRef(m_dataRefs.first());
+    while(!m_dataRefs.empty())
+        unsubscribeDataRef(*m_dataRefs.begin());
 
     qDebug() << Q_FUNC_INFO << simulated;
 
@@ -196,5 +206,8 @@ void ExtPlaneClient::setSimulated(bool simulated) {
 }
 
 void ExtPlaneClient::valueSet(ClientDataRef *ref) {
+    if(ref->modifiers().contains("string")) { // Quote strings
+        m_connection->setValue(ref->name(), QString("\"%1\"").arg(ref->value()));
+    }
     m_connection->setValue(ref->name(), ref->value());
 }

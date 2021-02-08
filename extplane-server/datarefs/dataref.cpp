@@ -22,7 +22,7 @@ const QString &DataRef::name() const {
     return _name;
 }
 
-QStringList DataRef::modifiers() const {
+const QStringList &DataRef::modifiers() const {
     return _modifiers;
 }
 
@@ -56,7 +56,7 @@ void DataRef::setType(extplaneRefID newType)
     _type = newType;
 }
 
-QString DataRef::typeString() const {
+const QString &DataRef::typeString() const {
     return _typeString;
 }
 
@@ -80,6 +80,16 @@ bool DataRef::shouldUnsubscribeAfterChange() const {
 bool DataRef::isValid() const
 {
     return _valueValid;
+}
+
+void DataRef::setUdpId(quint16 id)
+{
+    _udpId = id;
+}
+
+quint16 DataRef::udpId()
+{
+    return _udpId;
 }
 
 void DataRef::setValueValid()

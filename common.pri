@@ -8,6 +8,17 @@ exists($$(HOME)/SDK/) {
 # Build all the dataref classes as they are needed
 # everywhere.
 
+HEADERS += \
+    $$PWD/protocoldefs.h \
+    $$PWD/extplane-server/datarefprovider.h \
+    $$PWD/extplane-server/datarefs/dataref.h \
+    $$PWD/extplane-server/datarefs/floatdataref.h \
+    $$PWD/extplane-server/datarefs/floatarraydataref.h \
+    $$PWD/extplane-server/datarefs/intdataref.h \
+    $$PWD/extplane-server/datarefs/doubledataref.h \
+    $$PWD/extplane-server/datarefs/intarraydataref.h \
+    $$PWD/extplane-server/datarefs/datadataref.h
+
 SOURCES += \
     $$PWD/extplane-server/datarefprovider.cpp \
     $$PWD/extplane-server/datarefs/dataref.cpp \
@@ -18,12 +29,3 @@ SOURCES += \
     $$PWD/extplane-server/datarefs/intarraydataref.cpp \
     $$PWD/extplane-server/datarefs/datadataref.cpp
 
-HEADERS += \
-    $$PWD/extplane-server/datarefprovider.h \
-    $$PWD/extplane-server/datarefs/dataref.h \
-    $$PWD/extplane-server/datarefs/floatdataref.h \
-    $$PWD/extplane-server/datarefs/floatarraydataref.h \
-    $$PWD/extplane-server/datarefs/intdataref.h \
-    $$PWD/extplane-server/datarefs/doubledataref.h \
-    $$PWD/extplane-server/datarefs/intarraydataref.h \
-    $$PWD/extplane-server/datarefs/datadataref.h

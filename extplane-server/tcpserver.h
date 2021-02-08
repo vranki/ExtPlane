@@ -2,20 +2,14 @@
 #define TCPSERVER_H
 
 #include <QObject>
-#include <QList>
+#include <set>
 #include <QTcpServer>
 #include <QTcpSocket>
 
+#include "../protocoldefs.h"
 /**
   * Creates the TCP socket and manages client connections
   */
-// TCP port used to listen for connections
-#define EXTPLANE_PORT 51000
-// Network protocol, currently always 1
-#define EXTPLANE_PROTOCOL 1
-// Feature revision, every time we add a new feature or bug fix, this should be incremented so that clients can know how old the plugin is
-#define EXTPLANE_VERSION 1003
-
 #define EXTPLANE_STRINGIFY(s) __EXTPLANE_STRINGIFY(s)
 #define __EXTPLANE_STRINGIFY(s) #s
 
@@ -35,7 +29,7 @@ public:
     ~TcpServer();
     int clientCount() const;
     void setDataRefProvider(DataRefProvider *refProvider);
-
+    quint16 reserveUdpId();
 signals:
     void setFlightLoopInterval(float newInterval);
     void clientCountChanged(int clientCount);
@@ -45,11 +39,14 @@ public slots:
     void clientDiscoed(TcpClient *client);
     void disconnectClients(); // Call before destroying
     void extplaneWarning(QString message); // Send warning message to clients
+    void flightLoop();
 
 private:
     QTcpServer server;
-    QList<TcpClient *> m_clientConnections;
+    std::set<TcpClient *> m_clientConnections;
     DataRefProvider *m_refProvider;
+    quint16 m_nextFreeId = 0; // 0 = reserved, start from 1
+    quint8 m_nextFreeClientId = 1; // Same, loops after 255 clients
 };
 
 #endif // TCPSERVER_H

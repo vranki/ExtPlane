@@ -23,6 +23,7 @@ This will eventually be fixed.
 * Simulate key and button presses
 * Execute commands
 * Load situations
+* High-performance UDP option
 * Free & open source under GPLv3
 * Client libraries available for Qt (c++), Java and C#
 
@@ -163,7 +164,7 @@ platform specific plugins you have built. For example after
 building linux & windows plugins it should look like this:
 
 ```
-extplane-plugin/extplane
+/extplane
 └── 64
     ├── lin.xpl
     └── win.xpl
@@ -172,7 +173,7 @@ extplane-plugin/extplane
 You can copy the whole directory to XPlane's plugin directory:
 
 ```bash
-cp -R extplane-plugin/extplane /path/to/xplane/Resources/plugins
+cp -R extplane /path/to/xplane/Resources/plugins
 ```
 
 ### Cross-compile to Windows from Linux ###
@@ -249,6 +250,13 @@ sub sim/flightmodel/engine/ENGN_thro
 WRONG: sub sim/flightmodel/engine/ENGN_thro[1]
 ```
 
+### High-performance UDP output ###
+
+ExtPlane supports tight UDP protocol for basic dataref types (int, float, double)
+from simulator to client. Add modifier udp to ref name to request it in UDP.
+UDP datarefs are sent every flight loop using lightweight protocol.
+
+See [this file](UDP.md) for details.
 
 ### Keys and Buttons ###
 
@@ -278,21 +286,19 @@ Command identifiers are strings that look like datarefs.
 * **fms_wpt_entry id,latitude,longitude,altitude** Inserts waypoint to FMC. (e.g., "fms_wpt_entry 1,50.0267,8.51,32000") <br />
 * **fms_clear_entries** Clears all entries in FMC. 
 * **fms_set_dest index** Set destination waypoint the FMS is flying the aircraft toward. 
- 
-### Other ###
 
+### Other ###
 * **disconnect**                       Disconnect the TCP socket.
 * **extplane-set {setting} {value}**   Set ExtPlane setting
 
 Supported settings are:
 * **update_interval {value}**          How often ExtPlane should update its data from X-Plane, in seconds. Use as high value as possible here for best performance. For example 0.16 would mean 60Hz, 0.33 = 30Hz, 0.1 = 10Hz etc.. Must be a positive float. Default is 0.33.
 
-
-
 ## Protocol Output ##
 
 * **EXTPLANE {protocol}**              Sent when connected. Protocol is currently 1.
 * **EXTPLANE-VERSION {version}**       Sent when connected. Feature version integer, which is incremented with each new bug fix or feature.
+* **CLIENT-ID {clientid}**             Client ID used with UDP protocol
 * **EXTPLANE-WARNING {message}**       Show warning message for developer and/or user
 * **u{type} {dataref} {value}**        Dataref has changed in value based on accuracy.
     * Types may be `i` (int), `f` (float), `d` (double), `ia` (int array), `fa` (float array), or `b` (data).
@@ -330,7 +336,11 @@ sub sim/aircraft/view/acf_descrip:string
 ->
 ub sim/aircraft/view/acf_descrip:string "Boeing 737-800"
 ```
-
+Currently only string data datarefs can be set. Remember to use
+quotes to set values:
+```
+set sim/aircraft/view/acf_descrip:string "This is an example"
+```
 
 ### Console Output ###
 

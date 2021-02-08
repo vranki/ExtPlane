@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QList>
-#include <QSet>
+#include <set>
 #include "clientdataref.h"
 #include "extplaneconnection.h"
 #include "clientdatarefprovider.h"
@@ -22,7 +21,7 @@ class ExtPlaneClient : public QObject {
     Q_PROPERTY(ExtPlaneConnection *extplaneConnection READ extplaneConnection CONSTANT)
     Q_PROPERTY(bool simulated READ isSimulated WRITE setSimulated NOTIFY simulatedChanged)
     Q_PROPERTY(QString connectionMessage READ connectionMessage NOTIFY connectionMessageChanged)
-
+    Q_PROPERTY(bool connected READ isConnected NOTIFY connectedChanged)
 public:
     ExtPlaneClient(ExtPlaneClient const&)  = delete;
     void operator=(ExtPlaneClient const&)  = delete;
@@ -44,6 +43,7 @@ public:
     ClientDataRefProvider* datarefProvider() const;
     ExtPlaneConnection *extplaneConnection();
     QString connectionMessage();
+    bool isConnected() const;
 
 public slots:
     void unsubscribeDataRef(ClientDataRef *refToUnsubscribe);
@@ -58,6 +58,7 @@ signals:
     void simulatedChanged(bool simulated);
     void connectionMessageChanged(QString connectionMessage);
     void extplaneWarning(QString message);
+    void connectedChanged(bool connected);
 
 private slots:
     void cdrChanged(ClientDataRef *ref);
@@ -67,9 +68,9 @@ private slots:
 
 private:
     QString m_name;
-    QList<ClientDataRef*> m_dataRefs;
-    QSet<int> m_heldButtons;
-    QSet<QString> m_runningCommands;
+    std::set<ClientDataRef*> m_dataRefs;
+    std::set<int> m_heldButtons;
+    std::set<QString> m_runningCommands;
     ClientDataRefProvider *m_connection; // The actual connection class
     bool m_simulated;
     ExtPlaneConnection m_extplaneConnection;

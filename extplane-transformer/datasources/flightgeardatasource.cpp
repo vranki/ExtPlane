@@ -12,13 +12,13 @@ FlightGearDataSource::FlightGearDataSource() : DataSource() {
             this, &FlightGearDataSource::networkErrorChanged);
 
     // Fill the mappings of X-Plane <-> FlightGear data refs.
-    refMap.insert("sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot", "/instrumentation/magnetic-compass/indicated-heading-deg");
-    refMap.insert("sim/cockpit2/gauges/indicators/airspeed_kts_pilot", "/instrumentation/airspeed-indicator/indicated-speed-kt");
-    refMap.insert("sim/cockpit2/gauges/indicators/pitch_vacuum_deg_pilot", "/instrumentation/attitude-indicator/indicated-pitch-deg");
-    refMap.insert("sim/cockpit2/gauges/indicators/roll_vacuum_deg_pilot", "/instrumentation/attitude-indicator/indicated-roll-deg");
-    refMap.insert("sim/flightmodel/misc/h_ind", "/instrumentation/altimeter/indicated-altitude-ft");
-    refMap.insert("sim/flightmodel/position/vh_ind", "/instrumentation/vertical-speed-indicator/indicated-speed-fpm");
-    refMap.insert("sim/cockpit2/gauges/indicators/slip_deg", "/instrumentation/slip-skid-ball/indicated-slip-skid");
+    refMap.insert({"sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot", "/instrumentation/magnetic-compass/indicated-heading-deg"});
+    refMap.insert({"sim/cockpit2/gauges/indicators/airspeed_kts_pilot", "/instrumentation/airspeed-indicator/indicated-speed-kt"});
+    refMap.insert({"sim/cockpit2/gauges/indicators/pitch_vacuum_deg_pilot", "/instrumentation/attitude-indicator/indicated-pitch-deg"});
+    refMap.insert({"sim/cockpit2/gauges/indicators/roll_vacuum_deg_pilot", "/instrumentation/attitude-indicator/indicated-roll-deg"});
+    refMap.insert({"sim/flightmodel/misc/h_ind", "/instrumentation/altimeter/indicated-altitude-ft"});
+    refMap.insert({"sim/flightmodel/position/vh_ind", "/instrumentation/vertical-speed-indicator/indicated-speed-fpm"});
+    refMap.insert({"sim/cockpit2/gauges/indicators/slip_deg", "/instrumentation/slip-skid-ball/indicated-slip-skid"});
     // Please add more here
 
 
@@ -41,10 +41,10 @@ void FlightGearDataSource::connectToSource() {
 
 DataRef *FlightGearDataSource::subscribeRef(QString &name)
 {
-    if(refMap.contains(name)) {
-        QString fgRef = refMap.value(name);
+    if(refMap.find(name) != refMap.end()) {
+        QString fgRef = refMap.at(name);
         FloatDataRef *newRef = new FloatDataRef(this, name, nullptr);
-        floatRefs.append(newRef);
+        floatRefs.insert(newRef);
         tcpClient.writeLine("subscribe " + fgRef);
         return newRef;
     }
@@ -54,9 +54,9 @@ DataRef *FlightGearDataSource::subscribeRef(QString &name)
 void FlightGearDataSource::unsubscribeRef(DataRef *ref)
 {
     qDebug() << Q_FUNC_INFO << ref->name();
-    tcpClient.writeLine("unsubscribe " + refMap.value(ref->name()));
+    tcpClient.writeLine("unsubscribe " + refMap.at(ref->name()));
     if(ref->type() == extplaneRefTypeFloat)
-        floatRefs.removeOne(qobject_cast<FloatDataRef*> (ref));
+        floatRefs.erase(qobject_cast<FloatDataRef*> (ref));
     ref->deleteLater();
 }
 
@@ -106,7 +106,7 @@ void FlightGearDataSource::readLine(QString line)
         QString fgRef = splitted[0];
         QString valueStr = splitted[1];
         for(FloatDataRef *ref : floatRefs) {
-            if(refMap.value(ref->name()) == fgRef) {
+            if(refMap.at(ref->name()) == fgRef) {
                 ref->updateValue(valueStr.toFloat());
             }
         }

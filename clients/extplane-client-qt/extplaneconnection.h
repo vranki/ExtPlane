@@ -1,8 +1,8 @@
 #ifndef EXTPLANECONNECTION_H
 #define EXTPLANECONNECTION_H
 
-#include <QList>
-#include <QMap>
+#include <set>
+#include <map>
 #include <QTimer>
 #include <QStringList>
 #include "clientdatarefprovider.h"
@@ -10,6 +10,7 @@
 
 class SimulatedDataRef;
 class ExtPlaneClient;
+class ExtPlaneUdpClient;
 
 /**
  * A TCP-based connector class which connects to ExtPlane
@@ -23,10 +24,11 @@ public:
     explicit ExtPlaneConnection(QObject *parent = nullptr);
     virtual ~ExtPlaneConnection() {}
     void registerClient(ExtPlaneClient* client);
-
+    bool isConnected() const;
 signals:
     void connectionMessage(QString connectionMessage);
     void extplaneWarning(QString message);
+    void connectedChanged(bool connected);
 
 public slots:
     virtual ClientDataRef *subscribeDataRef(QString name, double accuracy = 0);
@@ -47,20 +49,21 @@ public slots:
 
 private slots:
     void connectionChangedSlot();
-    void connectedChanged(bool connected);
     void socketError(QAbstractSocket::SocketError err);
 
 protected:
     void subRef(ClientDataRef *ref);
     virtual void writeLine(QString line);
     virtual ClientDataRef *createDataRef(QString newName, double accuracy = 0);
-    QList<ExtPlaneClient*> clients;
-    QMap<QString, ClientDataRef*> dataRefs;
-    bool server_ok;
+    std::set<ExtPlaneClient*> clients;
+    std::map<QString, ClientDataRef*> dataRefs;
+    bool server_ok = false;
 
 private:
-    double m_updateInterval;
-    int m_extplaneVersion; // Version of the remote ExtPlane plugin. -1 if yet unknown.
+    double m_updateInterval = -1;
+    unsigned int m_extplaneVersion = 0; // Version of the remote ExtPlane plugin. 0 if yet unknown.
+    ExtPlaneUdpClient *m_udpClient = nullptr;
+    quint8 m_clientId = 0;
 };
 
 #endif // EXTPLANECONNECTION_H

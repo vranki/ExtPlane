@@ -1,6 +1,6 @@
 #include "alternatingsimulateddataref.h"
 
-#include "../util/console.h"
+#include "../../util/console.h"
 
 AlternatingSimulatedDataRef::AlternatingSimulatedDataRef(QObject *parent, QString values, double secondsPerValue, QString refName) :
     SimulatedDataRef(parent,0,0,1,false,0,refName)
@@ -13,7 +13,7 @@ AlternatingSimulatedDataRef::AlternatingSimulatedDataRef(QObject *parent, QStrin
 }
 
 void AlternatingSimulatedDataRef::tickTime(double dt, int total) {
-    Q_UNUSED(total);
+    Q_UNUSED(total)
     _time += dt;
     if(_time > _secondsPerValue) {
         _time = 0;

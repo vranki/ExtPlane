@@ -9,25 +9,28 @@
 #include "datarefs/datadataref.h"
 #include "datarefprovider.h"
 #include "console.h"
-#include "datarefs/dataref.h"
+#include "udpsender.h"
 
-TcpClient::TcpClient(QObject *parent,
+TcpClient::TcpClient(TcpServer *parent,
                      QTcpSocket *socket,
-                     DataRefProvider *refProvider) : QObject(parent)
-  , _socket(socket)
-  , _refProvider(refProvider)
+                     DataRefProvider *refProvider, quint8 clientId) : QObject(parent)
+  , m_socket(socket)
+  , m_refProvider(refProvider)
+  , m_tcpserver(parent)
+  , m_clientId(clientId)
 {
     INFO << "Client connected from " << socket->peerAddress().toString();
-    connect(_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(_socket, SIGNAL(disconnected()), this, SLOT(disconnectClient()));
-    connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
+    connect(m_socket, SIGNAL(disconnected()), this, SLOT(disconnectClient()));
+    connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
 
     QByteArray block;
     QTextStream out(&block, QIODevice::WriteOnly);
     out << "EXTPLANE " << EXTPLANE_PROTOCOL << "\n";
     out << "EXTPLANE-VERSION " << EXTPLANE_VERSION << "\n";
+    out << "CLIENT-ID " << m_clientId << "\n";
     out.flush();
-    _socket->write(block);
+    m_socket->write(block);
 }
 
 TcpClient::~TcpClient() {
@@ -37,36 +40,55 @@ TcpClient::~TcpClient() {
 
 void TcpClient::socketError(QAbstractSocket::SocketError err) {
     Q_UNUSED(err)
-    INFO << "Socket error:" << _socket->errorString();
+    INFO << "Socket error:" << m_socket->errorString();
 
     // deleteLater(); // WTF? No?
 }
 
 void TcpClient::disconnectClient() {
-    INFO << Q_FUNC_INFO << this << _subscribedRefs.size();
-    while(!_subscribedRefs.isEmpty()) {
-        DataRef *ref = _subscribedRefs.values().first();
-        _subscribedRefs.remove(ref);
+    INFO << Q_FUNC_INFO << this << m_subscribedRefs.size();
+    while(!m_subscribedRefs.empty()) {
+        DataRef *ref = *m_subscribedRefs.begin();
+        m_subscribedRefs.erase(ref);
         ref->disconnect(this);
-        _refProvider->unsubscribeRef(ref);
+        m_refProvider->unsubscribeRef(ref);
     }
-    for(int but : _heldButtons)
-        _refProvider->buttonRelease(but);
-    _socket->disconnectFromHost();
+    for(int but : m_heldButtons)
+        m_refProvider->buttonRelease(but);
+    m_socket->disconnectFromHost();
     emit discoed(this);
     deleteLater();
 }
 
 void TcpClient::extplaneWarning(QString message) {
-    if(_socket->isOpen()) {
-        _socket->write(QString("EXTPLANE-WARNING %1\n").arg(message).toUtf8());
+    if(m_socket->isOpen()) {
+        m_socket->write(QString("EXTPLANE-WARNING %1\n").arg(message).toUtf8());
+    }
+}
+
+void TcpClient::flightLoop()
+{
+    if(m_udpSender)
+        m_udpSender->flightLoop();
+}
+
+void TcpClient::sendUdpInfo(DataRef *ref)
+{
+    if(m_socket->isWritable()) {
+        if(ref->udpId()) {
+            m_socket->write(QString("udp %1 %2 %3\n").arg(ref->udpId()).arg(ref->typeString()).arg(ref->name()).toUtf8());
+        } else {
+            extplaneWarning(QString("Dataref %1 not available via UDP").arg(ref->name()));
+        }
     }
 }
 
 void TcpClient::readClient() {
-    while(_socket->canReadLine()) {
-        QByteArray lineBA = _socket->readLine();
+    while(m_socket->canReadLine()) {
+        QByteArray lineBA = m_socket->readLine();
         QString line = QString(lineBA).trimmed();
+
+        if(line.isEmpty()) break;
 
         // Split the command in strings
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
@@ -89,24 +111,24 @@ void TcpClient::readClient() {
 
                 DataRef *ref = getSubscribedRef(refName);
                 if(!ref) { // Ref not subscribed yet, try to subscribe
-                    ref = _refProvider->subscribeRef(refName);
+                    ref = m_refProvider->subscribeRef(refName);
                     if(ref) { // Succesfully subscribed
                         connect(ref, &DataRef::changed, this, &TcpClient::refChanged);
-                        _subscribedRefs.insert(ref);
+                        m_subscribedRefs.insert(ref);
                         ref->setAccuracy(accuracy);
 
                         if(ref->type() == extplaneRefTypeFloat) {
-                            _refValueF[ref] = qobject_cast<FloatDataRef*>(ref)->value();
+                            m_refValueF[ref] = qobject_cast<FloatDataRef*>(ref)->value();
                         } else if(ref->type() == extplaneRefTypeInt) {
-                            _refValueI[ref] = qobject_cast<IntDataRef*>(ref)->value();
+                            m_refValueI[ref] = qobject_cast<IntDataRef*>(ref)->value();
                         } else if(ref->type() == extplaneRefTypeDouble) {
-                            _refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
+                            m_refValueD[ref] = qobject_cast<DoubleDataRef*>(ref)->value();
                         } else if(ref->type() == extplaneRefTypeFloatArray) {
-                            _refValueFA[ref] = qobject_cast<FloatArrayDataRef*>(ref)->value();
+                            m_refValueFA[ref] = qobject_cast<FloatArrayDataRef*>(ref)->value();
                         } else if(ref->type() == extplaneRefTypeIntArray) {
-                            _refValueIA[ref] = qobject_cast<IntArrayDataRef*>(ref)->value();
+                            m_refValueIA[ref] = qobject_cast<IntArrayDataRef*>(ref)->value();
                         } else if(ref->type() == extplaneRefTypeData) {
-                            _refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
+                            m_refValueB[ref] = qobject_cast<DataDataRef*>(ref)->value();
                         }
                         INFO << "Subscribed to " << ref->name() << ", accuracy " << accuracy << ", type " << ref->typeString() << ", valid " << ref->isValid();
                     }
@@ -114,10 +136,23 @@ void TcpClient::readClient() {
                     INFO << "Updating " << refName << " accuracy to " << accuracy;
                     ref->setAccuracy(accuracy);
                 }
-                if(ref->isValid()) {
+                // ref can be null now!
+                if(ref && ref->isValid()) {
                     sendRef(ref); // Force update
+
+                    // Send UDP info
+                    if(ref->modifiers().contains("udp")) {
+                        if(!m_udpSender) {
+                            m_udpSender = new UdpSender(m_refProvider, m_socket->peerAddress(), m_clientId, this);
+                        }
+                        if(!ref->udpId()) {
+                            ref->setUdpId(m_tcpserver->reserveUdpId());
+                        }
+                        m_udpSender->subscribedRef(ref);
+                        sendUdpInfo(ref);
+                    }
                 }
-                if(command == "get") ref->setUnsubscribeAfterChange();
+                if(command == "get" && ref) ref->setUnsubscribeAfterChange();
             } else {
                 extplaneWarning(QString("Invalid sub command"));
             }
@@ -125,14 +160,31 @@ void TcpClient::readClient() {
             QString refName = subLine.value(1);
             unsubscribeRef(refName);
         } else if(command == "set") {
-            if(subLine.size() == 3) {
+            if(subLine.size() >= 3) {
                 QString refName = subLine.value(1);
                 DataRef *ref = getSubscribedRef(refName);
+
                 if (ref) {
                     if(ref->isWritable()) {
-                        QString refValue = subLine.value(2).trimmed();
-                        ref->setValue(refValue);
-                        _refProvider->changeDataRef(ref);
+                        if(ref->type() == extplaneRefTypeData) {
+                            // Data datarefs are more difficult to set.
+                            if(ref->modifiers().contains("string")) {
+                                if(line.count("\"") >= 2) {
+                                    // Strip quotes
+                                    QString value = line.mid(line.indexOf("\"") + 1);
+                                    value = value.mid(0, value.lastIndexOf("\""));
+                                    ref->setValue(value);
+                                } else {
+                                    INFO << "Warning: No quotes in string data dataref value";
+                                }
+                            } else {
+                                INFO << "Warning: setting data datarefs other than strings not supported yet.";
+                            }
+                        } else {
+                            QString refValue = subLine.value(2).trimmed();
+                            ref->setValue(refValue);
+                        }
+                        m_refProvider->changeDataRef(ref);
                     } else {
                         extplaneWarning(QString("Ref %1 is not writable!").arg(ref->name()));
                     }
@@ -145,7 +197,7 @@ void TcpClient::readClient() {
                 bool ok;
                 int keyId = subLine.value(1).toInt(&ok);
                 if(ok)
-                    _refProvider->keyStroke(keyId);
+                    m_refProvider->keyStroke(keyId);
             } else {
                 extplaneWarning(QString("Invalid key command"));
             }
@@ -154,8 +206,8 @@ void TcpClient::readClient() {
                 bool ok;
                 int keyId = subLine.value(1).toInt(&ok);
                 if(ok) {
-                    _refProvider->buttonPress(keyId);
-                    _heldButtons.insert(keyId);
+                    m_refProvider->buttonPress(keyId);
+                    m_heldButtons.insert(keyId);
                 }
             } else {
                 extplaneWarning("Invalid but command");
@@ -164,8 +216,8 @@ void TcpClient::readClient() {
             if(subLine.size() == 2) {
                 bool ok;
                 int keyId = subLine.value(1).toInt(&ok);
-                if(ok && _heldButtons.contains(keyId)) {
-                    _refProvider->buttonRelease(keyId);
+                if(ok && m_heldButtons.find(keyId) != m_heldButtons.end()) {
+                    m_refProvider->buttonRelease(keyId);
                 } else {
                     extplaneWarning("Invalid rel command, button not held");
                 }
@@ -178,7 +230,7 @@ void TcpClient::readClient() {
                     bool ok;
                     float newInterval = subLine.value(2).toFloat(&ok);
                     if(ok) {
-                        emit(setFlightLoopInterval(newInterval));
+                        emit setFlightLoopInterval(newInterval);
                     } else {
                         extplaneWarning(QString("Invalid flight loop interval %1").arg(subLine.value(2)));
                     }
@@ -202,22 +254,22 @@ void TcpClient::readClient() {
                     extplaneWarning(QString("Invalid cmd command"));
                 }
                 QString commandName = subLine.value(2);
-                _refProvider->command(commandName, type);
+                m_refProvider->command(commandName, type);
             } else {
                 extplaneWarning(QString("Invalid cmd command"));
             }
         } else if(command == "sit"){
             if(subLine.size() == 2) {
-                _refProvider->loadSituation(subLine.value(1));
+                m_refProvider->loadSituation(subLine.value(1));
             } else {
                 extplaneWarning(QString("Invalid sit command"));
             }
         } else if(command == "fms_wpt_entry"){
-            _refProvider->addFMSEntryLatLon(subLine.value(1));
+            m_refProvider->addFMSEntryLatLon(subLine.value(1));
         } else if(command == "fms_clear_entries"){
-            _refProvider->clearAllFmsEntries();
+            m_refProvider->clearAllFmsEntries();
         } else if(command == "fms_set_dest"){
-            _refProvider->setDestinationFmsEntry(subLine.value(1).toInt());
+            m_refProvider->setDestinationFmsEntry(subLine.value(1).toInt());
         } else {
             extplaneWarning(QString("Unknown command %1").arg(command));
         }
@@ -225,34 +277,33 @@ void TcpClient::readClient() {
 }
 
 void TcpClient::refChanged(DataRef *ref) {
-    Q_ASSERT(_subscribedRefs.contains(ref));
+    Q_ASSERT(m_subscribedRefs.find(ref) != m_subscribedRefs.end());
     Q_ASSERT(ref->isValid()); // Never send invalid values.
 
     // Check if the ref has changed enough to be worth sending
     if(ref->type()== extplaneRefTypeFloat) {
         FloatDataRef *refF = qobject_cast<FloatDataRef*>(ref);
-        if(qAbs(refF->value() - _refValueF[ref]) < ref->accuracy())
+        if(qAbs(refF->value() - m_refValueF[ref]) < ref->accuracy())
             return; // Hasn't changed enough
-        _refValueF.insert(ref, refF->value());
+        m_refValueF.insert({ref, refF->value()});
     } else if(ref->type()== extplaneRefTypeFloatArray) {
         FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
         bool bigenough = false;
-        QVector<float> values = refF->value();
+        std::vector<float> values = refF->value();
 
-        if(!_refValueFA.contains(ref) || refF->accuracy() == 0) {
+        if((m_refValueFA.find(ref) == m_refValueFA.end()) || refF->accuracy() == 0 || values.size() != m_refValueFA.at(ref).size()) {
             // New value or accuracy not set.
-            _refValueFA.insert(ref, values);
+            m_refValueFA[ref] = values;
         } else {
-            long length = values.size();
-
-            for (int i=0; i<length;i++){
-                if (qAbs(values.at(i) - _refValueFA.value(ref).at(i)) > ref->accuracy()) {
+            auto length = values.size();
+            for (unsigned long i=0; i < length; i++){
+                if (qAbs(values.at(i) - m_refValueFA.at(ref).at(i)) > ref->accuracy()) {
                     bigenough = true;
                     break;
                 }
             }
             if (bigenough){ // Values have changed enough
-                _refValueFA.insert(ref, values);
+                m_refValueFA[ref] = values;
             } else {
                 return;
             }
@@ -262,48 +313,48 @@ void TcpClient::refChanged(DataRef *ref) {
 
         bool bigenough = false;
 
-        QVector<int> values = refI->value();
-        if(!_refValueIA.contains(ref) || refI->accuracy() == 0) {
+        auto values = refI->value();
+        if((m_refValueIA.find(ref) == m_refValueIA.end()) || refI->accuracy() == 0 || values.size() != m_refValueIA.at(ref).size()) {
             // New value or accuracy not set.
-            _refValueIA.insert(ref, values);
+            m_refValueIA.insert({ref, values});
         } else {
+            auto length = values.size();
 
-            long length = values.size();
-
-            for (int i=0; i<length;i++){
-                if (qAbs(values.at(i) - _refValueIA.value(ref).at(i)) > ref->accuracy()) {
+            for (unsigned long i=0; i < length; i++){
+                if (qAbs(values.at(i) - m_refValueIA.at(ref).at(i)) > ref->accuracy()) {
                     bigenough = true;
                     break;
                 }
             }
             if (bigenough){ // Values have changed enough
-                _refValueIA.insert(ref, values);
+                m_refValueIA.insert({ref, values});
             } else {
                 return;
             }
         }
     } else if(ref->type() == extplaneRefTypeInt) {
         IntDataRef *refI = qobject_cast<IntDataRef*>(ref);
-        if(qAbs(refI->value() - _refValueI[ref]) < ref->accuracy())
+        if(qAbs(refI->value() - m_refValueI.at(ref)) < ref->accuracy())
             return; // Hasn't changed enough
-        _refValueI.insert(ref, refI->value());
+        m_refValueI.insert({ref, refI->value()});
     } else if(ref->type() == extplaneRefTypeDouble) {
         DoubleDataRef *refD = qobject_cast<DoubleDataRef*>(ref);
-        if(qAbs(refD->value() - _refValueD[ref]) < ref->accuracy())
+        if(qAbs(refD->value() - m_refValueD.at(ref)) < ref->accuracy())
             return; // Hasn't changed enough
-        _refValueD.insert(ref, refD->value());
+        m_refValueD.insert({ref, refD->value()});
     } else if(ref->type() == extplaneRefTypeData) {
         // The accuracy is handled internally for the data dataref, when it emits the update signal
         // it's time to send the update...
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
-        _refValueB.insert(ref, refB->value());
+        m_refValueB.insert({ref, refB->value()});
     } else {
         extplaneWarning(QString("Ref type %1 not supported (this should not happen!)").arg(ref->type()));
         return;
     }
 
     // Send the ref value if we got this far..
-    sendRef(ref);
+    if(!ref->udpId())
+        sendRef(ref);
 
     if(ref->shouldUnsubscribeAfterChange())
         unsubscribeRef(ref->name());
@@ -319,22 +370,21 @@ void TcpClient::sendRef(DataRef *ref) {
     out.flush(); // Is this optimal for performance? Should be studied.
 
     // INFO << QString::fromUtf8(block);
-    if(_socket->isOpen()) {
-        _socket->write(block);
-        //    _socket->flush(); Not really needed and may mess up performance
+    if(m_socket->isOpen()) {
+        m_socket->write(block);
     }
 }
 
 QStringList TcpClient::listRefs() {
     QStringList refNames;
-    for(DataRef *ref : _subscribedRefs)
+    for(DataRef *ref : m_subscribedRefs)
         refNames.append(ref->name());
 
     return refNames;
 }
 
 DataRef *TcpClient::getSubscribedRef(const QString &name) {
-    for(DataRef* r : _subscribedRefs.values()) {
+    for(DataRef* r : m_subscribedRefs) {
         if(r->name() == name)
             return r;
     }
@@ -344,14 +394,15 @@ DataRef *TcpClient::getSubscribedRef(const QString &name) {
 void TcpClient::unsubscribeRef(const QString &name) {
     DataRef *ref = getSubscribedRef(name);
     if(ref) {
+        if(m_udpSender) m_udpSender->unsubscribedRef(ref);
         ref->disconnect(this);
-        _refProvider->unsubscribeRef(ref);
-        _subscribedRefs.remove(ref);
-        _refValueF.remove(ref);
-        _refValueFA.remove(ref);
-        _refValueD.remove(ref);
-        _refValueB.remove(ref);
-        _refValueI.remove(ref);
-        _refValueIA.remove(ref);
+        m_refProvider->unsubscribeRef(ref);
+        m_subscribedRefs.erase(ref);
+        m_refValueF.erase(ref);
+        m_refValueFA.erase(ref);
+        m_refValueD.erase(ref);
+        m_refValueB.erase(ref);
+        m_refValueI.erase(ref);
+        m_refValueIA.erase(ref);
     }
 }

@@ -2,18 +2,14 @@
 #include "extplaneclient.h"
 
 ClientDataRef::ClientDataRef(QObject *parent, QString newName, double accuracy) : QObject(parent)
-                                                                                  , m_name(newName)
-                                                                                  , m_accuracy(accuracy)
-                                                                                  , m_subscribers(0)
-                                                                                  , m_client(nullptr)
-                                                                                  , m_changedOnce(false)
+  , m_accuracy(accuracy)
 {
-    qDebug() << Q_FUNC_INFO << m_name;
+    setName(newName);
 }
 
 ClientDataRef::~ClientDataRef() {
     if(m_subscribers > 0) {
-        qDebug() << Q_FUNC_INFO << "Warning: ref " << m_name << " destroyed but still subscribed by " << m_subscribers;
+        qWarning() << Q_FUNC_INFO << "Warning: ref " << m_name << " destroyed but still subscribed by " << m_subscribers;
     }
 }
 
@@ -26,11 +22,37 @@ void ClientDataRef::setName(QString &name) {
         return;
 
     m_name = name;
+    if(m_name.contains(":")) {
+        QString modifiersPart = name.right(name.length() - name.indexOf(":") - 1);
+        m_modifiers = modifiersPart.split(",");
+    }
     emit nameChanged(m_name);
 }
 
-QString ClientDataRef::value() {
+QString ClientDataRef::value() const {
     return m_values.isEmpty() ? "" : m_values.first();
+}
+
+int ClientDataRef::valueInt()
+{
+    if(!m_valueIntValid) {
+        m_valueInt = valueFloat(); // Allows decimals to be converted to ints
+        m_valueIntValid = true;
+    }
+    return m_valueInt;
+}
+
+float ClientDataRef::valueFloat() {
+    if(std::isnan(m_valueFloat))
+        m_valueFloat = value().toFloat();
+    return m_valueFloat;
+}
+
+double ClientDataRef::valueDouble()
+{
+    if(std::isnan(m_valueDouble))
+        m_valueDouble = value().toDouble();
+    return m_valueDouble;
 }
 
 ExtPlaneClient *ClientDataRef::client() const {
@@ -40,17 +62,24 @@ ExtPlaneClient *ClientDataRef::client() const {
 void ClientDataRef::setClient(ExtPlaneClient *client) {
     if (m_client == client)
         return;
-    qDebug() << Q_FUNC_INFO << name() << client;
     m_client = client;
     if(m_client) {
         connect(m_client, &ExtPlaneClient::destroyed, this, &ClientDataRef::clientDestroyed);
     }
+    invalidateValue();
     emit clientChanged(m_client);
 }
 
 void ClientDataRef::clientDestroyed() {
-    qDebug() << Q_FUNC_INFO << name();
     setClient(nullptr);
+}
+
+void ClientDataRef::invalidateValue()
+{
+    // Invalidate value types
+    m_valueIntValid = false;
+    m_valueFloat = std::nanf("");
+    m_valueDouble = std::nan("");
 }
 
 void ClientDataRef::setDataFormat(QString dataFormat) {
@@ -74,6 +103,9 @@ void ClientDataRef::updateValue(QString newValue) {
         m_values.replace(0, newValue);
     }
     m_changedOnce = true;
+
+    invalidateValue();
+
     emit changed(this);
 }
 
@@ -81,13 +113,34 @@ void ClientDataRef::updateValue(QStringList &newValues) {
     if(m_changedOnce && newValues == m_values) return;
     m_values = newValues;
     m_changedOnce = true;
+    invalidateValue();
     emit changed(this);
+}
+
+void ClientDataRef::updateValue(int newValue)
+{
+    invalidateValue();
+    m_valueInt = newValue;
+    m_valueIntValid = true;
+}
+
+void ClientDataRef::updateValue(float newValue)
+{
+    invalidateValue();
+    m_valueFloat = newValue;
+}
+
+void ClientDataRef::updateValue(double newValue)
+{
+    invalidateValue();
+    m_valueDouble = newValue;
 }
 
 void ClientDataRef::setValue(QString _newValue, int index) {
     while(m_values.size() < index + 1) // Resize list if needed
         m_values.append(QString(""));
     m_values[index] = _newValue;
+    invalidateValue();
     emit valueSet(this);
 }
 
@@ -95,6 +148,7 @@ void ClientDataRef::setValues(QStringList values)
 {
     if(values == m_values) return;
     m_values = values;
+    invalidateValue();
     emit valueSet(this);
 }
 
@@ -121,18 +175,31 @@ int ClientDataRef::subscribers() {
 }
 
 void ClientDataRef::setSubscribers(int sub) {
-    qDebug() << Q_FUNC_INFO << name() << sub;
     Q_ASSERT(sub >= 0);
     m_subscribers = sub;
 }
 
 void ClientDataRef::unsubscribe() {
-    qDebug() << Q_FUNC_INFO << m_client << m_subscribers;
     emit unsubscribed(this);
 }
 
-QString ClientDataRef::dataFormat() const {
+const QString& ClientDataRef::dataFormat() const {
     return m_dataFormat;
+}
+
+const QStringList &ClientDataRef::modifiers() const
+{
+    return m_modifiers;
+}
+
+void ClientDataRef::setUdpId(quint16 id)
+{
+    m_udpId = id;
+}
+
+quint16 ClientDataRef::udpId()
+{
+    return m_udpId;
 }
 
 bool ClientDataRef::isArray() {
