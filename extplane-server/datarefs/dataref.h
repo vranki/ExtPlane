@@ -27,7 +27,7 @@ class DataRef : public QObject {
 public:
     DataRef(QObject *parent, const QString &name, void* ref);
     const QString &name() const;
-    QStringList modifiers() const;
+    const QStringList &modifiers() const;
     void* ref() const;
     int subscriberCount() const;
     void setSubscriberCount(const int subs);
@@ -37,7 +37,7 @@ public:
     virtual void setValue(QString &newValue) = 0;
     extplaneRefID type() const; // NOTE: always only one type, although XPLMDataTypeID can have many.
     virtual void setType(extplaneRefID newType); // Only set after constructor
-    QString typeString() const;
+    const QString &typeString() const;
     virtual void setAccuracy(double val);
     virtual void updateAccuracy(double val);
     double accuracy() const { return _accuracy; }

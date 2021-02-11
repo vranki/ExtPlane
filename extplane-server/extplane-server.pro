@@ -12,8 +12,7 @@ QT       -= gui
 
 INCLUDEPATH += $$PWD/../util/
 
-SOURCES += tcpserver.cpp \
-    tcpclient.cpp
+SOURCES += tcpserver.cpp tcpclient.cpp
 
 HEADERS += \
     tcpserver.h \

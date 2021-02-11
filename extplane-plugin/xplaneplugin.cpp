@@ -278,6 +278,22 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
         XPLMSetDatad(ref->ref(), qobject_cast<DoubleDataRef*>(ref)->value());
         break;
     }
+    case extplaneRefTypeData:
+    {
+        QString value = ref->valueString();
+        Q_ASSERT(value.count("\"") >= 2);
+        value = value.mid(value.indexOf("\"") + 1);
+        value = value.mid(0, value.lastIndexOf("\""));
+        // Check ref length
+        int length = XPLMGetDatab(ref->ref(), nullptr, 0, 0);
+        // Create a bytearray of correct size and fill with 0's
+        QByteArray valueBa(length, 0);
+        valueBa.insert(0, value.toUtf8());
+        // Make sure size is still correct
+        valueBa.resize(length);
+        XPLMSetDatab(ref->ref(), valueBa.data(), 0, valueBa.length());
+        break;
+    }
     default:
         break;
     }

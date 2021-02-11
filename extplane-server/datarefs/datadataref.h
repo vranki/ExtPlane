@@ -3,6 +3,7 @@
 
 #include "dataref.h"
 
+#include <QObject>
 #include <QByteArray>
 #include <QTime>
 #include <QString>
@@ -25,7 +26,7 @@ public:
     QByteArray &newValue(); // Write to this and call updatevalue to change value
     void setValue(QByteArray &newValue); // @todo implement
     virtual void updateValue();
-    virtual QString valueString();
+    virtual QString valueString(); // Always has quotes "" around
     virtual void setValue(QString &newValue);
     void setLength(int newLength);
 private:

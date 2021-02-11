@@ -68,6 +68,8 @@ void TcpClient::readClient() {
         QByteArray lineBA = _socket->readLine();
         QString line = QString(lineBA).trimmed();
 
+        if(line.isEmpty()) break;
+
         // Split the command in strings
         QStringList subLine = line.split(" ", QString::SkipEmptyParts);
         QString command = subLine.value(0);
@@ -125,13 +127,30 @@ void TcpClient::readClient() {
             QString refName = subLine.value(1);
             unsubscribeRef(refName);
         } else if(command == "set") {
-            if(subLine.size() == 3) {
+            if(subLine.size() >= 3) {
                 QString refName = subLine.value(1);
                 DataRef *ref = getSubscribedRef(refName);
+
                 if (ref) {
                     if(ref->isWritable()) {
-                        QString refValue = subLine.value(2).trimmed();
-                        ref->setValue(refValue);
+                        if(ref->type() == extplaneRefTypeData) {
+                            // Data datarefs are more difficult to set.
+                            if(ref->modifiers().contains("string")) {
+                                if(line.count("\"") >= 2) {
+                                    // Strip quotes
+                                    QString value = line.mid(line.indexOf("\"") + 1);
+                                    value = value.mid(0, value.lastIndexOf("\""));
+                                    ref->setValue(value);
+                                } else {
+                                    INFO << "Warning: No quotes in string data dataref value";
+                                }
+                            } else {
+                                INFO << "Warning: setting data datarefs other than strings not supported yet.";
+                            }
+                        } else {
+                            QString refValue = subLine.value(2).trimmed();
+                            ref->setValue(refValue);
+                        }
                         _refProvider->changeDataRef(ref);
                     } else {
                         extplaneWarning(QString("Ref %1 is not writable!").arg(ref->name()));

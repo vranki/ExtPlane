@@ -163,7 +163,7 @@ platform specific plugins you have built. For example after
 building linux & windows plugins it should look like this:
 
 ```
-extplane-plugin/extplane
+/extplane
 └── 64
     ├── lin.xpl
     └── win.xpl
@@ -172,7 +172,7 @@ extplane-plugin/extplane
 You can copy the whole directory to XPlane's plugin directory:
 
 ```bash
-cp -R extplane-plugin/extplane /path/to/xplane/Resources/plugins
+cp -R extplane /path/to/xplane/Resources/plugins
 ```
 
 ### Cross-compile to Windows from Linux ###
@@ -330,7 +330,11 @@ sub sim/aircraft/view/acf_descrip:string
 ->
 ub sim/aircraft/view/acf_descrip:string "Boeing 737-800"
 ```
-
+Currently only string data datarefs can be set. Remember to use
+quotes to set values:
+```
+set sim/aircraft/view/acf_descrip:string "This is an example"
+```
 
 ### Console Output ###
 

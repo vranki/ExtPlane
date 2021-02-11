@@ -36,10 +36,12 @@ void ExtPlaneClient::createClient() {
 }
 
 ExtPlaneClient::~ExtPlaneClient() {
-    for(ClientDataRef *ref : m_dataRefs) {
-        m_dataRefs.removeOne(ref);
-        m_connection->unsubscribeDataRef(ref);
-        ref->setClient(nullptr);
+    while (!m_dataRefs.isEmpty()) {
+        auto *ref = m_dataRefs.takeLast();
+        if(ref->client()) {
+            m_connection->unsubscribeDataRef(ref);
+            ref->setClient(nullptr);
+        }
     }
 }
 
@@ -196,5 +198,8 @@ void ExtPlaneClient::setSimulated(bool simulated) {
 }
 
 void ExtPlaneClient::valueSet(ClientDataRef *ref) {
+    if(ref->modifiers().contains("string")) { // Quote strings
+        m_connection->setValue(ref->name(), QString("\"%1\"").arg(ref->value()));
+    }
     m_connection->setValue(ref->name(), ref->value());
 }

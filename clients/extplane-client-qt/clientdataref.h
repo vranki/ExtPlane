@@ -47,7 +47,8 @@ public:
     void setSubscribers(int sub);
     bool isArray();
     void unsubscribe(); // Call to unsubscribe ref. Subscriber count will be reduced by one.
-    QString dataFormat() const;
+    const QString &dataFormat() const;
+    const QStringList &modifiers() const;
 
 public slots:
     void setName(QString &name);
@@ -77,6 +78,7 @@ private:
     ExtPlaneClient* m_client;
     QString m_dataFormat;
     bool m_changedOnce; // False until first update sent.
+    QStringList m_modifiers;
 };
 
 #endif // CLIENTDATAREF_H

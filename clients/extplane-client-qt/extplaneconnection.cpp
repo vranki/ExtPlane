@@ -20,7 +20,7 @@ ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent)
 void ExtPlaneConnection::startConnection() {
     if(hostName().length()) {
         DEBUG << "Starting real connection to " << hostName() << "port" << port();
-        emit connectionMessage(QString("Connecting to %1:%2..").arg(hostName().arg(port())));
+        emit connectionMessage(QString("Connecting to %1:%2..").arg(hostName()).arg(port()));
         BasicTcpClient::startConnection();
     } else {
         DEBUG << "Hostname not set yet - not connecting yet.";
@@ -107,7 +107,7 @@ void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     disconnect(ref, nullptr, this, nullptr);
     if(server_ok)
         writeLine("unsub " + ref->name());
-
+    ref->setClient(nullptr);
     ref->deleteLater();
 }
 
@@ -159,8 +159,14 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
                                 }
                                 ref->updateValue(values);
                             } else {
-                                // Base64 decoded value, if value defined - empty string otherwise
-                                ref->updateValue((cmd.size() == 3) ? QByteArray::fromBase64(cmd.value(2).toUtf8()) : QString());
+                                QString value;
+                                if(ref->modifiers().contains("string")) {
+                                    if(line.count("\"") >= 2) {
+                                        value = line.mid(line.indexOf("\"") + 1);
+                                        value = value.mid(0, value.lastIndexOf("\""));
+                                    }
+                                }
+                                ref->updateValue(value);
                             }
                         } else {
                             INFO << "Unsupported ref type " << cmd.value(0);
@@ -234,9 +240,13 @@ void ExtPlaneConnection::setValues(QString name, QStringList values) {
 }
 
 void ExtPlaneConnection::setValueFromRef(ClientDataRef *ref) {
-    if(!ref->isArray()) {
-        setValue(ref->name(), ref->value());
-    } else {
+    if(ref->isArray()) {
         setValues(ref->name(), ref->values());
+    } else {
+        if(ref->modifiers().contains("string")) {
+            setValue(ref->name(), "\"" + ref->value() + "\""); // Add quotes to strings
+        } else {
+            setValue(ref->name(), ref->value());
+        }
     }
 }

@@ -22,7 +22,7 @@ const QString &DataRef::name() const {
     return _name;
 }
 
-QStringList DataRef::modifiers() const {
+const QStringList &DataRef::modifiers() const {
     return _modifiers;
 }
 
@@ -56,7 +56,7 @@ void DataRef::setType(extplaneRefID newType)
     _type = newType;
 }
 
-QString DataRef::typeString() const {
+const QString &DataRef::typeString() const {
     return _typeString;
 }
 
