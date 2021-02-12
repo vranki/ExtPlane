@@ -5,6 +5,7 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     $$PWD/dataref.h \
     $$PWD/extplaneclienttypes.h \
+    $$PWD/extplaneudpclient.h \
     $$PWD/simulatedextplaneconnection.h \
     $$PWD/extplaneconnection.h \
     $$PWD/extplaneclient.h \
@@ -18,6 +19,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/dataref.cpp \
     $$PWD/extplaneclienttypes.cpp \
+    $$PWD/extplaneudpclient.cpp \
     $$PWD/simulatedextplaneconnection.cpp \
     $$PWD/extplaneconnection.cpp \
     $$PWD/extplaneclient.cpp \

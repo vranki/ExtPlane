@@ -9,6 +9,7 @@ exists($$(HOME)/SDK/) {
 # everywhere.
 
 HEADERS += \
+    $$PWD/protocoldefs.h \
     $$PWD/extplane-server/datarefprovider.h \
     $$PWD/extplane-server/datarefs/dataref.h \
     $$PWD/extplane-server/datarefs/floatdataref.h \

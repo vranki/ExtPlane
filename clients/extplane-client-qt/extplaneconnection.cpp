@@ -4,17 +4,16 @@
 #include "simulateddatarefs/simulateddataref.h"
 #include "extplaneclient.h"
 #include "clientdataref.h"
+#include "extplaneudpclient.h"
 #include "../../util/console.h"
+#include "../../protocoldefs.h"
 
-ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent)
-                                                          , server_ok(false)
-                                                          , m_updateInterval(1.0 / 60.0)
-                                                          , m_extplaneVersion(-1) {
+ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent) {
     connect(this, SIGNAL(connectedChanged(bool)), this, SLOT(connectedChanged(bool)));
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, &BasicTcpClient::receivedLine, this, &ExtPlaneConnection::receivedLineSlot);
     connect(this, &BasicTcpClient::connectionChanged, this, &ExtPlaneConnection::connectionChangedSlot);
-    setPort(51000);
+    setPort(EXTPLANE_PORT);
 }
 
 void ExtPlaneConnection::startConnection() {
@@ -31,8 +30,11 @@ void ExtPlaneConnection::startConnection() {
 void ExtPlaneConnection::stopConnection() {
     DEBUG << "Stopping connection";
     BasicTcpClient::disconnectFromHost();
-    // qDeleteAll(dataRefs.values());
-    // dataRefs.clear();
+
+    if(m_udpClient)
+        m_udpClient->deleteLater();
+    m_udpClient = nullptr;
+
     emit connectionMessage("Stopped connection");
 }
 
@@ -65,11 +67,11 @@ void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {
 }
 
 void ExtPlaneConnection::registerClient(ExtPlaneClient* client) {
-    clients.append(client);
+    clients.insert(client);
 }
 
 ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accuracy) {
-    ClientDataRef *ref = dataRefs.value(name);
+    ClientDataRef *ref = dataRefs[name];
     if(ref) {
         DEBUG << QString("Ref %1 already subscribed %2 times").arg(name).arg(ref->subscribers());
         ref->setSubscribers(ref->subscribers()+1);
@@ -99,11 +101,13 @@ ClientDataRef *ExtPlaneConnection::createDataRef(QString name, double accuracy) 
 
 void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
     qDebug() << Q_FUNC_INFO << ref->name();
+    if(m_udpClient)
+        m_udpClient->unsubscribedRef(ref);
 
     ref->setSubscribers(ref->subscribers() - 1);
     if(ref->subscribers() > 0) return;
 
-    dataRefs.remove(ref->name());
+    dataRefs.erase(ref->name());
     disconnect(ref, nullptr, this, nullptr);
     if(server_ok)
         writeLine("unsub " + ref->name());
@@ -119,10 +123,9 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
             DEBUG << "Setting update interval to " << m_updateInterval;
             setUpdateInterval(m_updateInterval);
             // Sub all refs
-            DEBUG << "REFS" << dataRefs.count();
-            for(ClientDataRef *ref : dataRefs) {
-                DEBUG << "Subscribing to ref" << ref->name();
-                subRef(ref);
+            for(auto &refPair : dataRefs) {
+                DEBUG << "Subscribing to ref" << refPair.second->name();
+                subRef(refPair.second);
             }
         }
         return;
@@ -135,8 +138,30 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
                 if(cmd.value(0)=="EXTPLANE-VERSION" && cmd.length() == 2) {
                     INFO << "Connected to ExtPlane version" << cmd.value(1);
                     m_extplaneVersion = cmd.value(1).toInt(); // Nothing done with this currently.
+                    if(m_extplaneVersion != EXTPLANE_VERSION) {
+                        INFO << "Warning: Server uses extplane version" << m_extplaneVersion << "and we are" << EXTPLANE_VERSION;
+                    }
+                } else if(cmd.value(0)=="CLIENT-ID" && cmd.length() == 2) {
+                    INFO << "Client id set to" << cmd.value(1);
+                    m_clientId = cmd.value(1).toUInt();
+                } else if(cmd.value(0)=="udp") {
+                    ClientDataRef *ref = dataRefs.at(cmd.value(3));
+                    if(ref) {
+                        quint16 id = cmd.value(1).toUInt();
+                        ref->setUdpId(id);
+                        if(!m_udpClient) {
+                            if(!m_clientId) {
+                                INFO << "Warning: No client id received! UDP receiving all updates";
+                            }
+                            m_udpClient = new ExtPlaneUdpClient(m_clientId, this);
+                        }
+                        m_udpClient->subscribedRef(ref);
+                        INFO << "Tracking ref via UDP" << cmd.value(3) << id;
+                    } else {
+                        INFO << "Can't find dataref" << cmd.value(3);
+                    }
                 } else {
-                    ClientDataRef *ref = dataRefs.value(cmd.value(1));
+                    ClientDataRef *ref = dataRefs[cmd.value(1)];
                     if(ref) {
                         if ((cmd.value(0)=="ufa" || cmd.value(0)=="uia") && cmd.size() == 3) {
                             // Array dataref

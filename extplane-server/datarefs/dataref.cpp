@@ -82,6 +82,16 @@ bool DataRef::isValid() const
     return _valueValid;
 }
 
+void DataRef::setUdpId(quint16 id)
+{
+    _udpId = id;
+}
+
+quint16 DataRef::udpId()
+{
+    return _udpId;
+}
+
 void DataRef::setValueValid()
 {
     if(!_valueValid) {

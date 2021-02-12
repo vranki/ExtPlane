@@ -139,6 +139,16 @@ const QStringList &ClientDataRef::modifiers() const
     return m_modifiers;
 }
 
+void ClientDataRef::setUdpId(quint16 id)
+{
+    m_udpId = id;
+}
+
+quint16 ClientDataRef::udpId()
+{
+    return m_udpId;
+}
+
 bool ClientDataRef::isArray() {
     return m_values.size() > 1;
 }

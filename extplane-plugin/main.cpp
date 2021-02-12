@@ -49,11 +49,3 @@ PLUGIN_API int XPluginEnable() {
     DEBUG;
     return 1;
 }
-
-PLUGIN_API void XPluginReceiveMessage(
-        XPLMPluginID inFromWho,
-        long inMessage,
-        void *inParam) {
-    if(globalPlugin)
-        globalPlugin->receiveMessage(inFromWho, inMessage, inParam);
-}

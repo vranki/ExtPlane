@@ -16,10 +16,10 @@
 XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent)
                                               , argc(0)
                                               , argv(nullptr)
-                                              , app(nullptr)
-                                              , server(nullptr)
-                                              , flightLoopInterval(1.0f / 60.f) // Default to 60hz
-                                              , g_menu_container_idx(0)
+                                              , m_app(nullptr)
+                                              , m_server(nullptr)
+                                              , m_flightLoopInterval(-1) // Default to every flight loop
+                                              , m_menu_container_idx(0)
 { }
 
 XPlanePlugin::~XPlanePlugin() { }
@@ -33,10 +33,11 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall,
     Q_UNUSED(inCounter)
     Q_UNUSED(inRefcon)
     // Tell each dataref to update its value through the XPLM api
-    for(DataRef *ref : refs) updateDataRef(ref);
+    for(DataRef *ref : m_refs) updateDataRef(ref);
+    if(m_server) m_server->flightLoop();
     // Tell Qt to process it's own runloop
-    app->processEvents();
-    return flightLoopInterval;
+    m_app->processEvents();
+    return m_flightLoopInterval;
 }
 
 int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
@@ -46,16 +47,16 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     std::strcpy(outSig, "org.vranki.extplaneplugin");
     std::strcpy(outDesc, "Read and write X-Plane datarefs from external programs on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR);
 
-    g_menu_container_idx = XPLMAppendMenuItem(XPLMFindPluginsMenu(), "ExtPlane", nullptr, 0);
-    g_menu_id = XPLMCreateMenu("ExtPlane", XPLMFindPluginsMenu(), g_menu_container_idx, nullptr, nullptr);
-    XPLMAppendMenuItem(g_menu_id, "Listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR ". No GUI yet.", nullptr, 1);
+    m_menu_container_idx = XPLMAppendMenuItem(XPLMFindPluginsMenu(), "ExtPlane", nullptr, 0);
+    m_menu_id = XPLMCreateMenu("ExtPlane", XPLMFindPluginsMenu(), m_menu_container_idx, nullptr, nullptr);
+    XPLMAppendMenuItem(m_menu_id, "Listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR ". No GUI yet.", nullptr, 1);
 
     // Init application and server
-    app = new QCoreApplication(argc, &argv);
+    m_app = new QCoreApplication(argc, &argv);
     setlocale(LC_NUMERIC, "C"); // See http://stackoverflow.com/questions/25661295/why-does-qcoreapplication-call-setlocalelc-all-by-default-on-unix-linux
 
-    server = new TcpServer(this, this);
-    connect(server, &TcpServer::setFlightLoopInterval, this, &XPlanePlugin::setFlightLoopInterval);
+    m_server = new TcpServer(this, this);
+    connect(m_server, &TcpServer::setFlightLoopInterval, this, &XPlanePlugin::setFlightLoopInterval);
 
     // Log that we have started
     XPLMDebugString ("ExtPlane listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR "\n");
@@ -102,13 +103,13 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
                              ATCCustomData::DataCallback, nullptr,             // Raw data accessors
                              nullptr, nullptr);
 
-    app->processEvents();
+    m_app->processEvents();
     return 1;
 }
 
 DataRef* XPlanePlugin::subscribeRef(QString &name) {
     // Search in list of already subscribed datarefs - if found return that
-    for(DataRef *ref : refs) {
+    for(DataRef *ref : m_refs) {
         if(ref->name() == name) {
             DEBUG << "Already subscribed to " << name;
             ref->setSubscriberCount(ref->subscriberCount() + 1);
@@ -141,23 +142,23 @@ DataRef* XPlanePlugin::subscribeRef(QString &name) {
             DEBUG << "Subscribed to ref " << dr->name()
                   << ", type: " << dr->typeString()
                   << ", writable:" << dr->isWritable();
-            refs.append(dr);
+            m_refs.insert(dr);
             return dr;
         } else {
-            server->extplaneWarning(QString("Dataref type %1 not supported").arg(refType));
+            m_server->extplaneWarning(QString("Dataref type %1 not supported").arg(refType));
         }
     } else {
-        server->extplaneWarning(QString("Can't find dataref %1").arg(name));
+        m_server->extplaneWarning(QString("Can't find dataref %1").arg(name));
     }
     return nullptr;
 }
 
 void XPlanePlugin::unsubscribeRef(DataRef *ref) {
-    Q_ASSERT(refs.contains(ref));
+    Q_ASSERT(m_refs.find(ref) != m_refs.end());
 
     ref->setSubscriberCount(ref->subscriberCount() - 1);
     if(ref->subscriberCount() == 0) {
-        refs.removeOne(ref);
+        m_refs.erase(ref);
         DEBUG << "Ref " << ref->name() << " not subscribed by anyone - removing.";
         ref->deleteLater();
     }
@@ -246,7 +247,7 @@ void XPlanePlugin::buttonRelease(int buttonid) {
 void XPlanePlugin::changeDataRef(DataRef *ref)
 {
     if(!ref->isWritable()) {
-        server->extplaneWarning(QString("Tried to write read-only dataref %1").arg(ref->name()));
+        m_server->extplaneWarning(QString("Tried to write read-only dataref %1").arg(ref->name()));
         return;
     }
 
@@ -317,17 +318,17 @@ void XPlanePlugin::command(QString &name, extplaneCommandType type)
             break;
         }
     } else {
-        server->extplaneWarning(QString("Command %1 not found").arg(name));
+        m_server->extplaneWarning(QString("Command %1 not found").arg(name));
     }
 
 }
 
 void XPlanePlugin::setFlightLoopInterval(float newInterval) {
     if(newInterval > 0) {
-        flightLoopInterval = newInterval;
-        DEBUG << "New interval" << flightLoopInterval;
+        m_flightLoopInterval = newInterval;
+        DEBUG << "New interval" << m_flightLoopInterval;
     } else {
-        server->extplaneWarning(QString("Invalid interval %1").arg(newInterval));
+        m_server->extplaneWarning(QString("Invalid interval %1").arg(newInterval));
     }
 }
 
@@ -393,21 +394,15 @@ void XPlanePlugin::setDestinationFmsEntry(int index) {
 
 void XPlanePlugin::pluginStop() {
     DEBUG;
-    XPLMDestroyMenu(g_menu_id);
-    app->processEvents();
-    server->disconnectClients();
-    delete server;
-    server = nullptr;
-    app->quit();
-    app->processEvents();
-    delete app;
-    app = nullptr;
-    qDeleteAll(refs);
-    refs.clear();
-}
-
-void XPlanePlugin::receiveMessage(XPLMPluginID inFromWho, long inMessage, void *inParam) {
-    Q_UNUSED(inFromWho)
-    Q_UNUSED(inMessage)
-    Q_UNUSED(inParam)
+    XPLMDestroyMenu(m_menu_id);
+    m_app->processEvents();
+    m_server->disconnectClients();
+    delete m_server;
+    m_server = nullptr;
+    m_app->quit();
+    m_app->processEvents();
+    delete m_app;
+    m_app = nullptr;
+    qDeleteAll(m_refs);
+    m_refs.clear();
 }

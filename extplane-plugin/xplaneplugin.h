@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <set>
 #include <QStringList>
 #include <QtCore/QCoreApplication>
 #include "../extplane-server/tcpserver.h"
@@ -26,7 +27,6 @@ public:
     float flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
     int pluginStart(char * outName, char * outSig, char *outDesc);
     void pluginStop();
-    void receiveMessage(XPLMPluginID inFromWho, long inMessage, void *  inParam);
 
 public: // DataRefProvider implementation
     virtual DataRef *subscribeRef(QString &name);
@@ -52,14 +52,14 @@ private:
     // Returns the ref name without modifier part (after :)
     QString refNameWithoutModifiers(QString &original);
 
-    QList<DataRef*> refs;
+    std::set<DataRef*> m_refs;
     int argc; // Fake argc and argv for QCoreApplication
     char *argv;
-    QCoreApplication *app; // For Qt main loop
-    TcpServer *server;
-    float flightLoopInterval; // Delay between loop calls (in seconds)
-    int g_menu_container_idx;
-    XPLMMenuID g_menu_id; // ExtPlane menus
+    QCoreApplication *m_app; // For Qt main loop
+    TcpServer *m_server;
+    float m_flightLoopInterval; // Delay between loop calls (in seconds)
+    int m_menu_container_idx;
+    XPLMMenuID m_menu_id; // ExtPlane menus
 };
 
 #endif // XPLANEPLUGIN_H

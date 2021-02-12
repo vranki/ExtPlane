@@ -116,11 +116,13 @@ SOURCES += main.cpp \
     xplaneplugin.cpp \
     $$PWD/../extplane-server/tcpclient.cpp \
     $$PWD/../extplane-server/tcpserver.cpp \
+    $$PWD/../extplane-server/udpsender.cpp \
     customdata/navcustomdata.cpp \
     customdata/atccustomdata.cpp
 HEADERS += \
     xplaneplugin.h \
     $$PWD/../extplane-server/tcpclient.h \
     $$PWD/../extplane-server/tcpserver.h \
+    $$PWD/../extplane-server/udpsender.h \
     customdata/navcustomdata.h \
     customdata/atccustomdata.h \

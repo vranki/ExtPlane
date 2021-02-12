@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS = extplane-server \
     clients/extplane-client-qt \
+    clients/extplane-client-qt/democlient.pro \
     extplane-transformer
 
 CONFIG += ordered

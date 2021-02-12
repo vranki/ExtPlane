@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QList>
-#include <QSet>
+#include <set>
 #include "clientdataref.h"
 #include "extplaneconnection.h"
 #include "clientdatarefprovider.h"
@@ -67,9 +66,9 @@ private slots:
 
 private:
     QString m_name;
-    QList<ClientDataRef*> m_dataRefs;
-    QSet<int> m_heldButtons;
-    QSet<QString> m_runningCommands;
+    std::set<ClientDataRef*> m_dataRefs;
+    std::set<int> m_heldButtons;
+    std::set<QString> m_runningCommands;
     ClientDataRefProvider *m_connection; // The actual connection class
     bool m_simulated;
     ExtPlaneConnection m_extplaneConnection;

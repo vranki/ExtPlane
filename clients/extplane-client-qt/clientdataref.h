@@ -49,7 +49,8 @@ public:
     void unsubscribe(); // Call to unsubscribe ref. Subscriber count will be reduced by one.
     const QString &dataFormat() const;
     const QStringList &modifiers() const;
-
+    void setUdpId(quint16 id);
+    quint16 udpId();
 public slots:
     void setName(QString &name);
     void setAccuracy(double accuracy);
@@ -79,6 +80,7 @@ private:
     QString m_dataFormat;
     bool m_changedOnce; // False until first update sent.
     QStringList m_modifiers;
+    quint16 m_udpId = 0;
 };
 
 #endif // CLIENTDATAREF_H
