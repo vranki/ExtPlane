@@ -289,22 +289,21 @@ void TcpClient::refChanged(DataRef *ref) {
     } else if(ref->type()== extplaneRefTypeFloatArray) {
         FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
         bool bigenough = false;
-        QVector<float> values = refF->value();
+        std::vector<float> values = refF->value();
 
-        if(m_refValueFA.find(ref) == m_refValueFA.end() || refF->accuracy() == 0) {
+        if((m_refValueFA.find(ref) == m_refValueFA.end()) || refF->accuracy() == 0 || values.size() != m_refValueFA.at(ref).size()) {
             // New value or accuracy not set.
-            m_refValueFA.insert({ref, values});
+            m_refValueFA[ref] = values;
         } else {
-            long length = values.size();
-
-            for (int i=0; i<length;i++){
+            auto length = values.size();
+            for (unsigned long i=0; i < length; i++){
                 if (qAbs(values.at(i) - m_refValueFA.at(ref).at(i)) > ref->accuracy()) {
                     bigenough = true;
                     break;
                 }
             }
             if (bigenough){ // Values have changed enough
-                m_refValueFA.insert({ref, values});
+                m_refValueFA[ref] = values;
             } else {
                 return;
             }
@@ -314,15 +313,14 @@ void TcpClient::refChanged(DataRef *ref) {
 
         bool bigenough = false;
 
-        QVector<int> values = refI->value();
-        if(m_refValueIA.find(ref) == m_refValueIA.end() || refI->accuracy() == 0) {
+        auto values = refI->value();
+        if((m_refValueIA.find(ref) == m_refValueIA.end()) || refI->accuracy() == 0 || values.size() != m_refValueIA.at(ref).size()) {
             // New value or accuracy not set.
             m_refValueIA.insert({ref, values});
         } else {
+            auto length = values.size();
 
-            long length = values.size();
-
-            for (int i=0; i<length;i++){
+            for (unsigned long i=0; i < length; i++){
                 if (qAbs(values.at(i) - m_refValueIA.at(ref).at(i)) > ref->accuracy()) {
                     bigenough = true;
                     break;

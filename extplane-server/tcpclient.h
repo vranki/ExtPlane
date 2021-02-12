@@ -8,6 +8,7 @@
 #include <QHostAddress>
 #include <map>
 #include <set>
+#include <vector>
 
 class DataRef;
 class DataRefProvider;
@@ -49,14 +50,14 @@ private:
     set<DataRef*> m_subscribedRefs;
     map<DataRef*, double> m_refValueD;
     map<DataRef*, float> m_refValueF;
-    map<DataRef*, QVector<float> > m_refValueFA;
-    map<DataRef*, QVector<int> > m_refValueIA;
+    map<DataRef*, std::vector<float> > m_refValueFA;
+    map<DataRef*, std::vector<int> > m_refValueIA;
     map<DataRef*, int> m_refValueI;
     map<DataRef*, QByteArray> m_refValueB;
     set<int> m_heldButtons;
     DataRefProvider *m_refProvider;
     // Unsubscribe these refs after they have changed (used to implement "get" command)
-    QVector<DataRef*> refsToUnsubscribeAfterChange();
+    std::vector<DataRef*> refsToUnsubscribeAfterChange();
     TcpServer* m_tcpserver = nullptr;
     UdpSender* m_udpSender = nullptr;
     quint8 m_clientId = 0;

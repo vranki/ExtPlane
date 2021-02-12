@@ -9,7 +9,7 @@
 #include "../../protocoldefs.h"
 
 ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent) {
-    connect(this, SIGNAL(connectedChanged(bool)), this, SLOT(connectedChanged(bool)));
+    connect(this, &BasicTcpClient::connectedChanged, this, &ExtPlaneConnection::connectedChangedSlot);
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, &BasicTcpClient::receivedLine, this, &ExtPlaneConnection::receivedLineSlot);
     connect(this, &BasicTcpClient::connectionChanged, this, &ExtPlaneConnection::connectionChangedSlot);
@@ -50,12 +50,13 @@ void ExtPlaneConnection::setUpdateInterval(double newInterval) {
     }
 }
 
-void ExtPlaneConnection::connectedChanged(bool connected) {
+void ExtPlaneConnection::connectedChangedSlot(bool connected) {
     if(connected) {
         emit connectionMessage("Connected to ExtPlane, waiting for handshake");
     } else {
         emit connectionMessage("Socket disconnected");
     }
+    emit connectedChanged(connected);
 }
 
 void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {

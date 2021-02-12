@@ -178,7 +178,7 @@ void XPlanePlugin::updateDataRef(DataRef *ref) {
     case extplaneRefTypeFloatArray:
     {
         FloatArrayDataRef *faRef = qobject_cast<FloatArrayDataRef*>(ref);
-        int arrayLength = faRef->value().length();
+        int arrayLength = faRef->value().size();
         if(arrayLength == 0) {
             arrayLength = XPLMGetDatavf(faRef->ref(), nullptr, 0, 0);
             faRef->setLength(arrayLength);
@@ -191,7 +191,7 @@ void XPlanePlugin::updateDataRef(DataRef *ref) {
     case extplaneRefTypeIntArray:
     {
         IntArrayDataRef *iaRef = qobject_cast<IntArrayDataRef*>(ref);
-        int arrayLength = iaRef->value().length();
+        int arrayLength = iaRef->value().size();
         if(arrayLength <= 0) {
             arrayLength = XPLMGetDatavi(iaRef->ref(), nullptr, 0, 0);
             iaRef->setLength(arrayLength);
@@ -260,13 +260,13 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
     case extplaneRefTypeFloatArray:
     {
         FloatArrayDataRef *faRef = qobject_cast<FloatArrayDataRef*>(ref);
-        XPLMSetDatavf(ref->ref(), faRef->valueArray(), 0, faRef->value().length());
+        XPLMSetDatavf(ref->ref(), faRef->valueArray(), 0, faRef->value().size());
         break;
     }
     case extplaneRefTypeIntArray:
     {
         IntArrayDataRef *iaRef = qobject_cast<IntArrayDataRef*>(ref);
-        XPLMSetDatavi(ref->ref(), iaRef->valueArray(), 0, iaRef->value().length());
+        XPLMSetDatavi(ref->ref(), iaRef->valueArray(), 0, iaRef->value().size());
         break;
     }
     case extplaneRefTypeInt:

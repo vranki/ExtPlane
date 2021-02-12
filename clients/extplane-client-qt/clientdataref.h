@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <cmath>
 
 class ExtPlaneClient;
 
@@ -39,10 +40,16 @@ public:
     QString& name();
     QStringList& values(); // Returns all values
     double accuracy();
-    QString value(); // Returns first value
+    QString value() const; // Returns first value
+    int valueInt() const;
+    float valueFloat() const;
+    double valueDouble() const;
     ExtPlaneClient* client() const;
     void updateValue(QString newValue); // Update single value (from simulator)
     void updateValue(QStringList &newValues); // Update full array (from simulator)
+    void updateValue(int newValue);
+    void updateValue(float newValue);
+    void updateValue(double newValue);
     int subscribers();
     void setSubscribers(int sub);
     bool isArray();
@@ -51,6 +58,7 @@ public:
     const QStringList &modifiers() const;
     void setUdpId(quint16 id);
     quint16 udpId();
+
 public slots:
     void setName(QString &name);
     void setAccuracy(double accuracy);
@@ -74,11 +82,15 @@ private slots:
 private:
     QString m_name;
     QStringList m_values; // Length 1 if not array
+    int m_valueInt = 0;
+    bool m_valueIntValid = false;
+    float m_valueFloat = std::nanf("");
+    double m_valueDouble = std::nan("");
     double m_accuracy;
-    int m_subscribers;
-    ExtPlaneClient* m_client;
+    int m_subscribers = 0;
+    ExtPlaneClient* m_client = nullptr;
     QString m_dataFormat;
-    bool m_changedOnce; // False until first update sent.
+    bool m_changedOnce = false; // False until first update sent.
     QStringList m_modifiers;
     quint16 m_udpId = 0;
 };

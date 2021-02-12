@@ -10,7 +10,7 @@
 #define FloatArrayDataRef_H
 
 #include "dataref.h"
-#include <QVector>
+#include <vector>
 
 class FloatArrayDataRef : public DataRef {
     Q_OBJECT
@@ -18,14 +18,14 @@ class FloatArrayDataRef : public DataRef {
 public:
     FloatArrayDataRef(QObject *parent, QString name, void* ref);
     ~FloatArrayDataRef();
-    QVector<float> & value();
+    std::vector<float> &value();
     virtual void updateValue();
     virtual QString valueString();
     virtual void setValue(QString &newValue);
     void setLength(int newLength);
     float *valueArray();
 private:
-    QVector<float> _values; // Actual values in a vector
+    std::vector<float> _values; // Actual values in a vector
     int _length; // Length of dataref, as given by X-Plane. 0 if not set.
     float *_valueArray; // Array for reading & writing values. Allocated dynamically.
 };

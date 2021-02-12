@@ -7,8 +7,8 @@
 #include "../util/basictcpclient.h"
 #include "datasource.h"
 #include <QTimer>
-#include <QMap>
-#include <QVector>
+#include <set>
+#include <map>
 #include "../extplane-server/datarefs/floatdataref.h"
 
 
@@ -48,8 +48,8 @@ private slots:
 
 private:
     BasicTcpClient tcpClient;
-    QMap<QString,QString> refMap; // Mapping of X-Plane datarefs to FG value names
-    QList<FloatDataRef*> floatRefs; // All float datarefs used
+    std::map<QString,QString> refMap; // Mapping of X-Plane datarefs to FG value names
+    std::set<FloatDataRef*> floatRefs; // All float datarefs used
 };
 
 #endif // FLIGHTGEARDATASOURCE_H

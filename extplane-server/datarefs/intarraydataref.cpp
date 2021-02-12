@@ -1,6 +1,7 @@
 #include "intarraydataref.h"
-#include "../util/console.h"
+#include "../../util/console.h"
 #include <QStringList>
+#include <algorithm>
 
 IntArrayDataRef::IntArrayDataRef(QObject *parent, QString name, void *ref) : DataRef(parent, name, ref) {
     _typeString = "ia";
@@ -13,7 +14,7 @@ IntArrayDataRef::~IntArrayDataRef() {
     if(_valueArray) delete [] _valueArray;
 }
 
-QVector<int> & IntArrayDataRef::value() {
+std::vector<int> & IntArrayDataRef::value() {
     return _values;
 }
 
@@ -21,7 +22,7 @@ void IntArrayDataRef::updateValue() {
     bool valuesChanged = false;
     for(int i=0;i<_length;i++){
         if(_values.at(i) != _valueArray[i]) {
-            _values.replace(i, _valueArray[i]);
+            _values[i] = _valueArray[i];
             valuesChanged = true;
         }
     }
@@ -71,7 +72,7 @@ void IntArrayDataRef::setValue(QString &newValue) {
 void IntArrayDataRef::setLength(int newLength)
 {
     Q_ASSERT(newLength > 0);
-    _values.fill(-9999, newLength); // Resize and initialize vector
+    std::fill(_values.begin(), _values.end(), -9999);
     if(_valueArray) delete[] _valueArray;
     _valueArray = new int[newLength];
     _length = newLength;

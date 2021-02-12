@@ -22,6 +22,9 @@ class DataRef : public QObject
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(int valueInt READ valueInt NOTIFY valueChanged)
+    Q_PROPERTY(float valueFloat READ valueFloat NOTIFY valueChanged)
+    Q_PROPERTY(double valueDouble READ valueDouble NOTIFY valueChanged)
     Q_PROPERTY(QStringList values READ values WRITE setValues NOTIFY valueChanged)
     Q_PROPERTY(double accuracy READ accuracy WRITE setAccuracy NOTIFY accuracyChanged)
     Q_PROPERTY(ExtPlaneClient* client READ client WRITE setClient NOTIFY clientChanged)
@@ -38,6 +41,11 @@ public:
     ExtPlaneClient* client() const;
     QString dataFormat() const;
     double scaleFactor() const;
+
+    int valueInt() const;
+    float valueFloat() const;
+    double valueDouble() const;
+
 
 signals:
     void changed(ClientDataRef *ref); // Emitted when simulator updates value
@@ -69,8 +77,8 @@ private:
     ExtPlaneClient *m_client;
     QString m_name, m_dataFormat;
     QStringList m_emptyStringList; // Return if no client dataref available yet
-    double m_accuracy;
-    double m_scaleFactor;
+    double m_accuracy = 0;
+    double m_scaleFactor = 1;
 };
 
 #endif // DATAREF_H

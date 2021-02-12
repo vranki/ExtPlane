@@ -22,8 +22,10 @@ ExtPlaneClient::ExtPlaneClient(QObject *parent, QString name, bool simulated) : 
 void ExtPlaneClient::createClient() {
     if(m_connection) return; // Already created
     connect(&m_simulatedExtplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
+    connect(&m_simulatedExtplaneConnection, &ExtPlaneConnection::connectedChanged, this, &ExtPlaneClient::connectedChanged);
     connect(&m_extplaneConnection, &ExtPlaneConnection::connectionMessage, this, &ExtPlaneClient::setConnectionMessage);
     connect(&m_extplaneConnection, &ExtPlaneConnection::extplaneWarning, this, &ExtPlaneClient::extplaneWarning);
+    connect(&m_extplaneConnection, &ExtPlaneConnection::connectedChanged, this, &ExtPlaneClient::connectedChanged);
     qDebug() << Q_FUNC_INFO << "simulated:" << m_simulated;
     if(m_simulated) {
         m_simulatedExtplaneConnection.registerClient(this);
@@ -161,6 +163,11 @@ ExtPlaneConnection *ExtPlaneClient::extplaneConnection() {
 
 QString ExtPlaneClient::connectionMessage() {
     return m_connectionMessage;
+}
+
+bool ExtPlaneClient::isConnected() const
+{
+    return m_extplaneConnection.connected();
 }
 
 bool ExtPlaneClient::isSimulated() const {

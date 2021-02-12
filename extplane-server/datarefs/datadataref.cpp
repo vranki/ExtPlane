@@ -31,6 +31,7 @@ void DataDataRef::updateValue() {
 }
 
 void DataDataRef::setValue(QByteArray &newValue) {
+    Q_UNUSED(newValue);
     // qDebug() << Q_FUNC_INFO << "Set ref" <<  << "to string" << s << "length" << length;
 }
 

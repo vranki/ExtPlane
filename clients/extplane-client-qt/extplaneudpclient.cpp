@@ -54,7 +54,14 @@ void ExtPlaneUdpClient::processDatagram(QNetworkDatagram &dg)
     for(unsigned int i=0;i<dataCount;i++) {
         qint32 data;
         s >> id >> data;
-        dataReceived(id, QString::number(data));
+        auto ref = m_idRefMap[id];
+        if(id) {
+            if(ref) {
+                ref->updateValue(data);
+            } else {
+                qDebug() << Q_FUNC_INFO << "Can't find int ref value with id" << id;
+            }
+        }
     }
     s.skipRawData(2);
     dataCount = 0;
@@ -62,7 +69,14 @@ void ExtPlaneUdpClient::processDatagram(QNetworkDatagram &dg)
     for(unsigned int i=0;i<dataCount;i++) {
         float data;
         s >> id >> data;
-        dataReceived(id, QString::number(data, 'g', 32));
+        auto ref = m_idRefMap[id];
+        if(id) {
+            if(ref) {
+                ref->updateValue(data);
+            } else {
+                qDebug() << Q_FUNC_INFO << "Can't find float ref value with id" << id;
+            }
+        }
     }
     s.skipRawData(2);
     dataCount = 0;
@@ -70,17 +84,13 @@ void ExtPlaneUdpClient::processDatagram(QNetworkDatagram &dg)
     for(unsigned int i=0;i<dataCount;i++) {
         double data;
         s >> id >> data;
-        dataReceived(id, QString::number(data, 'g', 32));
-    }
-}
-
-void ExtPlaneUdpClient::dataReceived(quint16 id, QString value) {
-    auto ref = m_idRefMap[id];
-    if(id) {
-        if(ref) {
-            ref->updateValue(value);
-        } else {
-            qDebug() << Q_FUNC_INFO << "Can't find ref value with id" << id;
+        auto ref = m_idRefMap[id];
+        if(id) {
+            if(ref) {
+                ref->updateValue(data);
+            } else {
+                qDebug() << Q_FUNC_INFO << "Can't find double ref value with id" << id;
+            }
         }
     }
 }

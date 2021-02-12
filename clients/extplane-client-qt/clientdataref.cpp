@@ -2,10 +2,7 @@
 #include "extplaneclient.h"
 
 ClientDataRef::ClientDataRef(QObject *parent, QString newName, double accuracy) : QObject(parent)
-                                                                                  , m_accuracy(accuracy)
-                                                                                  , m_subscribers(0)
-                                                                                  , m_client(nullptr)
-                                                                                  , m_changedOnce(false)
+  , m_accuracy(accuracy)
 {
     setName(newName);
 }
@@ -32,8 +29,22 @@ void ClientDataRef::setName(QString &name) {
     emit nameChanged(m_name);
 }
 
-QString ClientDataRef::value() {
+QString ClientDataRef::value() const {
     return m_values.isEmpty() ? "" : m_values.first();
+}
+
+int ClientDataRef::valueInt() const
+{
+    return m_valueIntValid ? m_valueInt : value().toInt();
+}
+
+float ClientDataRef::valueFloat() const {
+    return std::isnan(m_valueFloat) ? value().toFloat() : m_valueFloat;
+}
+
+double ClientDataRef::valueDouble() const
+{
+    return std::isnan(m_valueDouble) ? value().toDouble() : m_valueDouble;
 }
 
 ExtPlaneClient *ClientDataRef::client() const {
@@ -83,6 +94,22 @@ void ClientDataRef::updateValue(QStringList &newValues) {
     m_values = newValues;
     m_changedOnce = true;
     emit changed(this);
+}
+
+void ClientDataRef::updateValue(int newValue)
+{
+    m_valueInt = newValue;
+    m_valueIntValid = true;
+}
+
+void ClientDataRef::updateValue(float newValue)
+{
+    m_valueFloat = newValue;
+}
+
+void ClientDataRef::updateValue(double newValue)
+{
+    m_valueDouble = newValue;
 }
 
 void ClientDataRef::setValue(QString _newValue, int index) {

@@ -5,8 +5,6 @@
 DataRef::DataRef(QObject *parent) : QObject(parent)
                                     , m_clientDataRef(nullptr)
                                     , m_client(nullptr)
-                                    , m_accuracy(0)
-                                    , m_scaleFactor(1)
 {
     // Connect both valueset and changed to valuechanged
     connect(this, &DataRef::valueSet, this, &DataRef::valueChanged);
@@ -100,6 +98,21 @@ QString DataRef::dataFormat() const {
 
 double DataRef::scaleFactor() const {
     return m_scaleFactor;
+}
+
+float DataRef::valueFloat() const
+{
+    return m_clientDataRef ? m_clientDataRef->valueFloat() : 0;
+}
+
+double DataRef::valueDouble() const
+{
+    return m_clientDataRef ? m_clientDataRef->valueDouble() : 0;
+}
+
+int DataRef::valueInt() const
+{
+    return m_clientDataRef ? m_clientDataRef->valueInt() : 0;
 }
 
 void DataRef::setClient(ExtPlaneClient *client) {

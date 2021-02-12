@@ -7,7 +7,8 @@
  */
 
 #include "floatarraydataref.h"
-#include "../util/console.h"
+#include "../../util/console.h"
+#include <algorithm>
 #include <QStringList>
 
 FloatArrayDataRef::FloatArrayDataRef(QObject *parent, QString name, void *ref) : DataRef(parent, name, ref) {
@@ -21,7 +22,7 @@ FloatArrayDataRef::~FloatArrayDataRef() {
     if(_valueArray) delete [] _valueArray;
 }
 
-QVector<float> & FloatArrayDataRef::value() {
+std::vector<float> &FloatArrayDataRef::value() {
     return _values;
 }
 
@@ -31,7 +32,7 @@ void FloatArrayDataRef::updateValue() {
     bool valuesChanged = false;
     for(int i=0;i<_length;i++){
         if(_values.at(i) != _valueArray[i]) {
-            _values.replace(i, _valueArray[i]);
+            _values[i] = _valueArray[i];
             valuesChanged = true;
         }
     }
@@ -81,7 +82,8 @@ void FloatArrayDataRef::setValue(QString &newValue) {
 void FloatArrayDataRef::setLength(int newLength)
 {
     Q_ASSERT(newLength >= 0);
-    _values.fill(-9999, newLength); // Resize and initialize vector
+    _values.resize(newLength);
+    std::fill(_values.begin(), _values.end(), -9999);
     if(_valueArray) delete[] _valueArray;
     _valueArray = new float[newLength];
     _length = newLength;

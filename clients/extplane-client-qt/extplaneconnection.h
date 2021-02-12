@@ -28,6 +28,7 @@ public:
 signals:
     void connectionMessage(QString connectionMessage);
     void extplaneWarning(QString message);
+    void connectedChanged(bool connected);
 
 public slots:
     virtual ClientDataRef *subscribeDataRef(QString name, double accuracy = 0);
@@ -48,7 +49,7 @@ public slots:
 
 private slots:
     void connectionChangedSlot();
-    void connectedChanged(bool connected);
+    void connectedChangedSlot(bool connected);
     void socketError(QAbstractSocket::SocketError err);
 
 protected:

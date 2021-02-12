@@ -21,7 +21,7 @@ class ExtPlaneClient : public QObject {
     Q_PROPERTY(ExtPlaneConnection *extplaneConnection READ extplaneConnection CONSTANT)
     Q_PROPERTY(bool simulated READ isSimulated WRITE setSimulated NOTIFY simulatedChanged)
     Q_PROPERTY(QString connectionMessage READ connectionMessage NOTIFY connectionMessageChanged)
-
+    Q_PROPERTY(bool connected READ isConnected NOTIFY connectedChanged)
 public:
     ExtPlaneClient(ExtPlaneClient const&)  = delete;
     void operator=(ExtPlaneClient const&)  = delete;
@@ -43,6 +43,7 @@ public:
     ClientDataRefProvider* datarefProvider() const;
     ExtPlaneConnection *extplaneConnection();
     QString connectionMessage();
+    bool isConnected() const;
 
 public slots:
     void unsubscribeDataRef(ClientDataRef *refToUnsubscribe);
@@ -57,6 +58,7 @@ signals:
     void simulatedChanged(bool simulated);
     void connectionMessageChanged(QString connectionMessage);
     void extplaneWarning(QString message);
+    void connectedChanged(bool connected);
 
 private slots:
     void cdrChanged(ClientDataRef *ref);
