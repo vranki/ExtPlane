@@ -48,7 +48,7 @@ QString& DataRef::name() {
     return m_name;
 }
 
-void DataRef::setName(QString &name) {
+void DataRef::setName(const QString name) {
     if (m_name == name)
         return;
 
@@ -92,6 +92,11 @@ ExtPlaneClient *DataRef::client() const {
     return m_client;
 }
 
+ClientDataRef *DataRef::clientDataRef() const
+{
+    return m_clientDataRef;
+}
+
 QString DataRef::dataFormat() const {
     return m_clientDataRef ?  m_clientDataRef->dataFormat() : "";
 }
@@ -131,7 +136,7 @@ void DataRef::setDataRefProvider() {
     if(client()->datarefProvider()) subscribeIfPossible();
 }
 
-void DataRef::setDataFormat(QString dataFormat) {
+void DataRef::setDataFormat(const QString dataFormat) {
     m_dataFormat = dataFormat;
     if(m_clientDataRef) m_clientDataRef->setDataFormat(m_dataFormat);
 }
@@ -153,11 +158,11 @@ QStringList& DataRef::values() {
     return m_clientDataRef ? m_clientDataRef->values() : m_emptyStringList;
 }
 
-void DataRef::setValue(QString _newValue, int index) {
+void DataRef::setValue(const QString _newValue, int index) {
     if(m_clientDataRef) m_clientDataRef->setValue(_newValue, index);
 }
 
-void DataRef::setValues(QStringList values) {
+void DataRef::setValues(const QStringList values) {
     if(m_clientDataRef) m_clientDataRef->setValues(values);
 }
 

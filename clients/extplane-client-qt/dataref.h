@@ -39,6 +39,7 @@ public:
     double accuracy();
     QString value(); // Returns first value
     ExtPlaneClient* client() const;
+    ClientDataRef* clientDataRef() const;
     QString dataFormat() const;
     double scaleFactor() const;
 
@@ -59,13 +60,13 @@ signals:
     void scaleFactorChanged(double scaleFactor);
 
 public slots:
-    void setName(QString &name);
+    void setName(const QString name);
     void setAccuracy(double accuracy);
-    void setValue(QString _newValue, int index=0); // Set value (from client)
-    void setValues(QStringList values); // Set full array (from client)
+    void setValue(const QString _newValue, int index=0); // Set value (from client)
+    void setValues(const QStringList values); // Set full array (from client)
     void setClient(ExtPlaneClient* client);
     void setDataRefProvider();
-    void setDataFormat(QString dataFormat);
+    void setDataFormat(const QString dataFormat);
     void scaleFactor(double scaleFactor);
 
 private slots:
