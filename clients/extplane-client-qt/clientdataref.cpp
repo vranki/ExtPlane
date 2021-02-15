@@ -33,18 +33,26 @@ QString ClientDataRef::value() const {
     return m_values.isEmpty() ? "" : m_values.first();
 }
 
-int ClientDataRef::valueInt() const
+int ClientDataRef::valueInt()
 {
-    return m_valueIntValid ? m_valueInt : value().toInt();
+    if(!m_valueIntValid) {
+        m_valueInt = valueFloat(); // Allows decimals to be converted to ints
+        m_valueIntValid = true;
+    }
+    return m_valueInt;
 }
 
-float ClientDataRef::valueFloat() const {
-    return std::isnan(m_valueFloat) ? value().toFloat() : m_valueFloat;
+float ClientDataRef::valueFloat() {
+    if(std::isnan(m_valueFloat))
+        m_valueFloat = value().toFloat();
+    return m_valueFloat;
 }
 
-double ClientDataRef::valueDouble() const
+double ClientDataRef::valueDouble()
 {
-    return std::isnan(m_valueDouble) ? value().toDouble() : m_valueDouble;
+    if(std::isnan(m_valueDouble))
+        m_valueDouble = value().toDouble();
+    return m_valueDouble;
 }
 
 ExtPlaneClient *ClientDataRef::client() const {
@@ -58,11 +66,20 @@ void ClientDataRef::setClient(ExtPlaneClient *client) {
     if(m_client) {
         connect(m_client, &ExtPlaneClient::destroyed, this, &ClientDataRef::clientDestroyed);
     }
+    invalidateValue();
     emit clientChanged(m_client);
 }
 
 void ClientDataRef::clientDestroyed() {
     setClient(nullptr);
+}
+
+void ClientDataRef::invalidateValue()
+{
+    // Invalidate value types
+    m_valueIntValid = false;
+    m_valueFloat = std::nanf("");
+    m_valueDouble = std::nan("");
 }
 
 void ClientDataRef::setDataFormat(QString dataFormat) {
@@ -86,6 +103,9 @@ void ClientDataRef::updateValue(QString newValue) {
         m_values.replace(0, newValue);
     }
     m_changedOnce = true;
+
+    invalidateValue();
+
     emit changed(this);
 }
 
@@ -93,22 +113,26 @@ void ClientDataRef::updateValue(QStringList &newValues) {
     if(m_changedOnce && newValues == m_values) return;
     m_values = newValues;
     m_changedOnce = true;
+    invalidateValue();
     emit changed(this);
 }
 
 void ClientDataRef::updateValue(int newValue)
 {
+    invalidateValue();
     m_valueInt = newValue;
     m_valueIntValid = true;
 }
 
 void ClientDataRef::updateValue(float newValue)
 {
+    invalidateValue();
     m_valueFloat = newValue;
 }
 
 void ClientDataRef::updateValue(double newValue)
 {
+    invalidateValue();
     m_valueDouble = newValue;
 }
 
@@ -116,6 +140,7 @@ void ClientDataRef::setValue(QString _newValue, int index) {
     while(m_values.size() < index + 1) // Resize list if needed
         m_values.append(QString(""));
     m_values[index] = _newValue;
+    invalidateValue();
     emit valueSet(this);
 }
 
@@ -123,6 +148,7 @@ void ClientDataRef::setValues(QStringList values)
 {
     if(values == m_values) return;
     m_values = values;
+    invalidateValue();
     emit valueSet(this);
 }
 

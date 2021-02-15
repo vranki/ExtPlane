@@ -41,9 +41,9 @@ public:
     QStringList& values(); // Returns all values
     double accuracy();
     QString value() const; // Returns first value
-    int valueInt() const;
-    float valueFloat() const;
-    double valueDouble() const;
+    int valueInt();
+    float valueFloat();
+    double valueDouble();
     ExtPlaneClient* client() const;
     void updateValue(QString newValue); // Update single value (from simulator)
     void updateValue(QStringList &newValues); // Update full array (from simulator)
@@ -80,6 +80,7 @@ private slots:
     void clientDestroyed();
 
 private:
+    void invalidateValue();
     QString m_name;
     QStringList m_values; // Length 1 if not array
     int m_valueInt = 0;

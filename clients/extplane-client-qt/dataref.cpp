@@ -78,7 +78,7 @@ QString DataRef::value() {
             if(!ok) {
                 if(m_clientDataRef->value().isEmpty()) return "";
 
-                qDebug() << Q_FUNC_INFO << "Warning: Ref " << name() << "scale factor is set, but can't convert value to double: " << m_clientDataRef->value();
+                qWarning() << Q_FUNC_INFO << "Warning: Ref " << name() << "scale factor is set, but can't convert value to double: " << m_clientDataRef->value();
                 return m_clientDataRef->value();
             }
             return QString::number(refValue);
