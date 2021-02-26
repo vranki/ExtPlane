@@ -9,7 +9,6 @@
 #include "../../protocoldefs.h"
 
 ExtPlaneConnection::ExtPlaneConnection(QObject *parent) : BasicTcpClient(parent) {
-    connect(this, &BasicTcpClient::connectedChanged, this, &ExtPlaneConnection::connectedChangedSlot);
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     connect(this, &BasicTcpClient::receivedLine, this, &ExtPlaneConnection::receivedLineSlot);
     connect(this, &BasicTcpClient::connectionChanged, this, &ExtPlaneConnection::connectionChangedSlot);
@@ -50,25 +49,22 @@ void ExtPlaneConnection::setUpdateInterval(double newInterval) {
     }
 }
 
-void ExtPlaneConnection::connectedChangedSlot(bool connected) {
-    if(connected) {
-        emit connectionMessage("Connected to ExtPlane, waiting for handshake");
-    } else {
-        emit connectionMessage("Socket disconnected");
-    }
-    emit connectedChanged(connected);
-}
-
 void ExtPlaneConnection::socketError(QAbstractSocket::SocketError err) {
     Q_UNUSED(err)
     emit connectionMessage(QString("Socket error: %1").arg(errorString()));
     INFO << "Socket error:" << errorString();
     server_ok = false;
+    emit connectedChanged(false);
     stopConnection();
 }
 
 void ExtPlaneConnection::registerClient(ExtPlaneClient* client) {
     clients.insert(client);
+}
+
+bool ExtPlaneConnection::isConnected() const
+{
+    return server_ok;
 }
 
 ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accuracy) {
@@ -128,6 +124,7 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
                 DEBUG << "Subscribing to ref" << refPair.second->name();
                 subRef(refPair.second);
             }
+            emit connectedChanged(true);
         }
         return;
     } else { // Handle updates

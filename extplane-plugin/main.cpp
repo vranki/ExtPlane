@@ -25,12 +25,7 @@ PLUGIN_API int XPluginStart(
     XPLMRegisterFlightLoopCallback(MyFlightLoopCallback, 0.01f, NULL);
     Q_ASSERT(!globalPlugin);
     globalPlugin = new XPlanePlugin();
-    if(globalPlugin) {
-        return globalPlugin->pluginStart(outName, outSig, outDesc);
-    } else {
-        INFO << "Unable to create plugin";
-        return 0;
-    }
+    return globalPlugin->pluginStart(outName, outSig, outDesc);
 }
 
 PLUGIN_API void XPluginStop() {
@@ -48,4 +43,13 @@ PLUGIN_API void XPluginDisable() {
 PLUGIN_API int XPluginEnable() {
     DEBUG;
     return 1;
+}
+
+PLUGIN_API void XPluginReceiveMessage(
+        XPLMPluginID inFromWho,
+        long inMessage,
+        void *inParam) {
+    Q_UNUSED(inFromWho)
+    Q_UNUSED(inMessage)
+    Q_UNUSED(inParam)
 }

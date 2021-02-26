@@ -24,7 +24,7 @@ public:
     explicit ExtPlaneConnection(QObject *parent = nullptr);
     virtual ~ExtPlaneConnection() {}
     void registerClient(ExtPlaneClient* client);
-
+    bool isConnected() const;
 signals:
     void connectionMessage(QString connectionMessage);
     void extplaneWarning(QString message);
@@ -49,7 +49,6 @@ public slots:
 
 private slots:
     void connectionChangedSlot();
-    void connectedChangedSlot(bool connected);
     void socketError(QAbstractSocket::SocketError err);
 
 protected:

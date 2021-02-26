@@ -167,7 +167,7 @@ QString ExtPlaneClient::connectionMessage() {
 
 bool ExtPlaneClient::isConnected() const
 {
-    return m_extplaneConnection.connected();
+    return m_extplaneConnection.isConnected();
 }
 
 bool ExtPlaneClient::isSimulated() const {
