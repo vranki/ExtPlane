@@ -49,27 +49,32 @@ ExtPlane will now send this ref in UDP packet every flight loop (usually
 
 Here is the spec for the data content and size in bytes for each part.
 
-"EXTP_" (5) - header string
-client_id (1, uint8) - client id, should be same as CLIENT-ID sent earlier
-int_count (2, uint16) - number of integer values to read
+* "EXTP_" (5) - header string
+* client_id (1, uint8) - client id, should be same as CLIENT-ID sent earlier
+* int_count (2, uint16) - number of integer values to read
 
 Repeated int_count times:
 
-ref_id (2, uint16) - ref id, same you got when subscribing
-value  (4, int32) - value of the int dataref
+* ref_id (2, uint16) - ref id, same you got when subscribing
+* value  (4, int32) - value of the int dataref
 
-"Ef" (2) - header for float data
-float_count (2, uint16) - number of float values to read
+Then:
 
-Repeated float_count times:
-
-ref_id (2, uint16) - ref id
-value  (4, float) - value of the float dataref
-
-"Ed" (2) - header for double data
-double_count (2, uint16) - number of double values to read
+* "Ef" (2) - header for float data
+* float_count (2, uint16) - number of float values to read
 
 Repeated float_count times:
 
-ref_id (2, uint16) - ref id
-value  (8, double) - value of the double dataref
+* ref_id (2, uint16) - ref id
+* value  (4, float) - value of the float dataref
+
+Then:
+
+* "Ed" (2) - header for double data
+* double_count (2, uint16) - number of double values to read
+
+Repeated double_count times:
+
+* ref_id (2, uint16) - ref id
+* value  (8, double) - value of the double dataref
+
