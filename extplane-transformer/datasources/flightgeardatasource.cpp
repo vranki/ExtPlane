@@ -79,7 +79,9 @@ void FlightGearDataSource::command(QString &name, extplaneCommandType type)
 {}
 
 bool FlightGearDataSource::loadSituation(QString sitFileLocation)
-{}
+{
+    return false;
+}
 
 void FlightGearDataSource::addFMSEntryLatLon(QString fmsEntryLine)
 {}

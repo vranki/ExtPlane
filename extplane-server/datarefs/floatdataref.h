@@ -12,7 +12,7 @@ public:
     virtual QString valueString();
     void setValue(QString & newValue);
 private:
-    float _value;
+    float _value = -999999.0f;
 };
 
 #endif // FLOATDATAREF_H

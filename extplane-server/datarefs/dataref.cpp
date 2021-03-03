@@ -2,15 +2,8 @@
 #include "../util/console.h"
 
 DataRef::DataRef(QObject *parent, const QString &name, void *ref) : QObject(parent)
-  , _typeString("?")
-  , _type(extplaneRefTypeUnknown)
   , _ref(ref)
-  , _accuracy(0)
-  , _valueValid(false)
   , _name(name)
-  , _subscriberCount(0)
-  , _writable(false)
-  , _unsubscribeAfterChange(false)
 {
     if(name.contains(":")) {
         QString modifiersPart = name.right(name.length() - name.indexOf(":") - 1);

@@ -27,6 +27,8 @@ public:
     float flightLoop(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
     int pluginStart(char * outName, char * outSig, char *outDesc);
     void pluginStop();
+    int pluginEnable();
+    void pluginDisable();
 
 public: // DataRefProvider implementation
     virtual DataRef *subscribeRef(QString &name);
@@ -53,13 +55,13 @@ private:
     QString refNameWithoutModifiers(QString &original);
 
     std::set<DataRef*> m_refs;
-    int argc; // Fake argc and argv for QCoreApplication
-    char *argv;
-    QCoreApplication *m_app; // For Qt main loop
-    TcpServer *m_server;
-    float m_flightLoopInterval; // Delay between loop calls (in seconds)
-    int m_menu_container_idx;
-    XPLMMenuID m_menu_id; // ExtPlane menus
+    int argc = 0; // Fake argc and argv for QCoreApplication
+    char *argv = nullptr;
+    QCoreApplication *m_app = nullptr; // For Qt main loop
+    TcpServer *m_server = nullptr;
+    float m_flightLoopInterval = -1; // Delay between loop calls (in seconds)
+    int m_menu_container_idx = -1;
+    XPLMMenuID m_menu_id = nullptr; // ExtPlane menus
 };
 
 #endif // XPLANEPLUGIN_H

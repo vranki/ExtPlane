@@ -5,8 +5,8 @@
 
 ExtPlaneUdpClient::ExtPlaneUdpClient(quint8 clientId, QObject *parent) : QObject(parent)
   , m_clientId(clientId)
-{
-    m_udpPort = UDP_OUT_PORT_BASE + m_clientId;
+  , m_udpPort(UDP_OUT_PORT_BASE + m_clientId)
+{    
     if(m_socket.bind(m_udpPort)) {
         connect(&m_socket, &QUdpSocket::readyRead, this, &ExtPlaneUdpClient::readPendingDatagrams);
         INFO << "UDP listener bound to port" << m_udpPort;
@@ -25,26 +25,26 @@ void ExtPlaneUdpClient::unsubscribedRef(ClientDataRef *ref) {
     m_idRefMap.erase(ref->udpId());
 }
 
-void ExtPlaneUdpClient::readPendingDatagrams()
-{
+void ExtPlaneUdpClient::readPendingDatagrams() {
     while(m_socket.hasPendingDatagrams()) {
         QNetworkDatagram dg = m_socket.receiveDatagram();
         processDatagram(dg);
     }
 }
 
-void ExtPlaneUdpClient::processDatagram(QNetworkDatagram &dg)
-{
+void ExtPlaneUdpClient::processDatagram(QNetworkDatagram &dg) {
     QByteArray data = dg.data();
     QDataStream s(&data, QIODevice::ReadOnly);
     if(!data.startsWith("EXTP_")) {
-        qWarning() << Q_FUNC_INFO << "Wrong header, not extplane packet??";
+        qWarning() << Q_FUNC_INFO << "Wrong header, non extplane packet sen to port" << m_udpPort;
         return;
     }
     s.skipRawData(5);
+
     quint8 clientid;
     quint16 id;
     quint16 dataCount;
+
     s >> clientid;
     if(m_clientId && (clientid != m_clientId)) {
         // Packet meant for another client, ignore
@@ -64,10 +64,10 @@ void ExtPlaneUdpClient::processDatagram(QNetworkDatagram &dg)
         }
     }
     s.skipRawData(2);
-    dataCount = 0;
     s >> dataCount;
     for(unsigned int i=0;i<dataCount;i++) {
         float data;
+        s.setFloatingPointPrecision(QDataStream::SinglePrecision);
         s >> id >> data;
         auto ref = m_idRefMap[id];
         if(id) {
@@ -79,10 +79,10 @@ void ExtPlaneUdpClient::processDatagram(QNetworkDatagram &dg)
         }
     }
     s.skipRawData(2);
-    dataCount = 0;
     s >> dataCount;
     for(unsigned int i=0;i<dataCount;i++) {
         double data;
+        s.setFloatingPointPrecision(QDataStream::DoublePrecision);
         s >> id >> data;
         auto ref = m_idRefMap[id];
         if(id) {

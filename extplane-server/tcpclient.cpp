@@ -46,7 +46,7 @@ void TcpClient::socketError(QAbstractSocket::SocketError err) {
 }
 
 void TcpClient::disconnectClient() {
-    INFO << Q_FUNC_INFO << this << m_subscribedRefs.size();
+    // INFO << Q_FUNC_INFO << this << m_clientId << m_subscribedRefs.size();
     while(!m_subscribedRefs.empty()) {
         DataRef *ref = *m_subscribedRefs.begin();
         m_subscribedRefs.erase(ref);
@@ -139,18 +139,17 @@ void TcpClient::readClient() {
                 // ref can be null now!
                 if(ref && ref->isValid()) {
                     sendRef(ref); // Force update
-
-                    // Send UDP info
-                    if(ref->modifiers().contains("udp")) {
-                        if(!m_udpSender) {
-                            m_udpSender = new UdpSender(m_refProvider, m_socket->peerAddress(), m_clientId, this);
-                        }
-                        if(!ref->udpId()) {
-                            ref->setUdpId(m_tcpserver->reserveUdpId());
-                        }
-                        m_udpSender->subscribedRef(ref);
-                        sendUdpInfo(ref);
+                }
+                // Send UDP info
+                if(ref && ref->modifiers().contains("udp")) {
+                    if(!m_udpSender) {
+                        m_udpSender = new UdpSender(m_refProvider, m_socket->peerAddress(), m_clientId, this);
                     }
+                    if(!ref->udpId()) {
+                        ref->setUdpId(m_tcpserver->reserveUdpId());
+                    }
+                    m_udpSender->subscribedRef(ref);
+                    sendUdpInfo(ref);
                 }
                 if(command == "get" && ref) ref->setUnsubscribeAfterChange();
             } else {
@@ -280,12 +279,15 @@ void TcpClient::refChanged(DataRef *ref) {
     Q_ASSERT(m_subscribedRefs.find(ref) != m_subscribedRefs.end());
     Q_ASSERT(ref->isValid()); // Never send invalid values.
 
+    if(ref->udpId()) return; // Handled by UDP
+
     // Check if the ref has changed enough to be worth sending
     if(ref->type()== extplaneRefTypeFloat) {
         FloatDataRef *refF = qobject_cast<FloatDataRef*>(ref);
-        if(qAbs(refF->value() - m_refValueF[ref]) < ref->accuracy())
+        auto val = refF->value();
+        if(qAbs(val - m_refValueF[ref]) < ref->accuracy())
             return; // Hasn't changed enough
-        m_refValueF.insert({ref, refF->value()});
+        m_refValueF[ref] =  val;
     } else if(ref->type()== extplaneRefTypeFloatArray) {
         FloatArrayDataRef *refF = qobject_cast<FloatArrayDataRef*>(ref);
         bool bigenough = false;
@@ -327,7 +329,7 @@ void TcpClient::refChanged(DataRef *ref) {
                 }
             }
             if (bigenough){ // Values have changed enough
-                m_refValueIA.insert({ref, values});
+                m_refValueIA[ref] = values;
             } else {
                 return;
             }
@@ -336,25 +338,24 @@ void TcpClient::refChanged(DataRef *ref) {
         IntDataRef *refI = qobject_cast<IntDataRef*>(ref);
         if(qAbs(refI->value() - m_refValueI.at(ref)) < ref->accuracy())
             return; // Hasn't changed enough
-        m_refValueI.insert({ref, refI->value()});
+        m_refValueI[ref] = refI->value();
     } else if(ref->type() == extplaneRefTypeDouble) {
         DoubleDataRef *refD = qobject_cast<DoubleDataRef*>(ref);
         if(qAbs(refD->value() - m_refValueD.at(ref)) < ref->accuracy())
             return; // Hasn't changed enough
-        m_refValueD.insert({ref, refD->value()});
+        m_refValueD[ref] = refD->value();
     } else if(ref->type() == extplaneRefTypeData) {
         // The accuracy is handled internally for the data dataref, when it emits the update signal
         // it's time to send the update...
         DataDataRef *refB = qobject_cast<DataDataRef*>(ref);
-        m_refValueB.insert({ref, refB->value()});
+        m_refValueB[ref] = refB->value();
     } else {
         extplaneWarning(QString("Ref type %1 not supported (this should not happen!)").arg(ref->type()));
         return;
     }
 
     // Send the ref value if we got this far..
-    if(!ref->udpId())
-        sendRef(ref);
+    sendRef(ref);
 
     if(ref->shouldUnsubscribeAfterChange())
         unsubscribeRef(ref->name());

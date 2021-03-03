@@ -70,14 +70,14 @@ bool ExtPlaneConnection::isConnected() const
 ClientDataRef *ExtPlaneConnection::subscribeDataRef(QString name, double accuracy) {
     ClientDataRef *ref = dataRefs[name];
     if(ref) {
-        DEBUG << QString("Ref %1 already subscribed %2 times").arg(name).arg(ref->subscribers());
+        // DEBUG << QString("Ref %1 already subscribed %2 times").arg(name).arg(ref->subscribers());
         ref->setSubscribers(ref->subscribers()+1);
         if(accuracy < ref->accuracy()) {
             if(server_ok)
                 subRef(ref); // Re-subscribe with higher accuracy
         }
     } else {
-        DEBUG << QString("Subscribing to new ref %1").arg(name);
+        // DEBUG << "Subscribing to new ref" << name << "accuracy" << accuracy;
         ref = createDataRef(name, accuracy);
 
         dataRefs[ref->name()] = ref;
@@ -97,7 +97,6 @@ ClientDataRef *ExtPlaneConnection::createDataRef(QString name, double accuracy) 
 }
 
 void ExtPlaneConnection::unsubscribeDataRef(ClientDataRef *ref) {
-    qDebug() << Q_FUNC_INFO << ref->name();
     if(m_udpClient)
         m_udpClient->unsubscribedRef(ref);
 
@@ -117,11 +116,11 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
         if(line=="EXTPLANE 1") {
             server_ok = true;
             emit connectionMessage(QString("Connected to ExtPlane at %1:%2").arg(hostName()).arg(port()));
-            DEBUG << "Setting update interval to " << m_updateInterval;
+            // DEBUG << "Setting update interval to " << m_updateInterval;
             setUpdateInterval(m_updateInterval);
             // Sub all refs
             for(auto &refPair : dataRefs) {
-                DEBUG << "Subscribing to ref" << refPair.second->name();
+                // DEBUG << "Subscribing to ref" << refPair.second->name();
                 subRef(refPair.second);
             }
             emit connectedChanged(true);
@@ -154,7 +153,7 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
                             m_udpClient = new ExtPlaneUdpClient(m_clientId, this);
                         }
                         m_udpClient->subscribedRef(ref);
-                        INFO << "Tracking ref via UDP" << cmd.value(3) << id;
+                        // INFO << "Tracking ref via UDP" << cmd.value(3) << id;
                     } else {
                         INFO << "Can't find dataref" << cmd.value(3);
                     }
@@ -212,14 +211,14 @@ void ExtPlaneConnection::subRef(ClientDataRef *ref) {
     writeLine(subLine);
 }
 
-void ExtPlaneConnection::writeLine(QString line) {
+void ExtPlaneConnection::writeLine(const QString &line) {
     if(!server_ok) {
         emit connectionMessage(QString("Connection not ok! Tried to write %1").arg(line));
         DEBUG << "Connection not ok! Tried to write" << line;
         return;
     }
-    line +="\n";
     write(line.toUtf8());
+    write("\n");
 }
 
 void ExtPlaneConnection::keyPress(int id) {
@@ -253,7 +252,12 @@ void ExtPlaneConnection::commandEnd(QString name) {
 }
 
 void ExtPlaneConnection::setValue(QString name, QString value) {
-    QString line = "set " + name + " " + value;
+    if(value.isEmpty()) {
+        DEBUG << "Trying to set empty value for ref" << name;
+        return;
+    }
+
+    QString line = QString("set %1 %2").arg(name, value);
     writeLine(line);
 }
 

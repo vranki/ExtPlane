@@ -2,7 +2,6 @@
 #include "../util/console.h"
 
 FloatDataRef::FloatDataRef(QObject *parent, QString &name, void *ref) : DataRef(parent, name, ref)
-  , _value(-999999.0f)
 {
     _type = extplaneRefTypeFloat;
     _typeString = "f";

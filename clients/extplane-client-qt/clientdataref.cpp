@@ -29,8 +29,11 @@ void ClientDataRef::setName(QString &name) {
     emit nameChanged(m_name);
 }
 
-QString ClientDataRef::value() const {
-    return m_values.isEmpty() ? "" : m_values.first();
+QString ClientDataRef::value() {
+    if(m_values.isEmpty()) {
+        m_values.append(valueString());
+    }
+    return m_values.first();
 }
 
 int ClientDataRef::valueInt()
@@ -74,12 +77,22 @@ void ClientDataRef::clientDestroyed() {
     setClient(nullptr);
 }
 
+QString ClientDataRef::valueString()
+{
+    if(m_valueIntValid) return QString::number(m_valueInt);
+    if(!qIsNaN(m_valueFloat)) return QString::number(m_valueFloat);
+    if(!qIsNaN(m_valueDouble)) return QString::number(m_valueDouble);
+    // qDebug() << Q_FUNC_INFO << "No value set for" << name();
+    return "";
+}
+
 void ClientDataRef::invalidateValue()
 {
     // Invalidate value types
     m_valueIntValid = false;
     m_valueFloat = std::nanf("");
     m_valueDouble = std::nan("");
+    m_values.clear();
 }
 
 void ClientDataRef::setDataFormat(QString dataFormat) {
@@ -95,25 +108,19 @@ QStringList& ClientDataRef::values() {
 }
 
 void ClientDataRef::updateValue(QString newValue) {
-    if(m_changedOnce && !m_values.isEmpty() && newValue == m_values.first()) return;
+    invalidateValue();
 
     if(m_values.isEmpty()) {
         m_values.push_back(newValue);
     } else {
         m_values.replace(0, newValue);
     }
-    m_changedOnce = true;
-
-    invalidateValue();
-
     emit changed(this);
 }
 
 void ClientDataRef::updateValue(QStringList &newValues) {
-    if(m_changedOnce && newValues == m_values) return;
-    m_values = newValues;
-    m_changedOnce = true;
     invalidateValue();
+    m_values = newValues;
     emit changed(this);
 }
 
@@ -122,25 +129,30 @@ void ClientDataRef::updateValue(int newValue)
     invalidateValue();
     m_valueInt = newValue;
     m_valueIntValid = true;
+    emit changed(this);
 }
 
 void ClientDataRef::updateValue(float newValue)
 {
     invalidateValue();
     m_valueFloat = newValue;
+    emit changed(this);
 }
 
 void ClientDataRef::updateValue(double newValue)
 {
     invalidateValue();
     m_valueDouble = newValue;
+    emit changed(this);
 }
 
 void ClientDataRef::setValue(QString _newValue, int index) {
+    if(m_values.size() <= 1)
+        invalidateValue();
+
     while(m_values.size() < index + 1) // Resize list if needed
         m_values.append(QString(""));
     m_values[index] = _newValue;
-    invalidateValue();
     emit valueSet(this);
 }
 

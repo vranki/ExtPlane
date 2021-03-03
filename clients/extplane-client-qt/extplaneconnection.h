@@ -53,7 +53,7 @@ private slots:
 
 protected:
     void subRef(ClientDataRef *ref);
-    virtual void writeLine(QString line);
+    virtual void writeLine(const QString &line);
     virtual ClientDataRef *createDataRef(QString newName, double accuracy = 0);
     std::set<ExtPlaneClient*> clients;
     std::map<QString, ClientDataRef*> dataRefs;

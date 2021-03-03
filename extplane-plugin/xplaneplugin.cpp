@@ -13,14 +13,7 @@
 #include <cstring>
 #include <XPLMUtilities.h>
 
-XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent)
-                                              , argc(0)
-                                              , argv(nullptr)
-                                              , m_app(nullptr)
-                                              , m_server(nullptr)
-                                              , m_flightLoopInterval(-1) // Default to every flight loop
-                                              , m_menu_container_idx(0)
-{ }
+XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent) { }
 
 XPlanePlugin::~XPlanePlugin() { }
 
@@ -47,63 +40,11 @@ int XPlanePlugin::pluginStart(char * outName, char * outSig, char *outDesc) {
     std::strcpy(outSig, "org.vranki.extplaneplugin");
     std::strcpy(outDesc, "Read and write X-Plane datarefs from external programs on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR);
 
-    m_menu_container_idx = XPLMAppendMenuItem(XPLMFindPluginsMenu(), "ExtPlane", nullptr, 0);
-    m_menu_id = XPLMCreateMenu("ExtPlane", XPLMFindPluginsMenu(), m_menu_container_idx, nullptr, nullptr);
-    XPLMAppendMenuItem(m_menu_id, "Listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR ". No GUI yet.", nullptr, 1);
-
+    Q_ASSERT(!m_app);
     // Init application and server
     m_app = new QCoreApplication(argc, &argv);
     setlocale(LC_NUMERIC, "C"); // See http://stackoverflow.com/questions/25661295/why-does-qcoreapplication-call-setlocalelc-all-by-default-on-unix-linux
 
-    m_server = new TcpServer(this, this);
-    connect(m_server, &TcpServer::setFlightLoopInterval, this, &XPlanePlugin::setFlightLoopInterval);
-
-    // Log that we have started
-    XPLMDebugString ("ExtPlane listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR "\n");
-
-    // Register the nav custom data accessors
-    XPLMRegisterDataAccessor("extplane/navdata/5km",
-                             xplmType_Data,                                 // The types we support
-                             0,                                             // Writable
-                             nullptr, nullptr,                                    // Integer accessors
-                             nullptr, nullptr,                                    // Float accessors
-                             nullptr, nullptr,                                    // Doubles accessors
-                             nullptr, nullptr,                                    // Int array accessors
-                             nullptr, nullptr,                                    // Float array accessors
-                             NavCustomData::DataCallback_5km, nullptr,         // Raw data accessors
-                             nullptr, nullptr);                                   // Refcons not used
-    XPLMRegisterDataAccessor("extplane/navdata/20km",
-                             xplmType_Data,                                 // The types we support
-                             0,                                             // Writable
-                             nullptr, nullptr,                                    // Integer accessors
-                             nullptr, nullptr,                                    // Float accessors
-                             nullptr, nullptr,                                    // Doubles accessors
-                             nullptr, nullptr,                                    // Int array accessors
-                             nullptr, nullptr,                                    // Float array accessors
-                             NavCustomData::DataCallback_20km, nullptr,        // Raw data accessors
-                             nullptr, nullptr);                                   // Refcons not used
-    XPLMRegisterDataAccessor("extplane/navdata/100km",
-                             xplmType_Data,                                 // The types we support
-                             0,                                             // Writable
-                             nullptr, nullptr,                                    // Integer accessors
-                             nullptr, nullptr,                                    // Float accessors
-                             nullptr, nullptr,                                    // Doubles accessors
-                             nullptr, nullptr,                                    // Int array accessors
-                             nullptr, nullptr,                                    // Float array accessors
-                             NavCustomData::DataCallback_100km, nullptr,       // Raw data accessors
-                             nullptr, nullptr);                                   // Refcons not used
-    XPLMRegisterDataAccessor("extplane/atc/124thatc/latest",
-                             xplmType_Data,                                 // The types we support
-                             0,                                             // Writable
-                             nullptr, nullptr,                                    // Integer accessors
-                             nullptr, nullptr,                                    // Float accessors
-                             nullptr, nullptr,                                    // Doubles accessors
-                             nullptr, nullptr,                                    // Int array accessors
-                             nullptr, nullptr,                                    // Float array accessors
-                             ATCCustomData::DataCallback, nullptr,             // Raw data accessors
-                             nullptr, nullptr);
-
-    m_app->processEvents();
     return 1;
 }
 
@@ -324,12 +265,8 @@ void XPlanePlugin::command(QString &name, extplaneCommandType type)
 }
 
 void XPlanePlugin::setFlightLoopInterval(float newInterval) {
-    if(newInterval > 0) {
-        m_flightLoopInterval = newInterval;
-        DEBUG << "New interval" << m_flightLoopInterval;
-    } else {
-        m_server->extplaneWarning(QString("Invalid interval %1").arg(newInterval));
-    }
+    m_flightLoopInterval = newInterval;
+    DEBUG << "New interval" << m_flightLoopInterval;
 }
 
 QString XPlanePlugin::refNameWithoutModifiers(QString &original) {
@@ -394,15 +331,75 @@ void XPlanePlugin::setDestinationFmsEntry(int index) {
 
 void XPlanePlugin::pluginStop() {
     DEBUG;
-    XPLMDestroyMenu(m_menu_id);
-    m_app->processEvents();
-    m_server->disconnectClients();
-    delete m_server;
-    m_server = nullptr;
-    m_app->quit();
-    m_app->processEvents();
+    Q_ASSERT(m_app);
     delete m_app;
     m_app = nullptr;
-    qDeleteAll(m_refs);
-    m_refs.clear();
+}
+
+int XPlanePlugin::pluginEnable() {
+    m_menu_container_idx = XPLMAppendMenuItem(XPLMFindPluginsMenu(), "ExtPlane", nullptr, 0);
+    m_menu_id = XPLMCreateMenu("ExtPlane", XPLMFindPluginsMenu(), m_menu_container_idx, nullptr, nullptr);
+    XPLMAppendMenuItem(m_menu_id, "Listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR ". No GUI yet.", nullptr, 1);
+
+    Q_ASSERT(!m_server);
+    m_server = new TcpServer(this, this);
+    connect(m_server, &TcpServer::setFlightLoopInterval, this, &XPlanePlugin::setFlightLoopInterval);
+
+    // Log that we have started
+    XPLMDebugString ("ExtPlane listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR "\n");
+
+    // Register the nav custom data accessors
+    XPLMRegisterDataAccessor("extplane/navdata/5km",
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             NavCustomData::DataCallback_5km, nullptr,         // Raw data accessors
+                             nullptr, nullptr);                                   // Refcons not used
+    XPLMRegisterDataAccessor("extplane/navdata/20km",
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             NavCustomData::DataCallback_20km, nullptr,        // Raw data accessors
+                             nullptr, nullptr);                                   // Refcons not used
+    XPLMRegisterDataAccessor("extplane/navdata/100km",
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             NavCustomData::DataCallback_100km, nullptr,       // Raw data accessors
+                             nullptr, nullptr);                                   // Refcons not used
+    XPLMRegisterDataAccessor("extplane/atc/124thatc/latest",
+                             xplmType_Data,                                 // The types we support
+                             0,                                             // Writable
+                             nullptr, nullptr,                                    // Integer accessors
+                             nullptr, nullptr,                                    // Float accessors
+                             nullptr, nullptr,                                    // Doubles accessors
+                             nullptr, nullptr,                                    // Int array accessors
+                             nullptr, nullptr,                                    // Float array accessors
+                             ATCCustomData::DataCallback, nullptr,             // Raw data accessors
+                             nullptr, nullptr);
+    return 1;
+}
+
+void XPlanePlugin::pluginDisable() {
+    XPLMRemoveMenuItem(XPLMFindPluginsMenu(), m_menu_container_idx);
+    m_menu_container_idx = -1;
+    XPLMDestroyMenu(m_menu_id);
+    m_menu_id = nullptr;
+    if(m_server)
+        m_server->disconnectClients();
+    delete m_server;
+    Q_ASSERT(m_refs.empty());
+    m_server = nullptr;
 }

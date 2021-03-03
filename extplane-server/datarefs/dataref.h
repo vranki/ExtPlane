@@ -52,18 +52,18 @@ signals:
 protected:
     void setValueValid(); // Call this to mark the value valid.
 
-    QString _typeString;
-    extplaneRefID _type;
-    void* _ref;
-    double _accuracy;
-    bool _valueValid;
+    QString _typeString = "?";
+    extplaneRefID _type = extplaneRefTypeUnknown;
+    void* _ref = nullptr;
+    double _accuracy = 0;
+    bool _valueValid = false;
 
 private:
     QString _name;
     QStringList _modifiers;
-    int _subscriberCount;
-    bool _writable;
-    bool _unsubscribeAfterChange;
+    int _subscriberCount = 0;
+    bool _writable = false;
+    bool _unsubscribeAfterChange = false;
     quint16 _udpId = 0; // UDP id, global for all clients
 };
 

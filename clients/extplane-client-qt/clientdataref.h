@@ -40,7 +40,7 @@ public:
     QString& name();
     QStringList& values(); // Returns all values
     double accuracy();
-    QString value() const; // Returns first value
+    QString value(); // Returns first value
     int valueInt();
     float valueFloat();
     double valueDouble();
@@ -80,6 +80,7 @@ private slots:
     void clientDestroyed();
 
 private:
+    QString valueString(); // Generate string from raw values, if possible
     void invalidateValue();
     QString m_name;
     QStringList m_values; // Length 1 if not array
@@ -91,7 +92,6 @@ private:
     int m_subscribers = 0;
     ExtPlaneClient* m_client = nullptr;
     QString m_dataFormat;
-    bool m_changedOnce = false; // False until first update sent.
     QStringList m_modifiers;
     quint16 m_udpId = 0;
 };

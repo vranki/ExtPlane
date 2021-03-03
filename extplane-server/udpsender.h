@@ -3,17 +3,10 @@
 
 #include <QObject>
 #include <QUdpSocket>
-#include <QDataStream>
 #include <set>
 
 class DataRef;
 class DataRefProvider;
-class FloatDataRef;
-class DoubleDataRef;
-class IntDataRef;
-
-#define UDP_PACKET_SIZE 508
-#define BUFFER_RESERVE 4096 // Size to resize empty buffers
 
 class UdpSender : public QObject
 {
@@ -28,19 +21,14 @@ private slots:
     void refChanged(DataRef *ref);
 
 private:
+    quint16 countRefs(int type);
     DataRefProvider *m_refProvider = nullptr;
 
     QUdpSocket m_socket;
     QHostAddress m_host;
     quint8 m_clientId = 0;
-
-    QByteArray m_bufInt;
-    quint16 m_countInt = 0;
-    QByteArray m_bufFloat;
-    quint16 m_countFloat = 0;
-    QByteArray m_bufDouble;
-    quint16 m_countDouble = 0;
     quint16 m_udpPort = 0;
+    std::set<DataRef *> m_changedRefs; // List of refs changed since last send
 };
 
 #endif // UDPSENDER_H

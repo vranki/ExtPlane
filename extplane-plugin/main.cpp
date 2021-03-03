@@ -38,11 +38,15 @@ PLUGIN_API void XPluginStop() {
 
 PLUGIN_API void XPluginDisable() {
     DEBUG;
+    if(globalPlugin)
+        globalPlugin->pluginDisable();
 }
 
 PLUGIN_API int XPluginEnable() {
     DEBUG;
-    return 1;
+    if(globalPlugin)
+        return globalPlugin->pluginEnable();
+    return 0;
 }
 
 PLUGIN_API void XPluginReceiveMessage(

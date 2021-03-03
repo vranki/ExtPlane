@@ -105,7 +105,9 @@ void CondorDatasource::buttonRelease(int buttonid) {}
 
 void CondorDatasource::command(QString &name, extplaneCommandType type) {}
 
-bool CondorDatasource::loadSituation(QString sitFileLocation) {}
+bool CondorDatasource::loadSituation(QString sitFileLocation) {
+    return false;
+}
 
 void CondorDatasource::addFMSEntryLatLon(QString fmsEntryLine)
 {}

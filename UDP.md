@@ -77,4 +77,3 @@ Repeated double_count times:
 
 * ref_id (2, uint16) - ref id
 * value  (8, double) - value of the double dataref
-

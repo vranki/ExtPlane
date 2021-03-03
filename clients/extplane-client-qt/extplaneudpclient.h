@@ -21,7 +21,7 @@ private:
     void dataReceived(quint16 id, QString value);
     QUdpSocket m_socket;
     std::map<quint16, ClientDataRef*> m_idRefMap;
-    quint8 m_clientId=0;
+    quint8 m_clientId = 0;
     quint16 m_udpPort = 0;
 };
 
