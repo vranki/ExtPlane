@@ -12,9 +12,6 @@
 #include <sstream>
 #include <fstream>
 
-/**
-  *
-  */
 class ATCCustomData : public QObject
 {
     Q_OBJECT
@@ -24,15 +21,11 @@ public:
     void updateData();
     QString getData(){ return _data; };
 
-signals:
-
-public slots:
-
 private:
     QString _data;
     std::ostringstream _gLogPath;
     std::ifstream _gLogFileIFS;
-    std::ios::streampos _gPos;
+    std::streampos _gPos;
 
 };
 

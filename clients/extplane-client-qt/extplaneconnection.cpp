@@ -130,7 +130,7 @@ void ExtPlaneConnection::receivedLineSlot(QString & line) {
         if(line.startsWith("EXTPLANE-WARNING")) {
             emit extplaneWarning(line.mid(17));
         } else {
-            QStringList cmd = line.split(" ", QString::SkipEmptyParts);
+            QStringList cmd = line.split(" ", Qt::SkipEmptyParts);
             if(cmd.size()>=2) { // Normally 3, but can be 2 if a data dataref updates to be empty
                 if(cmd.value(0)=="EXTPLANE-VERSION" && cmd.length() == 2) {
                     INFO << "Connected to ExtPlane version" << cmd.value(1);

@@ -5,7 +5,7 @@
 
 #include <QObject>
 #include <QByteArray>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QString>
 
 /**
@@ -32,7 +32,7 @@ public:
 private:
     QByteArray m_value; // Value of dataref is stored here once retrieved from XPLM
     QByteArray m_newValue; // Temp variable used while checking changes. Here to avoid resizing.
-    QTime m_lastUpdate; // Timer used for tracking the last update time
+    QElapsedTimer m_lastUpdate; // Timer used for tracking the last update time
 };
 
 #endif // DATADATAREF_H

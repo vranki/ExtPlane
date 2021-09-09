@@ -1,16 +1,16 @@
 #include "extplaneclienttypes.h"
-#include <QQmlEngine>
-#include <extplaneclient.h>
-#include <dataref.h>
-#include <clientdatarefprovider.h>
-#include <extplaneclient.h>
-#include <dataref.h>
-#include <extplaneconnection.h>
+#include "extplaneclient.h"
+#include "dataref.h"
+#include "clientdatarefprovider.h"
+#include "extplaneclient.h"
+#include "dataref.h"
+#include "extplaneconnection.h"
 #include <QQmlContext>
+#include <QQmlEngine>
 
 void ExtPlaneClientTypes::registerQmlTypes()
 {
-    qmlRegisterInterface<ClientDataRefProvider>("ClientDataRefProvider");
+    qmlRegisterInterface<ClientDataRefProvider>("ClientDataRefProvider"); // TODO: Figure out warning here
     qmlRegisterType<ExtPlaneClient>("org.vranki.extplane", 1, 0, "ExtPlaneClient");
     qmlRegisterType<DataRef>("org.vranki.extplane", 1, 0, "DataRef");
     qmlRegisterType<ExtPlaneConnection>("org.vranki.extplane", 1, 0, "ExtPlaneConnection");

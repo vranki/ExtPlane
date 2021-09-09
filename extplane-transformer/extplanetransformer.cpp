@@ -9,7 +9,6 @@ ExtplaneTransformer::ExtplaneTransformer() :
 {
     m_dataSources << "None" << "FlightGear" << "Condor";
     m_dataSourceName = m_dataSources.first(); // None
-    emit dataSourcesChanged(m_dataSources);
 }
 
 TcpServer *ExtplaneTransformer::tcpServer()

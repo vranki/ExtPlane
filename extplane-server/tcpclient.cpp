@@ -91,7 +91,7 @@ void TcpClient::readClient() {
         if(line.isEmpty()) break;
 
         // Split the command in strings
-        QStringList subLine = line.split(" ", QString::SkipEmptyParts);
+        QStringList subLine = line.split(" ", Qt::SkipEmptyParts);
         QString command = subLine.value(0);
         if(command == "disconnect") {
             DEBUG << "killing this client connection";

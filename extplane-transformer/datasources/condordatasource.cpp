@@ -36,7 +36,7 @@ void CondorDatasource::readPendingDatagrams() {
         QString data = QString::fromUtf8(datagram.data());
 
         QStringList lines = data.split("\r\n");
-        for(QString line : lines) {
+        for(QString &line : lines) {
             QStringList splitLine = line.split("=");
             if(splitLine.length() == 2) {
                 rxValue(splitLine[0], splitLine[1]);

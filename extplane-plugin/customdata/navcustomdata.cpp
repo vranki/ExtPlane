@@ -1,7 +1,7 @@
 #include "navcustomdata.h"
 
 #include <QList>
-#include <QTime>
+#include <QElapsedTimer>
 #include <qmath.h>
 #include <QDebug>
 #include <QThread>
@@ -27,7 +27,7 @@ NavCustomData::NavCustomData(QObject *parent) :
 
     // Init
     int total = 0;
-    QTime timer;
+    QElapsedTimer timer;
     timer.restart();
 
     // Loop through entire database
@@ -141,7 +141,7 @@ int NavCustomData::DataCallback_Common(void *inRefcon, void *outValue, int inOff
     if(outValue != NULL) {
 
         // Book-keeping
-        QTime timer;
+        QElapsedTimer timer;
         timer.restart();
 
         // Get current lat lon
