@@ -32,3 +32,19 @@ void IntDataRef::setValue(QString &newValue) {
         INFO << "Cannot set value " << newValue;
     }
 }
+
+size_t IntDataRef::dataSize()
+{
+    return 4;
+}
+
+void *IntDataRef::rawData()
+{
+    return static_cast<void*>(&_value);
+}
+
+void IntDataRef::fromRawData(void *ptr)
+{
+    int newValue = *static_cast<int*>(ptr);
+    updateValue(newValue);
+}

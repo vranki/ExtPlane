@@ -29,6 +29,9 @@ CONFIG   += console warn_on shared c++11
 CONFIG   -= app_bundle
 CONFIG   -= debug_and_release
 
+CONFIG += link_pkgconfig
+PKGCONFIG += libmosquittopp
+
 TEMPLATE = lib
 
 TARGET = extplane-plugin
@@ -119,10 +122,21 @@ SOURCES += main.cpp \
     $$PWD/../extplane-server/udpsender.cpp \
     customdata/navcustomdata.cpp \
     customdata/atccustomdata.cpp
+
 HEADERS += \
     xplaneplugin.h \
     $$PWD/../extplane-server/tcpclient.h \
     $$PWD/../extplane-server/tcpserver.h \
     $$PWD/../extplane-server/udpsender.h \
     customdata/navcustomdata.h \
-    customdata/atccustomdata.h \
+    customdata/atccustomdata.h
+
+CONFIG(mqtt) {
+    message(Building with MQTT support)
+    DEFINES += WITH_MQTT
+    SOURCES += $$PWD/../mqttpublisher/mqttpublisher.cpp \
+               $$PWD/../mqttpublisher/mqttclient.cpp
+    HEADERS += $$PWD/../mqttpublisher/mqttpublisher.h \
+               $$PWD/../mqttpublisher/mqttclient.h
+}
+
