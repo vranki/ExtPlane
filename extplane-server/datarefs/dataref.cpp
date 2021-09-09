@@ -85,6 +85,19 @@ quint16 DataRef::udpId()
     return _udpId;
 }
 
+size_t DataRef::dataSize()
+{
+    return 0;
+}
+
+void *DataRef::rawData() {
+    return nullptr;
+}
+
+void DataRef::fromRawData(void *ptr) {
+    Q_UNUSED(ptr);
+}
+
 void DataRef::setValueValid()
 {
     if(!_valueValid) {

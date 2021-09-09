@@ -33,3 +33,17 @@ void FloatDataRef::setValue(QString &newValue)
         INFO << "Cannot set value " << newValue;
     }
 }
+
+size_t FloatDataRef::dataSize() {
+    return 4;
+}
+
+void* FloatDataRef::rawData()
+{
+    return static_cast<void*>(&_value);
+}
+
+void FloatDataRef::fromRawData(void *ptr) {
+    float newValue = *static_cast<float*>(ptr);
+    updateValue(newValue);
+}

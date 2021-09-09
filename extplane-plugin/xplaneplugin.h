@@ -12,6 +12,7 @@
 #include <XPLMMenus.h>
 
 class DataRef;
+class MQTTPublisher;
 
 /**
   * The main X-Plane plugin class
@@ -59,6 +60,7 @@ private:
     char *argv = nullptr;
     QCoreApplication *m_app = nullptr; // For Qt main loop
     TcpServer *m_server = nullptr;
+    MQTTPublisher *m_mqttPublisher = nullptr;
     float m_flightLoopInterval = -1; // Delay between loop calls (in seconds)
     int m_menu_container_idx = -1;
     XPLMMenuID m_menu_id = nullptr; // ExtPlane menus

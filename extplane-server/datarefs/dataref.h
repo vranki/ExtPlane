@@ -46,6 +46,11 @@ public:
     bool isValid() const; // True if the value has been set initially. False if not.
     void setUdpId(quint16 id);
     quint16 udpId();
+    // Raw data processing - Use only for int, float and double refs for now.
+    virtual size_t dataSize(); // Number of bytes the value requires - eg float and int = 4, double 8, others return 0.
+    virtual void* rawData(); // Raw pointer to ref data. Null if not supported.
+    virtual void fromRawData(void *ptr); // Set ref value from raw pointer. Reads dataSize() bytes.
+
 signals:
     void changed(DataRef *ref); // Should not be emitted if value is not valid.
 

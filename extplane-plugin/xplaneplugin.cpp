@@ -13,6 +13,10 @@
 #include <cstring>
 #include <XPLMUtilities.h>
 
+#ifdef WITH_MQTT
+#include "../mqttpublisher/mqttpublisher.h"
+#endif
+
 XPlanePlugin::XPlanePlugin(QObject *parent) : QObject(parent) { }
 
 XPlanePlugin::~XPlanePlugin() { }
@@ -30,6 +34,11 @@ float XPlanePlugin::flightLoop(float inElapsedSinceLastCall,
     if(m_server) m_server->flightLoop();
     // Tell Qt to process it's own runloop
     m_app->processEvents();
+#ifdef WITH_MQTT
+    if(m_mqttPublisher) {
+        m_mqttPublisher->poll();
+    }
+#endif
     return m_flightLoopInterval;
 }
 
@@ -301,7 +310,7 @@ void XPlanePlugin::addFMSEntryLatLon(QString fmsEntryLine){
         return;
     }
 
-    QStringList params = fmsEntryLine.split(",", QString::SkipEmptyParts);
+    QStringList params = fmsEntryLine.split(",", Qt::SkipEmptyParts);
     int id = params.value(0).toInt();
     float lat = params.value(1).toFloat();
     float lon = params.value(2).toFloat();
@@ -337,10 +346,6 @@ void XPlanePlugin::pluginStop() {
 }
 
 int XPlanePlugin::pluginEnable() {
-    m_menu_container_idx = XPLMAppendMenuItem(XPLMFindPluginsMenu(), "ExtPlane", nullptr, 0);
-    m_menu_id = XPLMCreateMenu("ExtPlane", XPLMFindPluginsMenu(), m_menu_container_idx, nullptr, nullptr);
-    XPLMAppendMenuItem(m_menu_id, "Listening on TCP port " EXTPLANE_PORT_STR " with protocol " EXTPLANE_PROTOCOL_STR " version " EXTPLANE_VERSION_STR ". No GUI yet.", nullptr, 1);
-
     Q_ASSERT(!m_server);
     m_server = new TcpServer(this, this);
     connect(m_server, &TcpServer::setFlightLoopInterval, this, &XPlanePlugin::setFlightLoopInterval);
@@ -389,6 +394,15 @@ int XPlanePlugin::pluginEnable() {
                              nullptr, nullptr,                                    // Float array accessors
                              ATCCustomData::DataCallback, nullptr,             // Raw data accessors
                              nullptr, nullptr);
+#ifdef WITH_MQTT
+    m_mqttPublisher = new MQTTPublisher(this, this);
+    m_mqttPublisher->start();
+#endif
+    m_menu_container_idx = XPLMAppendMenuItem(XPLMFindPluginsMenu(), "ExtPlane", nullptr, 0);
+    m_menu_id = XPLMCreateMenu("ExtPlane", XPLMFindPluginsMenu(), m_menu_container_idx, nullptr, nullptr);
+    QString menuItem = QString("Listening on TCP port %1 with protocol %2 version %3. MQTT output %4. No GUI yet.").arg(EXTPLANE_PORT_STR).arg(EXTPLANE_PROTOCOL_STR).arg(EXTPLANE_VERSION_STR).arg(m_mqttPublisher ? "Enabled" : "Disabled");
+    XPLMAppendMenuItem(m_menu_id, qPrintable(menuItem), nullptr, 1);
+
     return 1;
 }
 
@@ -397,9 +411,19 @@ void XPlanePlugin::pluginDisable() {
     m_menu_container_idx = -1;
     XPLMDestroyMenu(m_menu_id);
     m_menu_id = nullptr;
+
+    if(m_mqttPublisher) {
+#ifdef WITH_MQTT
+        m_mqttPublisher->stop();
+        delete m_mqttPublisher;
+#endif
+        m_mqttPublisher = nullptr;
+    }
+
     if(m_server)
         m_server->disconnectClients();
     delete m_server;
+
     Q_ASSERT(m_refs.empty());
     m_server = nullptr;
 }

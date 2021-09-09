@@ -24,6 +24,7 @@ This will eventually be fixed.
 * Execute commands
 * Load situations
 * High-performance UDP option
+* MQTT protocol for easy integration to external systems such as Node Red
 * Free & open source under GPLv3
 * Client libraries available for Qt (c++), Java and C#
 
@@ -257,6 +258,12 @@ from simulator to client. Add modifier udp to ref name to request it in UDP.
 UDP datarefs are sent every flight loop using lightweight protocol.
 
 See [this file](UDP.md) for details.
+
+## MQTT output ##
+
+ExtPlane has experimental MQTT protocol support using [Mosquitto](https://mosquitto.org/) library.
+
+See [this file](MQTT.md) for details.
 
 ### Keys and Buttons ###
 
