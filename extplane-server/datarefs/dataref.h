@@ -18,6 +18,10 @@ enum {
     extplaneRefTypeData = 32
 };
 
+typedef struct {
+    int lower;
+    int upper;
+} indexPair;
 
 /**
   * Base class for DataRefs.

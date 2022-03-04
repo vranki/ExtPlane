@@ -210,13 +210,25 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
     case extplaneRefTypeFloatArray:
     {
         FloatArrayDataRef *faRef = qobject_cast<FloatArrayDataRef*>(ref);
-        XPLMSetDatavf(ref->ref(), faRef->valueArray(), 0, faRef->value().size());
+        while(!faRef->changedIndices.empty()) {
+            XPLMSetDatavf(ref->ref(), faRef->valueArray() + faRef->changedIndices.front().lower,
+             faRef->changedIndices.front().lower,
+             faRef->changedIndices.front().upper - faRef->changedIndices.front().lower + 1
+            );
+            faRef->changedIndices.pop_front();
+        }
         break;
     }
     case extplaneRefTypeIntArray:
     {
         IntArrayDataRef *iaRef = qobject_cast<IntArrayDataRef*>(ref);
-        XPLMSetDatavi(ref->ref(), iaRef->valueArray(), 0, iaRef->value().size());
+        while(!iaRef->changedIndices.empty()) {
+            XPLMSetDatavi(ref->ref(), iaRef->valueArray() + iaRef->changedIndices.front().lower,
+             iaRef->changedIndices.front().lower,
+             iaRef->changedIndices.front().upper - iaRef->changedIndices.front().lower + 1
+            );
+            iaRef->changedIndices.pop_front();
+        }
         break;
     }
     case extplaneRefTypeInt:

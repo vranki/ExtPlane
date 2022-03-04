@@ -11,6 +11,7 @@
 
 #include "dataref.h"
 #include <vector>
+#include <list>
 
 class FloatArrayDataRef : public DataRef {
     Q_OBJECT
@@ -19,6 +20,7 @@ public:
     FloatArrayDataRef(QObject *parent, QString name, void* ref);
     ~FloatArrayDataRef();
     std::vector<float> &value();
+    std::list<indexPair> changedIndices;
     virtual void updateValue();
     virtual QString valueString();
     virtual void setValue(QString &newValue);
