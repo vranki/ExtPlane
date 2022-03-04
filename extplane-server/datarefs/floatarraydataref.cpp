@@ -16,10 +16,12 @@ FloatArrayDataRef::FloatArrayDataRef(QObject *parent, QString name, void *ref) :
     _type = extplaneRefTypeFloatArray;
     _length = 0;
     _valueArray = nullptr;
+    changedIndices = new std::list<indexPair>;
 }
 
 FloatArrayDataRef::~FloatArrayDataRef() {
     if(_valueArray) delete [] _valueArray;
+    if(changedIndices) delete changedIndices;
 }
 
 std::vector<float> &FloatArrayDataRef::value() {
@@ -63,7 +65,7 @@ void FloatArrayDataRef::setValue(QString &newValue) {
         return;
     }
 
-    changedIndices.clear();
+    changedIndices->clear();
 
     // Remove [] and split values
     QString arrayString = newValue.mid(1, newValue.length() - 2);
@@ -78,13 +80,13 @@ void FloatArrayDataRef::setValue(QString &newValue) {
         float value = values[i].toFloat(&ok);
         if(ok) {
             _valueArray[i] = value;
-            if(changedIndices.empty() || changedIndices.back().upper != (i-1))
+            if(changedIndices->empty() || changedIndices->back().upper != (i-1))
             {
               indPair.lower = i;
               indPair.upper = i;
-              changedIndices.push_back(indPair);
+              changedIndices->push_back(indPair);
             } else {    
-              changedIndices.back().upper = i;
+              changedIndices->back().upper = i;
             }
         } else if(!values.at(i).isEmpty()) {
             INFO << "Invalid value " << values.at(i) << "in array";
