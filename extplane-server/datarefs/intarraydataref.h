@@ -4,6 +4,7 @@
 #include "dataref.h"
 #include <QObject>
 #include <vector>
+#include <list>
 
 class IntArrayDataRef : public DataRef {
     Q_OBJECT
