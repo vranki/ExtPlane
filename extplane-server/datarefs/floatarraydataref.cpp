@@ -31,7 +31,7 @@ std::vector<float> &FloatArrayDataRef::value() {
 // Copies values from valuearray to value list and emits changed as needed
 void FloatArrayDataRef::updateValue() {
     Q_ASSERT(_length > 0);
-    bool valuesChanged = false;   
+    bool valuesChanged = false;
     for(int i=0;i<_length;i++){
         if(_values.at(i) != _valueArray[i]) {
             _values[i] = _valueArray[i];
