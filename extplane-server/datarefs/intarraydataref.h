@@ -2,7 +2,6 @@
 #define IntArrayDataRef_H
 
 #include "dataref.h"
-#include <QObject>
 #include <vector>
 #include <list>
 
@@ -13,7 +12,7 @@ public:
     IntArrayDataRef(QObject *parent, QString name, void* ref);
     ~IntArrayDataRef();
     std::vector<int> &value();
-    std::list<indexPair>* changedIndices;
+    std::list<std::pair<int, int>> changedIndices;
     virtual void updateValue();
     virtual QString valueString();
     virtual void setValue(QString &newValue);

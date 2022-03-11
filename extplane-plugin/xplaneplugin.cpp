@@ -142,7 +142,7 @@ void XPlanePlugin::updateDataRef(DataRef *ref) {
     {
         IntArrayDataRef *iaRef = qobject_cast<IntArrayDataRef*>(ref);
         int arrayLength = iaRef->value().size();
-        if(arrayLength <= 0) {
+        if(arrayLength == 0) {
             arrayLength = XPLMGetDatavi(iaRef->ref(), nullptr, 0, 0);
             iaRef->setLength(arrayLength);
         }
@@ -210,12 +210,12 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
     case extplaneRefTypeFloatArray:
     {
         FloatArrayDataRef *faRef = qobject_cast<FloatArrayDataRef*>(ref);
-        while(!faRef->changedIndices->empty()) {
-            XPLMSetDatavf(ref->ref(), faRef->valueArray() + faRef->changedIndices->front().lower,
-             faRef->changedIndices->front().lower,
-             faRef->changedIndices->front().upper - faRef->changedIndices->front().lower + 1
+        while(!faRef->changedIndices.empty()) {
+            XPLMSetDatavf(ref->ref(), faRef->valueArray() + faRef->changedIndices.front().first,
+             faRef->changedIndices.front().first,
+             faRef->changedIndices.front().second - faRef->changedIndices.front().first + 1
             );
-            faRef->changedIndices->pop_front();
+            faRef->changedIndices.pop_front();
         }
         break;
     }
@@ -223,9 +223,9 @@ void XPlanePlugin::changeDataRef(DataRef *ref)
     {
         IntArrayDataRef *iaRef = qobject_cast<IntArrayDataRef*>(ref);
         while(!iaRef->changedIndices.empty()) {
-            XPLMSetDatavi(ref->ref(), iaRef->valueArray() + iaRef->changedIndices.front().lower,
-             iaRef->changedIndices.front().lower,
-             iaRef->changedIndices.front().upper - iaRef->changedIndices.front().lower + 1
+            XPLMSetDatavi(ref->ref(), iaRef->valueArray() + iaRef->changedIndices.front().first,
+             iaRef->changedIndices.front().first,
+             iaRef->changedIndices.front().second - iaRef->changedIndices.front().first + 1
             );
             iaRef->changedIndices.pop_front();
         }
