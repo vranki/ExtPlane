@@ -83,7 +83,7 @@ void IntArrayDataRef::setValue(QString &newValue) {
             INFO << "Invalid value " << values.at(i) << "in array";
         }
     }
-    emit changed(this);
+    updateValue();
 }
 
 void IntArrayDataRef::setLength(int newLength)
