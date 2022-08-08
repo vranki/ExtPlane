@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 
 CONFIG(mqtt) {
     SUBDIRS += mqttpublisher
+    message("Building with MQTT interface enabled")
 }
 
 SUBDIRS = extplane-server \
