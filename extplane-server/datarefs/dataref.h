@@ -18,7 +18,6 @@ enum {
     extplaneRefTypeData = 32
 };
 
-
 /**
   * Base class for DataRefs.
   */

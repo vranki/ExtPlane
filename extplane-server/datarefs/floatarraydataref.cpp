@@ -72,6 +72,12 @@ void FloatArrayDataRef::setValue(QString &newValue) {
         float value = values[i].toFloat(&ok);
         if(ok) {
             _valueArray[i] = value;
+            if(changedIndices.empty() || changedIndices.back().second != (i-1))
+            {
+              changedIndices.push_back(std::pair<int, int>(i, i));
+            } else {    
+              changedIndices.back().second = i;
+            }
         } else if(!values.at(i).isEmpty()) {
             INFO << "Invalid value " << values.at(i) << "in array";
         }

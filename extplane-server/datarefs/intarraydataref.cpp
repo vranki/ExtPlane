@@ -1,7 +1,7 @@
 #include "intarraydataref.h"
 #include "../../util/console.h"
-#include <QStringList>
 #include <algorithm>
+#include <QStringList>
 
 IntArrayDataRef::IntArrayDataRef(QObject *parent, QString name, void *ref) : DataRef(parent, name, ref) {
     _typeString = "ia";
@@ -18,7 +18,9 @@ std::vector<int> & IntArrayDataRef::value() {
     return _values;
 }
 
+// Copies values from valuearray to value list and emits changed as needed
 void IntArrayDataRef::updateValue() {
+    Q_ASSERT(_length > 0);
     bool valuesChanged = false;
     for(int i=0;i<_length;i++){
         if(_values.at(i) != _valueArray[i]) {
@@ -62,23 +64,30 @@ void IntArrayDataRef::setValue(QString &newValue) {
         int value = values[i].toInt(&ok);
         if(ok) {
             _valueArray[i] = value;
+            if(changedIndices.empty() || changedIndices.back().second != (i-1))
+            {
+              changedIndices.push_back(std::pair<int, int>(i, i));
+            } else {    
+              changedIndices.back().second = i;
+            }
         } else if(!values.at(i).isEmpty()) {
             INFO << "Invalid value " << values.at(i) << "in array";
         }
     }
-    emit changed(this);
+    updateValue();
 }
 
 void IntArrayDataRef::setLength(int newLength)
 {
-    Q_ASSERT(newLength > 0);
+    Q_ASSERT(newLength >= 0);
+    _values.resize(newLength);
     std::fill(_values.begin(), _values.end(), -9999);
     if(_valueArray) delete[] _valueArray;
     _valueArray = new int[newLength];
     _length = newLength;
 }
 
-int* IntArrayDataRef::valueArray()
+int *IntArrayDataRef::valueArray()
 {
     Q_ASSERT(_valueArray);
     return _valueArray;
