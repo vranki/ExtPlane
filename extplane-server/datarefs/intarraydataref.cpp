@@ -72,6 +72,7 @@ void IntArrayDataRef::setValue(QString &newValue) {
 void IntArrayDataRef::setLength(int newLength)
 {
     Q_ASSERT(newLength > 0);
+    _values.resize(newLength);
     std::fill(_values.begin(), _values.end(), -9999);
     if(_valueArray) delete[] _valueArray;
     _valueArray = new int[newLength];
